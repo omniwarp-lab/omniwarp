@@ -1,0 +1,4 @@
+packages:
+  - "omniwarp"
+allowBuilds:
+  esbuild: true
