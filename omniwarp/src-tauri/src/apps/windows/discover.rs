@@ -1,4 +1,4 @@
-use crate::apps::{AppInfo, Apps};
+use crate::apps::{AppInfo, AppKind, Apps};
 use windows::core::{Interface, Result, PWSTR};
 use windows::Win32::Foundation::PROPERTYKEY;
 use windows::Win32::Storage::EnhancedStorage::{PKEY_Link_Arguments, PKEY_Link_TargetParsingPath};
@@ -84,6 +84,7 @@ fn build_app(item: &IShellItem) -> Option<AppInfo> {
         target_path,
         args,
         icon_path: None,
+        kind: AppKind::App,
     })
 }
 
