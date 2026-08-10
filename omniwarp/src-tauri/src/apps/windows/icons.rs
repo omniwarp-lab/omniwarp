@@ -1,4 +1,6 @@
+use crate::apps::Apps;
 use std::collections::{HashMap, HashSet};
+use std::hash::{DefaultHasher, Hash, Hasher};
 use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
 use windows::core::{Interface, HSTRING, PCWSTR};
@@ -18,6 +20,34 @@ use windows::Win32::UI::Shell::{
 };
 
 const SIZE: u32 = 48;
+
+impl Apps {
+    pub fn cache_icons(&mut self, cache_dir: &Path) {
+        if std::fs::create_dir_all(cache_dir).is_err() {
+            return;
+        }
+
+        for app in self.apps.iter_mut() {
+            let icon_path = cache_dir.join(Self::icon_filename(&app.id));
+
+            if !icon_path.exists() {
+                if let Some(png_bytes) = icon(&app.id) {
+                    let _ = std::fs::write(&icon_path, png_bytes);
+                }
+            }
+
+            if icon_path.exists() {
+                app.icon_path = Some(icon_path.to_string_lossy().to_string());
+            }
+        }
+    }
+
+    fn icon_filename(id: &str) -> String {
+        let mut hasher = DefaultHasher::new();
+        id.hash(&mut hasher);
+        format!("{:x}_{}.png", hasher.finish(), SIZE)
+    }
+}
 
 fn icon(id: &str) -> Option<Vec<u8>> {
     if let Some(bytes) = icon_from_package(id, SIZE) {
