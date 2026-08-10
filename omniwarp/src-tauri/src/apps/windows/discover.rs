@@ -1,11 +1,13 @@
 use crate::apps::{AppInfo, Apps};
-use windows::core::{Result, PWSTR};
+use windows::core::{Interface, Result, PWSTR};
+use windows::Win32::Foundation::PROPERTYKEY;
+use windows::Win32::Storage::EnhancedStorage::{PKEY_Link_Arguments, PKEY_Link_TargetParsingPath};
 use windows::Win32::System::Com::{
     CoInitializeEx, CoTaskMemFree, CoUninitialize, COINIT_APARTMENTTHREADED,
 };
 use windows::Win32::UI::Shell::{
-    BHID_EnumItems, FOLDERID_AppsFolder, IEnumShellItems, IShellItem, SHGetKnownFolderItem,
-    KNOWN_FOLDER_FLAG, SIGDN_DESKTOPABSOLUTEPARSING, SIGDN_NORMALDISPLAY,
+    BHID_EnumItems, FOLDERID_AppsFolder, IEnumShellItems, IShellItem, IShellItem2,
+    SHGetKnownFolderItem, KNOWN_FOLDER_FLAG, SIGDN_DESKTOPABSOLUTEPARSING, SIGDN_NORMALDISPLAY,
 };
 
 struct ComGuard(bool);
@@ -72,9 +74,21 @@ fn build_app(item: &IShellItem) -> Option<AppInfo> {
     let id_p = unsafe { OwnedPwstr(item.GetDisplayName(SIGDN_DESKTOPABSOLUTEPARSING).ok()?) };
     let name_p = unsafe { OwnedPwstr(item.GetDisplayName(SIGDN_NORMALDISPLAY).ok()?) };
 
+    let item2: Option<IShellItem2> = item.cast().ok();
+    let target_path = item_string(item2.as_ref(), &PKEY_Link_TargetParsingPath);
+    let args = item_string(item2.as_ref(), &PKEY_Link_Arguments).unwrap_or_default();
+
     Some(AppInfo {
         name: name_p.into_string(),
         id: id_p.into_string(),
+        target_path,
+        args,
         icon_path: None,
     })
+}
+
+
+fn item_string(item2: Option<&IShellItem2>, key: &PROPERTYKEY) -> Option<String> {
+    let i2 = item2?;
+    unsafe { i2.GetString(key) }.ok().map(|p| OwnedPwstr(p).into_string())
 }
