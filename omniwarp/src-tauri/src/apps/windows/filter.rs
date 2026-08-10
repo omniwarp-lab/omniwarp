@@ -48,7 +48,7 @@ fn is_clsid(target: &str) -> bool {
     target.starts_with("::{")
 }
 
-fn is_game(target: &str) -> bool {
+pub fn is_game(target: &str) -> bool {
     const GAME_PLATFORM_SCHEMES: &[&str] = &[
         "steam",
         "com.epicgames.launcher",
