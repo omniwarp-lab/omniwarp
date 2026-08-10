@@ -1,1 +1,2 @@
 mod discover;
+mod icons;
