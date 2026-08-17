@@ -2,5 +2,6 @@
   "$schema": "https://turborepo.dev/schema.json",
   "tasks": {
     "tauri": { "cache": false, "persistent": true }
-  }
+  },
+  "envMode": "loose"
 }
