@@ -1,4 +1,5 @@
 use crate::apps::{AppInfo, AppKind, Apps};
+use std::collections::HashMap;
 use windows::core::{Interface, Result, PWSTR};
 use windows::Win32::Foundation::PROPERTYKEY;
 use windows::Win32::Storage::EnhancedStorage::{PKEY_Link_Arguments, PKEY_Link_TargetParsingPath};
@@ -66,7 +67,10 @@ impl Apps {
             }
         }
 
-        Ok(Self { apps })
+        Ok(Self {
+            apps,
+            index: HashMap::new(),
+        })
     }
 }
 
@@ -88,8 +92,9 @@ fn build_app(item: &IShellItem) -> Option<AppInfo> {
     })
 }
 
-
 fn item_string(item2: Option<&IShellItem2>, key: &PROPERTYKEY) -> Option<String> {
     let i2 = item2?;
-    unsafe { i2.GetString(key) }.ok().map(|p| OwnedPwstr(p).into_string())
+    unsafe { i2.GetString(key) }
+        .ok()
+        .map(|p| OwnedPwstr(p).into_string())
 }

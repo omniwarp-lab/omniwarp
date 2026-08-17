@@ -1,6 +1,24 @@
+use std::collections::HashMap;
+
 #[derive(Debug)]
 pub struct Apps {
     apps: Vec<AppInfo>,
+    index: HashMap<String, usize>,
+}
+
+impl Apps {
+    pub fn get(&self, id: &str) -> Option<&AppInfo> {
+        self.index.get(id).map(|&i| &self.apps[i])
+    }
+
+    pub fn build_index(&mut self) {
+        self.index = self
+            .apps
+            .iter()
+            .enumerate()
+            .map(|(i, a)| (a.id.clone(), i))
+            .collect();
+    }
 }
 
 #[derive(Debug)]
