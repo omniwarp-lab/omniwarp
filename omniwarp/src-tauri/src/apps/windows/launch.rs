@@ -1,4 +1,5 @@
 use crate::apps::{AppInfo, Apps};
+use std::borrow::Cow;
 use std::cell::RefCell;
 use windows::core::HSTRING;
 use windows::Win32::Foundation::HWND;
@@ -46,6 +47,7 @@ fn launch_uwp(aumid: &str) -> windows::core::Result<u32> {
 
 fn launch_via_shell(app: &AppInfo) {
     let target = app.target_path.as_deref().expect("no target_path");
+    let target = ensure_shell_uri_for_clsid(target);
 
     let args = match app.args.trim().is_empty() {
         true => "",
@@ -56,7 +58,7 @@ fn launch_via_shell(app: &AppInfo) {
         ShellExecuteW(
             Some(HWND::default()),
             &HSTRING::from("open"),
-            &HSTRING::from(target),
+            &HSTRING::from(target.as_ref()),
             &HSTRING::from(args),
             &HSTRING::from(""),
             SW_SHOWNORMAL,
@@ -68,5 +70,13 @@ fn launch_via_shell(app: &AppInfo) {
         eprintln!("ShellExecuteW failed: {code}");
     } else {
         eprintln!("spawned ok");
+    }
+}
+
+fn ensure_shell_uri_for_clsid(target: &str) -> Cow<'_, str> {
+    if target.starts_with("::{") {
+        Cow::Owned(format!("shell:{target}"))
+    } else {
+        Cow::Borrowed(target)
     }
 }
