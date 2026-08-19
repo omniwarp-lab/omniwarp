@@ -2512,6 +2512,7 @@ name = "omniwarp"
 version = "0.1.0"
 dependencies = [
  "image",
+ "parking_lot",
  "roxmltree",
  "serde",
  "serde_json",

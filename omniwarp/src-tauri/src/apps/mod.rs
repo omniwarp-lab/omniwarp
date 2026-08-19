@@ -1,8 +1,11 @@
+use serde::Serialize;
 use std::collections::HashMap;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
+#[serde(transparent)]
 pub struct Apps {
     apps: Vec<AppInfo>,
+    #[serde(skip)]
     index: HashMap<String, usize>,
 }
 
@@ -21,18 +24,22 @@ impl Apps {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub enum AppKind {
     App,
     Game,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct AppInfo {
     pub name: String,
     pub id: String,
     pub icon_path: Option<String>,
+    #[serde(skip)]
     pub target_path: Option<String>,
+    #[serde(skip)]
     pub args: String,
     pub kind: AppKind,
 }
