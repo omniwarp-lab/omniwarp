@@ -5,7 +5,6 @@ interface CommandItem {
   icon: string
   label: string
   subgroup: string
-  onSelect?: () => void
 }
 
 type CommandIcon = LucideIcon
