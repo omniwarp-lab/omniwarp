@@ -1,6 +1,6 @@
 import { discoverApps } from '@/features/apps/commands.ts'
-import { useCommandStore } from '@/features/commands/store.ts'
-import { appToCommandItem } from '@/features/commands/adapters.ts'
+import { useCommandStore } from '@/features/command-palette/store.ts'
+import { appToCommandItem } from '@/features/command-palette/adapters.ts'
 import { AppWindowIcon, Gamepad2Icon } from 'lucide-react'
 
 async function registerAppsGroup(): Promise<void> {

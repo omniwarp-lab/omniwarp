@@ -1,4 +1,4 @@
-import { CommandItem } from '@/features/commands/types.ts'
+import { CommandItem } from '@/features/command-palette/types.ts'
 import { AppInfo } from '@/features/apps/types.ts'
 
 function appToCommandItem(app: AppInfo): CommandItem {

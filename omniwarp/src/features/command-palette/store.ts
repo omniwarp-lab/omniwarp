@@ -1,5 +1,5 @@
 import { create } from 'zustand/react'
-import { CommandGroup } from '@/features/commands/types.ts'
+import { CommandGroup } from '@/features/command-palette/types.ts'
 
 interface CommandStore {
   groups: CommandGroup[]
