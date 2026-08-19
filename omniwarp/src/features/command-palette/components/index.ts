@@ -1,3 +1,5 @@
 export { CommandPalette } from './command-palette'
 export { CommandInput } from './command-input'
 export { CommandFooter } from './command-footer'
+export { CommandGroup } from './command-group'
+export { CommandItem } from './command-item'
