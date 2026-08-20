@@ -9,9 +9,11 @@ import { IconRenderer } from '@/features/command-palette/components/icon-rendere
 function CommandItem({
   item,
   fallbackIcon,
+  subgroup,
 }: {
   item: CommandItemType
   fallbackIcon: CommandIcon
+  subgroup: string
 }) {
   return (
     <CommandItemPrimitive
@@ -26,7 +28,7 @@ function CommandItem({
           {item.label}
         </span>
         <span className='truncate tracking-normall font-medium leading-tight text-muted-foreground'>
-          {item.subgroup}
+          {subgroup}
         </span>
       </span>
     </CommandItemPrimitive>

@@ -1,0 +1,17 @@
+{
+  "commandPalette": {
+    "placeholder": "…دستوری تایپ کنید یا جستجو کنید",
+    "groups": {
+      "apps": "برنامه\u200Cها",
+      "results": "نتایج"
+    },
+    "subgroups": {
+      "app": "برنامه",
+      "game": "بازی"
+    },
+    "hints": {
+      "open": "باز کردن",
+      "navigate": "پیمایش"
+    }
+  }
+}

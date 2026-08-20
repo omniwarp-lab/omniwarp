@@ -1,7 +1,10 @@
 import { Kbd } from '@/components/ui/kbd.tsx'
 import { ArrowUpDown, CornerDownLeft } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 function CommandFooter() {
+  const { t } = useTranslation()
+
   return (
     <footer className='flex h-10 shrink-0 items-center justify-between border-t border-border bg-muted/40 px-4 text-xs text-muted-foreground'>
       <span className='flex items-center gap-1.5 font-medium'>OmniWarp</span>
@@ -10,13 +13,13 @@ function CommandFooter() {
           <Kbd>
             <ArrowUpDown className='size-4' />
           </Kbd>{' '}
-          navigate
+          {t('commandPalette.hints.navigate')}
         </bdi>
         <bdi>
           <Kbd>
             <CornerDownLeft className='size-4' />
           </Kbd>{' '}
-          open
+          {t('commandPalette.hints.open')}
         </bdi>
       </div>
     </footer>

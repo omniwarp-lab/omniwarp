@@ -9,10 +9,12 @@ import { ScrollArea } from '@/components/ui/scroll-area.tsx'
 import { useCommandStore } from '@/features/command-palette/store.ts'
 import Fuse from 'fuse.js'
 import { useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 function CommandPalette() {
   const [query, setQuery] = useState('')
   const groups = useCommandStore((s) => s.groups)
+  const { t } = useTranslation()
 
   const flatItems = useMemo(
     () =>
@@ -46,23 +48,28 @@ function CommandPalette() {
       <ScrollArea className='min-h-0 flex-1 p-2'>
         <CommandList>
           {results ? (
-            <CommandGroup heading={'results'}>
+            <CommandGroup heading={t('commandPalette.groups.results')}>
               {results.map((item) => (
                 <CommandItem
                   key={item.id}
                   item={item}
                   fallbackIcon={item.fallbackIcon}
+                  subgroup={t(`commandPalette.subgroups.${item.subgroup}`)}
                 />
               ))}
             </CommandGroup>
           ) : (
             groups.map((group) => (
-              <CommandGroup key={group.key} heading={group.key}>
+              <CommandGroup
+                key={group.key}
+                heading={t(`commandPalette.groups.${group.key}`)}
+              >
                 {group.items.map((item) => (
                   <CommandItem
                     key={item.id}
                     item={item}
                     fallbackIcon={group.subgroupFallbackIcons[item.subgroup]}
+                    subgroup={t(`commandPalette.subgroups.${item.subgroup}`)}
                   />
                 ))}
               </CommandGroup>

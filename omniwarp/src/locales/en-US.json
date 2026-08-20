@@ -1,0 +1,17 @@
+{
+  "commandPalette": {
+    "placeholder": "Type a command or search…",
+    "groups": {
+      "apps": "Apps",
+      "results": "Results"
+    },
+    "subgroups": {
+      "app": "App",
+      "game": "Game"
+    },
+    "hints": {
+      "open": "Open",
+      "navigate": "Navigate"
+    }
+  }
+}
