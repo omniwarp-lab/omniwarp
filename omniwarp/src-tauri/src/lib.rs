@@ -2,6 +2,7 @@ use crate::apps::Apps;
 use parking_lot::Mutex;
 use std::sync::Arc;
 use tauri::tray::TrayIcon;
+use tauri::Manager;
 
 mod apps;
 mod commands;
@@ -29,6 +30,15 @@ pub fn run() {
         .setup(|app| {
             Tray::setup(app)?;
             Shortcuts::setup(app)?;
+
+            if let Some(window) = app.get_webview_window("main") {
+                let window_clone = window.clone();
+                window.on_window_event(move |event| {
+                    if let tauri::WindowEvent::Focused(false) = event {
+                        let _ = window_clone.hide();
+                    }
+                });
+            }
 
             Ok(())
         })

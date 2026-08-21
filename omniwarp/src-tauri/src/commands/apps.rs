@@ -32,7 +32,9 @@ pub fn discover_apps(
 }
 
 #[tauri::command]
-pub fn launch_app(state: tauri::State<AppState>, id: String) {
+pub fn launch_app(window: tauri::WebviewWindow, state: tauri::State<AppState>, id: String) {
+    let _ = window.hide();
+
     let guard = state.apps.lock();
     guard.as_ref().unwrap().launch(&id);
 }
