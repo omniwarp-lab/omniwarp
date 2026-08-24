@@ -1,7 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { CommandPalette } from '@/features/command-palette/components'
+import { useEffect } from 'react'
+import { runOnce } from '@/lib/run-once.ts'
+import { registerAppsGroup } from '@/features/command-palette/register.ts'
 
 function IndexComponent() {
+  useEffect(() => {
+    runOnce('apps', registerAppsGroup)
+  }, [])
+
   return <CommandPalette />
 }
 
