@@ -42,14 +42,42 @@ function CommandPalette() {
     return fuse.search(query).map((r) => r.item)
   }, [query, fuse])
 
+  type PaletteItem = (typeof flatItems)[number]
+
+  type Section = {
+    key: string
+    heading: string
+    items: PaletteItem[]
+  }
+
+  const sections = useMemo<Section[]>(() => {
+    if (results) {
+      return [
+        {
+          key: 'results',
+          heading: 'commandPalette.groups.results',
+          items: results,
+        },
+      ]
+    }
+    return groups.map((group) => ({
+      key: group.key,
+      heading: `commandPalette.groups.${group.key}`,
+      items: group.items.map((item) => ({
+        ...item,
+        fallbackIcon: group.subgroupFallbackIcons[item.subgroup],
+      })),
+    }))
+  }, [results, groups])
+
   return (
     <Command className='h-full flex flex-col' shouldFilter={false}>
       <CommandInput query={query} setQuery={setQuery} />
       <ScrollArea className='min-h-0 flex-1 p-2'>
         <CommandList>
-          {results ? (
-            <CommandGroup heading={t('commandPalette.groups.results')}>
-              {results.map((item) => (
+          {sections.map((section) => (
+            <CommandGroup key={section.key} heading={t(section.heading)}>
+              {section.items.map((item) => (
                 <CommandItem
                   key={item.id}
                   item={item}
@@ -58,23 +86,7 @@ function CommandPalette() {
                 />
               ))}
             </CommandGroup>
-          ) : (
-            groups.map((group) => (
-              <CommandGroup
-                key={group.key}
-                heading={t(`commandPalette.groups.${group.key}`)}
-              >
-                {group.items.map((item) => (
-                  <CommandItem
-                    key={item.id}
-                    item={item}
-                    fallbackIcon={group.subgroupFallbackIcons[item.subgroup]}
-                    subgroup={t(`commandPalette.subgroups.${item.subgroup}`)}
-                  />
-                ))}
-              </CommandGroup>
-            ))
-          )}
+          ))}
         </CommandList>
       </ScrollArea>
       <CommandFooter />
