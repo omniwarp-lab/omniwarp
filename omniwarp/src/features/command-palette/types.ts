@@ -16,4 +16,17 @@ interface CommandGroup {
   items: CommandItem[]
 }
 
-export type { CommandGroup, CommandItem, CommandIcon }
+type PaletteItem = CommandItem & { fallbackIcon: CommandIcon }
+type CommandSection = {
+  key: string
+  heading: string
+  items: PaletteItem[]
+}
+
+export type {
+  CommandGroup,
+  CommandItem,
+  PaletteItem,
+  CommandIcon,
+  CommandSection,
+}

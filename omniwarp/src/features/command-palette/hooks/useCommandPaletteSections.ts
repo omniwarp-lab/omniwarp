@@ -1,28 +1,22 @@
 import Fuse from 'fuse.js'
 import {
   CommandGroup,
-  CommandIcon,
-  CommandItem,
+  CommandSection,
 } from '@/features/command-palette/types.ts'
 import { useMemo } from 'react'
+import { toPaletteItem } from '@/features/command-palette/adapters.ts'
+import { useTranslation } from 'react-i18next'
 
-type PaletteItem = CommandItem & { fallbackIcon: CommandIcon }
+function useCommandPaletteSections(
+  groups: CommandGroup[],
+  query: string,
+): CommandSection[] {
+  const { t } = useTranslation()
 
-type Section = {
-  key: string
-  heading: string
-  items: PaletteItem[]
-}
-
-function withFallbackIcon(item: CommandItem, group: CommandGroup): PaletteItem {
-  return { ...item, fallbackIcon: group.subgroupFallbackIcons[item.subgroup] }
-}
-
-function useCommandPaletteSections(groups: CommandGroup[], query: string) {
   const flatItems = useMemo(
     () =>
       groups.flatMap((group) =>
-        group.items.map((item) => withFallbackIcon(item, group)),
+        group.items.map((item) => toPaletteItem(item, group, t)),
       ),
     [groups],
   )
@@ -42,20 +36,20 @@ function useCommandPaletteSections(groups: CommandGroup[], query: string) {
     return fuse.search(query).map((r) => r.item)
   }, [query, fuse])
 
-  return useMemo<Section[]>(() => {
+  return useMemo(() => {
     if (results) {
       return [
         {
           key: 'results',
-          heading: 'commandPalette.groups.results',
+          heading: t('commandPalette.groups.results'),
           items: results,
         },
       ]
     }
     return groups.map((group) => ({
       key: group.key,
-      heading: `commandPalette.groups.${group.key}`,
-      items: group.items.map((item) => withFallbackIcon(item, group)),
+      heading: t(`commandPalette.groups.${group.key}`),
+      items: group.items.map((item) => toPaletteItem(item, group, t)),
     }))
   }, [results, groups])
 }

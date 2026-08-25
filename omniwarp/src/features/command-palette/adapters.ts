@@ -1,5 +1,10 @@
-import { CommandItem } from '@/features/command-palette/types.ts'
+import {
+  CommandGroup,
+  CommandItem,
+  PaletteItem,
+} from '@/features/command-palette/types.ts'
 import { AppInfo } from '@/features/apps/types.ts'
+import { TFunction } from 'i18next'
 
 function appToCommandItem(app: AppInfo): CommandItem {
   return {
@@ -10,4 +15,18 @@ function appToCommandItem(app: AppInfo): CommandItem {
   }
 }
 
-export { appToCommandItem }
+function toPaletteItem(
+  item: CommandItem,
+  group: CommandGroup,
+  t: TFunction,
+): PaletteItem {
+  return {
+    id: item.id,
+    icon: item.icon,
+    subgroup: t(`commandPalette.subgroups.${item.subgroup}`),
+    label: item.label,
+    fallbackIcon: group.subgroupFallbackIcons[item.subgroup],
+  }
+}
+
+export { appToCommandItem, toPaletteItem }
