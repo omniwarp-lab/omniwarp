@@ -1,7 +1,7 @@
 import { discoverApps } from '@/features/apps/commands.ts'
 import { useCommandStore } from '@/features/command-palette/store.ts'
 import { appToCommandItem } from '@/features/command-palette/adapters.ts'
-import { AppWindowIcon, Gamepad2Icon } from 'lucide-react'
+import { AppWindowIcon, BoltIcon, Gamepad2Icon } from 'lucide-react'
 
 async function registerAppsGroup(): Promise<void> {
   const apps = await discoverApps()
@@ -21,8 +21,20 @@ async function registerCommandsGroup(): Promise<void> {
   useCommandStore.getState().addGroup({
     key: 'commands',
     order: 0,
-    items: [],
-    subgroupConfigs: {},
+    items: [
+      {
+        id: 'commands:omniwarp.settings',
+        icon: BoltIcon,
+        subgroup: 'omniwarp',
+        labelKey: 'omniwarp.settings',
+      },
+    ],
+    subgroupConfigs: {
+      omniwarp: {
+        gradient: 'bg-gradient-to-br from-[#40444c] to-[#282b31]',
+        iconColor: '#fff',
+      },
+    },
   })
 }
 

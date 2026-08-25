@@ -8,7 +8,8 @@
     },
     "subgroups": {
       "app": "App",
-      "game": "Game"
+      "game": "Game",
+      "omniwarp": "OmniWarp"
     },
     "hints": {
       "open": "Open",
@@ -17,5 +18,8 @@
   },
   "tray": {
     "quit": "Quit"
+  },
+  "omniwarp": {
+    "settings": "Settings"
   }
 }

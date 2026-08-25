@@ -1,4 +1,5 @@
 import { launchApp } from '@/features/apps/commands.ts'
+import { openSettings } from '@/features/settings/commands.ts'
 
 async function handleSelect(value: string) {
   const separator = value.indexOf(':')
@@ -10,6 +11,11 @@ async function handleSelect(value: string) {
   switch (kind) {
     case 'app':
       await launchApp(id)
+      break
+    case 'commands':
+      if (id === 'omniwarp.settings') {
+        await openSettings()
+      }
       break
   }
 }

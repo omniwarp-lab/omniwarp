@@ -8,7 +8,8 @@
     },
     "subgroups": {
       "app": "برنامه",
-      "game": "بازی"
+      "game": "بازی",
+      "omniwarp": "OmniWarp"
     },
     "hints": {
       "open": "باز کردن",
@@ -17,5 +18,8 @@
   },
   "tray": {
     "quit": "خروج"
+  },
+  "omniwarp": {
+    "settings": "تنظیمات"
   }
 }

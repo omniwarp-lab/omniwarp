@@ -17,6 +17,7 @@ struct AppState {
 use crate::shortcuts::Shortcuts;
 use crate::tray::Tray;
 use commands::apps::{discover_apps, launch_app};
+use commands::settings::open_settings_window;
 use commands::tray::update_tray_menu;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -45,7 +46,8 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             discover_apps,
             launch_app,
-            update_tray_menu
+            update_tray_menu,
+            open_settings_window
         ])
         .run(tauri::generate_context!())
         .expect("Error while running OmniWarp");
