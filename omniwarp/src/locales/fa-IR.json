@@ -3,7 +3,8 @@
     "placeholder": "…دستوری تایپ کنید یا جستجو کنید",
     "groups": {
       "apps": "برنامه\u200Cها",
-      "results": "نتایج"
+      "results": "نتایج",
+      "commands": "دستورها"
     },
     "subgroups": {
       "app": "برنامه",

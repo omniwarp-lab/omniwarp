@@ -1,22 +1,48 @@
 import type { LucideIcon } from 'lucide-react'
 
-interface CommandItem {
+interface CommandItemBase {
   id: string
-  icon: string
-  label: string
+  icon: CommandIcon
   subgroup: string
 }
 
-type CommandIcon = LucideIcon
+interface AppCommandItem extends CommandItemBase {
+  label: string
+  labelKey?: never
+}
+
+interface TranslatedCommandItem extends CommandItemBase {
+  labelKey: string
+  label?: never
+}
+
+type CommandItem = AppCommandItem | TranslatedCommandItem
+
+interface ItemImage {
+  kind: 'image'
+  src: string
+}
+
+type CommandIcon = LucideIcon | ItemImage
+
+interface SubgroupConfig {
+  gradient?: string
+  iconColor?: string
+  fallbackIcon?: LucideIcon
+}
 
 interface CommandGroup {
   key: string
   order: number
-  subgroupFallbackIcons: Record<string, CommandIcon>
+  subgroupConfigs: Record<string, SubgroupConfig>
   items: CommandItem[]
 }
 
-type PaletteItem = CommandItem & { fallbackIcon: CommandIcon }
+type PaletteItem = Omit<CommandItem, 'label' | 'labelKey'> & {
+  label: string
+  subgroupConfig?: SubgroupConfig
+}
+
 type CommandSection = {
   key: string
   heading: string
@@ -28,5 +54,6 @@ export type {
   CommandItem,
   PaletteItem,
   CommandIcon,
+  SubgroupConfig,
   CommandSection,
 }

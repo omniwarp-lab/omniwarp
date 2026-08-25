@@ -11,7 +11,7 @@ function appToCommandItem(app: AppInfo): CommandItem {
     id: `app:${app.id}`,
     label: app.name,
     subgroup: app.kind,
-    icon: app.iconPath ? app.iconPath : '',
+    icon: { kind: 'image', src: app.iconPath ? app.iconPath : '' },
   }
 }
 
@@ -23,9 +23,9 @@ function toPaletteItem(
   return {
     id: item.id,
     icon: item.icon,
+    subgroupConfig: group.subgroupConfigs[item.subgroup],
     subgroup: t(`commandPalette.subgroups.${item.subgroup}`),
-    label: item.label,
-    fallbackIcon: group.subgroupFallbackIcons[item.subgroup],
+    label: item.labelKey !== undefined ? t(item.labelKey) : item.label,
   }
 }
 

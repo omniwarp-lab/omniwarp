@@ -3,7 +3,8 @@
     "placeholder": "Type a command or search…",
     "groups": {
       "apps": "Apps",
-      "results": "Results"
+      "results": "Results",
+      "commands": "Commands"
     },
     "subgroups": {
       "app": "App",

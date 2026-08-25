@@ -8,13 +8,22 @@ async function registerAppsGroup(): Promise<void> {
 
   useCommandStore.getState().addGroup({
     key: 'apps',
-    order: 0,
+    order: 1,
     items: apps.map(appToCommandItem),
-    subgroupFallbackIcons: {
-      game: Gamepad2Icon,
-      app: AppWindowIcon,
+    subgroupConfigs: {
+      game: { fallbackIcon: Gamepad2Icon },
+      app: { fallbackIcon: AppWindowIcon },
     },
   })
 }
 
-export { registerAppsGroup }
+async function registerCommandsGroup(): Promise<void> {
+  useCommandStore.getState().addGroup({
+    key: 'commands',
+    order: 0,
+    items: [],
+    subgroupConfigs: {},
+  })
+}
+
+export { registerAppsGroup, registerCommandsGroup }
