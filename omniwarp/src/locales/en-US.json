@@ -21,5 +21,9 @@
   },
   "omniwarp": {
     "settings": "Settings"
+  },
+  "settings": {
+    "language": "Language",
+    "languageDescription": "Changes the language across OmniWarp"
   }
 }

@@ -5,9 +5,11 @@ import i18n from '@/i18n'
 import { syncTrayLabels } from '@/features/tray/commands'
 import { routeTree } from './routeTree.gen'
 import './App.css'
+import { initLanguageSync } from '@/features/settings/sync'
 
 i18n.on('initialized', syncTrayLabels)
 syncTrayLabels()
+initLanguageSync()
 
 const router = createRouter({
   routeTree,
