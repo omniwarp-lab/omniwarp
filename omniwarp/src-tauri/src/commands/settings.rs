@@ -6,6 +6,7 @@ const SETTINGS_WINDOW_URL: &str = "/settings";
 #[tauri::command]
 pub async fn open_settings_window(app: AppHandle) -> Result<(), String> {
     if let Some(window) = app.get_webview_window(SETTINGS_WINDOW_LABEL) {
+        window.unminimize().map_err(|e| e.to_string())?;
         window.show().map_err(|e| e.to_string())?;
         window.set_focus().map_err(|e| e.to_string())?;
         return Ok(());
