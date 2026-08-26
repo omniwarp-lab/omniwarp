@@ -11,15 +11,13 @@ function useCommandPaletteSections(
   groups: CommandGroup[],
   query: string,
 ): CommandSection[] {
-  const { t, i18n } = useTranslation()
-  const { language } = i18n
-
+  const { t } = useTranslation()
   const flatItems = useMemo(
     () =>
       groups.flatMap((group) =>
         group.items.map((item) => toPaletteItem(item, group, t)),
       ),
-    [groups],
+    [groups, t],
   )
 
   const fuse = useMemo(
@@ -52,7 +50,7 @@ function useCommandPaletteSections(
       heading: t(`commandPalette.groups.${group.key}`),
       items: group.items.map((item) => toPaletteItem(item, group, t)),
     }))
-  }, [results, groups, language])
+  }, [results, groups, t])
 }
 
 export { useCommandPaletteSections }
