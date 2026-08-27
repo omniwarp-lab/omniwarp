@@ -3,3 +3,4 @@ mod discover;
 mod filter;
 mod icons;
 mod launch;
+mod packages;
