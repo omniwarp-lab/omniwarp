@@ -38,7 +38,7 @@ pub struct AppInfo {
     pub id: String,
     pub icon_path: Option<String>,
     #[serde(skip)]
-    pub target_path: Option<String>,
+    pub target_path: String,
     #[serde(skip)]
     pub args: String,
     pub kind: AppKind,

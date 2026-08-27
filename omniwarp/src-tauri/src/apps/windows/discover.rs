@@ -1,3 +1,4 @@
+use crate::apps::windows::packages::package_roots;
 use crate::apps::{AppInfo, AppKind, Apps};
 use std::collections::HashMap;
 use windows::core::{Interface, Result, PWSTR};
@@ -79,12 +80,15 @@ fn build_app(item: &IShellItem) -> Option<AppInfo> {
     let name_p = unsafe { OwnedPwstr(item.GetDisplayName(SIGDN_NORMALDISPLAY).ok()?) };
 
     let item2: Option<IShellItem2> = item.cast().ok();
-    let target_path = item_string(item2.as_ref(), &PKEY_Link_TargetParsingPath);
+    let id = id_p.into_string();
+    let target_path = item_string(item2.as_ref(), &PKEY_Link_TargetParsingPath)
+        .or_else(|| resolve_uwp_target_path(&id))
+        .unwrap_or_default();
     let args = item_string(item2.as_ref(), &PKEY_Link_Arguments).unwrap_or_default();
 
     Some(AppInfo {
         name: name_p.into_string(),
-        id: id_p.into_string(),
+        id,
         target_path,
         args,
         icon_path: None,
@@ -97,4 +101,20 @@ fn item_string(item2: Option<&IShellItem2>, key: &PROPERTYKEY) -> Option<String>
     unsafe { i2.GetString(key) }
         .ok()
         .map(|p| OwnedPwstr(p).into_string())
+}
+
+fn resolve_uwp_target_path(aumid: &str) -> Option<String> {
+    let (family, app_id) = aumid.split_once('!')?;
+    let root = package_roots().get(family)?;
+    let manifest = std::fs::read_to_string(root.join("AppxManifest.xml")).ok()?;
+    let exe = manifest_executable(&manifest, app_id)?;
+    Some(root.join(exe).to_string_lossy().into_owned())
+}
+
+fn manifest_executable(manifest: &str, app_id: &str) -> Option<String> {
+    let doc = roxmltree::Document::parse(manifest).ok()?;
+    doc.descendants()
+        .find(|n| n.tag_name().name() == "Application" && n.attribute("Id") == Some(app_id))?
+        .attribute("Executable")
+        .map(str::to_string)
 }

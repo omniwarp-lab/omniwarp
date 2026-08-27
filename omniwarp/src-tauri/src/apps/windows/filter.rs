@@ -13,12 +13,8 @@ impl Apps {
         let uninstall_keys = collect_uninstall_targets();
 
         self.apps.retain(|app| {
-            match &app.target_path {
-                Some(target) => {
-                    is_launchable(target) && !is_uninstaller(target, &app.args, &uninstall_keys)
-                }
-                None => true, // no target -> keep
-            }
+            is_launchable(&app.target_path)
+                && !is_uninstaller(&app.target_path, &app.args, &uninstall_keys)
         });
     }
 }
