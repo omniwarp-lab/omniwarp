@@ -12,6 +12,7 @@ function appToCommandItem(app: AppInfo): CommandItem {
     label: app.name,
     subgroup: app.kind,
     icon: { kind: 'image', src: app.iconPath ? app.iconPath : '' },
+    isRunning: app.pids.length > 0,
   }
 }
 
@@ -26,6 +27,7 @@ function toPaletteItem(
     subgroupConfig: group.subgroupConfigs[item.subgroup],
     subgroup: t(`commandPalette.subgroups.${item.subgroup}`),
     label: item.labelKey !== undefined ? t(item.labelKey) : item.label,
+    isRunning: item.isRunning,
   }
 }
 

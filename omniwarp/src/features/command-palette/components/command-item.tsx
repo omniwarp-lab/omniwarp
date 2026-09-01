@@ -7,10 +7,14 @@ function CommandItem({ item }: { item: PaletteItem }) {
   return (
     <CommandItemPrimitive
       value={item.id}
-      className='group flex cursor-pointer items-center gap-3 rounded-md px-3 py-2.5 text-sm outline-none select-none aria-selected:bg-accent aria-selected:text-accent-foreground'
+      className='group group/item flex cursor-pointer items-center gap-3 rounded-md px-3 py-2.5 text-sm outline-none select-none aria-selected:bg-accent aria-selected:text-accent-foreground'
       onSelect={handleSelect}
     >
-      <CommandIconRenderer icon={item.icon} config={item.subgroupConfig} />
+      <CommandIconRenderer
+        icon={item.icon}
+        config={item.subgroupConfig}
+        isRunning={item.isRunning}
+      />
 
       <span className='flex min-w-0 flex-1 flex-row justify-between antialiased'>
         <span className='truncate tracking-normall font-medium leading-tight'>

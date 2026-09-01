@@ -4,6 +4,7 @@ import {
   CommandIcon,
   SubgroupConfig,
 } from '@/features/command-palette/types.ts'
+import { Avatar, AvatarBadge } from '@/components/ui/avatar'
 import type { LucideIcon } from 'lucide-react'
 import { useState } from 'react'
 
@@ -62,12 +63,24 @@ function ImageIconRenderer({
 function CommandIconRenderer({
   icon,
   config,
+  isRunning,
 }: {
   icon: CommandIcon
   config?: SubgroupConfig
+  isRunning?: boolean
 }) {
   if ('kind' in icon)
-    return <ImageIconRenderer src={icon.src} fallback={config?.fallbackIcon} />
+    return (
+      <Avatar
+        size='sm'
+        className='size-6 rounded-none bg-transparent after:hidden'
+      >
+        <ImageIconRenderer src={icon.src} fallback={config?.fallbackIcon} />
+        {isRunning && (
+          <AvatarBadge className='size-1.5 group-aria-selected/item:ring-accent bg-emerald-500' />
+        )}
+      </Avatar>
+    )
 
   return (
     <IconRenderer

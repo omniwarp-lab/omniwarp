@@ -4,3 +4,4 @@ mod filter;
 mod icons;
 mod launch;
 mod packages;
+mod snapshot;

@@ -93,6 +93,7 @@ fn build_app(item: &IShellItem) -> Option<AppInfo> {
         args,
         icon_path: None,
         kind: AppKind::App,
+        pids: Vec::new(),
     })
 }
 

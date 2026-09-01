@@ -4,6 +4,7 @@ interface CommandItemBase {
   id: string
   icon: CommandIcon
   subgroup: string
+  isRunning?: boolean
 }
 
 interface AppCommandItem extends CommandItemBase {

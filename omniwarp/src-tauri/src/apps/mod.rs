@@ -42,6 +42,7 @@ pub struct AppInfo {
     #[serde(skip)]
     pub args: String,
     pub kind: AppKind,
+    pub pids: Vec<u32>,
 }
 
 #[cfg(target_os = "windows")]

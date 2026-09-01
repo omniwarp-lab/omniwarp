@@ -7,6 +7,7 @@ interface AppInfo {
   id: string
   iconPath: string | null
   kind: AppKind
+  pids: number[]
 }
 
 export type { Apps, AppKind, AppInfo }

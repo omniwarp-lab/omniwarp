@@ -25,6 +25,7 @@ pub fn discover_apps(
     apps.classify();
     apps.cache_icons(&cache_dir);
     apps.build_index();
+    apps.snapshot_running();
 
     let apps = Arc::new(apps);
     let mut guard = state.apps.lock();
