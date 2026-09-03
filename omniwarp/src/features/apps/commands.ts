@@ -5,8 +5,12 @@ function discoverApps(): Promise<Apps> {
   return invoke('discover_apps')
 }
 
-function launchApp(id: string) {
+function launchApp(id: string): Promise<void> {
   return invoke('launch_app', { id })
 }
 
-export { discoverApps, launchApp }
+function focusApp(id: string): Promise<boolean> {
+  return invoke('focus_app', { id })
+}
+
+export { discoverApps, launchApp, focusApp }

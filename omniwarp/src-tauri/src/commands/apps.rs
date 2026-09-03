@@ -36,3 +36,15 @@ pub fn launch_app(window: tauri::WebviewWindow, state: tauri::State<AppState>, i
     let guard = state.apps.lock();
     guard.as_ref().unwrap().launch(&id);
 }
+
+#[tauri::command]
+pub fn focus_app(window: tauri::WebviewWindow, state: tauri::State<AppState>, id: String) -> bool {
+    let _ = window.hide();
+
+    let guard = state.apps.lock();
+    if let Some(apps) = guard.as_ref() {
+        apps.focus(&id)
+    } else {
+        false
+    }
+}

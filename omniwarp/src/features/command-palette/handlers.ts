@@ -1,5 +1,6 @@
-import { launchApp } from '@/features/apps/commands.ts'
+import { focusApp, launchApp } from '@/features/apps/commands.ts'
 import { openSettings } from '@/features/settings/commands.ts'
+import { isAppRunning } from '@/features/command-palette/selectors.ts'
 
 async function handleSelect(value: string) {
   const separator = value.indexOf(':')
@@ -9,9 +10,14 @@ async function handleSelect(value: string) {
   const id = value.slice(separator + 1)
 
   switch (kind) {
-    case 'app':
+    case 'app': {
+      if (isAppRunning(id)) {
+        const focused = await focusApp(id)
+        if (focused) return
+      }
       await launchApp(id)
       break
+    }
     case 'commands':
       if (id === 'omniwarp.settings') {
         await openSettings()

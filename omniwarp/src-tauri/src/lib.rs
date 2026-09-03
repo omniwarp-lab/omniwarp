@@ -15,7 +15,7 @@ struct AppState {
 
 use crate::shortcuts::Shortcuts;
 use crate::tray::Tray;
-use commands::apps::{discover_apps, launch_app};
+use commands::apps::{discover_apps, focus_app, launch_app};
 use commands::settings::open_settings_window;
 use commands::tray::update_tray_menu;
 
@@ -67,6 +67,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             discover_apps,
             launch_app,
+            focus_app,
             update_tray_menu,
             open_settings_window
         ])
