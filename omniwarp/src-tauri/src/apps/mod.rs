@@ -7,6 +7,8 @@ pub struct Apps {
     apps: Vec<AppInfo>,
     #[serde(skip)]
     index: HashMap<String, usize>,
+    #[serde(skip)]
+    exe_index: HashMap<String, usize>,
 }
 
 impl Apps {
@@ -21,6 +23,16 @@ impl Apps {
             .enumerate()
             .map(|(i, a)| (a.id.clone(), i))
             .collect();
+        #[cfg(target_os = "windows")]
+        self.build_exe_index();
+    }
+
+    pub fn running_map(&self) -> HashMap<&str, &[u32]> {
+        self.apps
+            .iter()
+            .filter(|a| !a.pids.is_empty())
+            .map(|a| (a.id.as_str(), a.pids.as_slice()))
+            .collect()
     }
 }
 

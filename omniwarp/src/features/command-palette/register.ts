@@ -2,6 +2,7 @@ import { discoverApps } from '@/features/apps/commands.ts'
 import { useCommandStore } from '@/features/command-palette/store.ts'
 import { appToCommandItem } from '@/features/command-palette/adapters.ts'
 import { AppWindowIcon, BoltIcon, Gamepad2Icon } from 'lucide-react'
+import { initAppsSync } from '@/features/apps/sync.ts'
 
 async function registerAppsGroup(): Promise<void> {
   const apps = await discoverApps()
@@ -15,6 +16,8 @@ async function registerAppsGroup(): Promise<void> {
       app: { fallbackIcon: AppWindowIcon },
     },
   })
+
+  void initAppsSync()
 }
 
 async function registerCommandsGroup(): Promise<void> {

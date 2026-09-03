@@ -14,8 +14,7 @@ impl Shortcuts {
                         if window.is_visible().unwrap_or(false) {
                             let _ = window.hide();
                         } else {
-                            let _ = window.show();
-                            let _ = window.set_focus();
+                            crate::show_main_window(app);
                         }
                     }
                 }

@@ -71,6 +71,7 @@ impl Apps {
         Ok(Self {
             apps,
             index: HashMap::new(),
+            exe_index: HashMap::new(),
         })
     }
 }

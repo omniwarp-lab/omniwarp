@@ -1,8 +1,7 @@
 use crate::apps::Apps;
 use parking_lot::Mutex;
-use std::sync::Arc;
 use tauri::tray::TrayIcon;
-use tauri::Manager;
+use tauri::{Emitter, Manager};
 
 mod apps;
 mod commands;
@@ -10,7 +9,7 @@ mod shortcuts;
 mod tray;
 
 struct AppState {
-    apps: Mutex<Option<Arc<Apps>>>,
+    apps: Mutex<Option<Apps>>,
     tray: Mutex<Option<TrayIcon>>,
 }
 
@@ -20,16 +19,27 @@ use commands::apps::{discover_apps, launch_app};
 use commands::settings::open_settings_window;
 use commands::tray::update_tray_menu;
 
+pub fn show_main_window(app: &tauri::AppHandle) {
+    if let Some(window) = app.get_webview_window("main") {
+        let state = app.state::<AppState>();
+        let mut guard = state.apps.lock();
+        if let Some(apps) = guard.as_mut() {
+            apps.snapshot_running();
+            let running = apps.running_map();
+            let _ = window.emit("omniwarp://apps-running-updated", running);
+        }
+        let _ = window.show();
+        let _ = window.set_focus();
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let mut builder = tauri::Builder::default();
     #[cfg(desktop)]
     {
         builder = builder.plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
-            if let Some(window) = app.get_webview_window("main") {
-                let _ = window.show();
-                let _ = window.set_focus();
-            }
+            show_main_window(app);
         }));
     }
 
