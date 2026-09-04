@@ -8,9 +8,10 @@ import {
 } from '@/features/command-palette/components'
 import { ScrollArea } from '@/components/ui/scroll-area.tsx'
 import { useCommandStore } from '@/features/command-palette/store.ts'
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useCommandPaletteSections } from '@/features/command-palette/hooks/useCommandPaletteSections.ts'
 import { PaletteItem } from '@/features/command-palette/types'
+import { getCurrentWindow } from '@tauri-apps/api/window'
 
 function CommandPalette() {
   const [query, setQuery] = useState('')
@@ -25,6 +26,29 @@ function CommandPalette() {
     () => sections.flatMap((section) => section.items),
     [sections],
   )
+
+  useEffect(() => {
+    const focusInput = () => {
+      requestAnimationFrame(() => {
+        inputRef.current?.focus()
+      })
+    }
+
+    const unlisten = getCurrentWindow().onFocusChanged(
+      ({ payload: focused }) => {
+        if (focused) {
+          focusInput()
+        }
+      },
+    )
+
+    window.addEventListener('focus', focusInput)
+
+    return () => {
+      void unlisten.then((fn) => fn())
+      window.removeEventListener('focus', focusInput)
+    }
+  }, [])
 
   const resolveActiveItem = (): PaletteItem | null => {
     const selectedEl = containerRef.current?.querySelector<HTMLElement>(
