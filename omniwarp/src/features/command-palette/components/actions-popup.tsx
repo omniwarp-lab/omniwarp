@@ -83,7 +83,11 @@ function ActionsPopup({ item, onClose }: ActionsPopupProps) {
 
     if (e.key === 'Escape') {
       e.preventDefault()
-      onClose()
+      if (query) {
+        setQuery('')
+      } else {
+        onClose()
+      }
       return
     }
 

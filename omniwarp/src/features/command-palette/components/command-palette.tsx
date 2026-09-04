@@ -87,9 +87,15 @@ function CommandPalette() {
       return
     }
 
-    if (e.key === 'Escape' && activeItem) {
+    if (e.key === 'Escape') {
       e.preventDefault()
-      handleCloseActions()
+      if (activeItem) {
+        handleCloseActions()
+      } else if (query) {
+        setQuery('')
+      } else {
+        void getCurrentWindow().hide()
+      }
       return
     }
   }
@@ -102,7 +108,12 @@ function CommandPalette() {
         vimBindings={false}
         onKeyDown={handleKeyDown}
       >
-        <CommandInput inputRef={inputRef} query={query} setQuery={setQuery} />
+        <CommandInput
+          inputRef={inputRef}
+          query={query}
+          setQuery={setQuery}
+          onKeyDown={handleKeyDown}
+        />
         <ScrollArea className='min-h-0 flex-1 p-2'>
           <CommandList>
             {sections.map((section) => (

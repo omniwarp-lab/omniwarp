@@ -7,9 +7,15 @@ interface CommandInputProps {
   query: string
   setQuery: (value: string) => void
   inputRef?: React.Ref<HTMLInputElement>
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void
 }
 
-function CommandInput({ query, setQuery, inputRef }: CommandInputProps) {
+function CommandInput({
+  query,
+  setQuery,
+  inputRef,
+  onKeyDown,
+}: CommandInputProps) {
   const { t } = useTranslation()
 
   return (
@@ -22,6 +28,7 @@ function CommandInput({ query, setQuery, inputRef }: CommandInputProps) {
         className='h-11 w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground'
         value={query}
         onValueChange={setQuery}
+        onKeyDown={onKeyDown}
       />
     </div>
   )
