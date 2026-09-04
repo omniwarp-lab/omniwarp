@@ -18,6 +18,7 @@ function CommandPalette() {
   const [activeItem, setActiveItem] = useState<PaletteItem | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const viewportRef = useRef<HTMLDivElement>(null)
 
   const groups = useCommandStore((s) => s.groups)
   const sections = useCommandPaletteSections(groups, query)
@@ -49,6 +50,20 @@ function CommandPalette() {
       window.removeEventListener('focus', focusInput)
     }
   }, [])
+
+  useEffect(() => {
+    if (!query) {
+      if (viewportRef.current) {
+        viewportRef.current.scrollTop = 0
+      }
+
+      const firstItem =
+        containerRef.current?.querySelector<HTMLElement>('[cmdk-item]')
+      firstItem?.dispatchEvent(
+        new PointerEvent('pointermove', { bubbles: true }),
+      )
+    }
+  }, [query])
 
   const resolveActiveItem = (): PaletteItem | null => {
     const selectedEl = containerRef.current?.querySelector<HTMLElement>(
@@ -114,7 +129,7 @@ function CommandPalette() {
           setQuery={setQuery}
           onKeyDown={handleKeyDown}
         />
-        <ScrollArea className='min-h-0 flex-1 p-2'>
+        <ScrollArea viewportRef={viewportRef} className='min-h-0 flex-1 p-2'>
           <CommandList>
             {sections.map((section) => (
               <CommandGroup key={section.key} heading={section.heading}>
