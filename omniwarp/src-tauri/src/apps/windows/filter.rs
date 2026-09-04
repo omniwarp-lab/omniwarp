@@ -11,11 +11,39 @@ use windows::Win32::System::Registry::{
 impl Apps {
     pub fn filter(&mut self) {
         let uninstall_keys = collect_uninstall_targets();
+        let current_exe = std::env::current_exe().ok();
 
         self.apps.retain(|app| {
-            is_launchable(&app.target_path)
+            !is_self(&app.target_path, current_exe.as_deref())
+                && is_launchable(&app.target_path)
                 && !is_uninstaller(&app.target_path, &app.args, &uninstall_keys)
         });
+    }
+}
+
+fn is_self(target: &str, current_exe: Option<&Path>) -> bool {
+    let Some(current_exe) = current_exe else {
+        return false;
+    };
+    let trimmed = target
+        .trim()
+        .trim_matches(|c: char| c == '"' || c == '\'')
+        .trim();
+    if trimmed.is_empty() {
+        return false;
+    }
+    let target_path = Path::new(trimmed);
+
+    if target_path == current_exe {
+        return true;
+    }
+
+    match (
+        target_path.file_name().and_then(|f| f.to_str()),
+        current_exe.file_name().and_then(|f| f.to_str()),
+    ) {
+        (Some(t), Some(c)) => t.eq_ignore_ascii_case(c),
+        _ => false,
     }
 }
 
