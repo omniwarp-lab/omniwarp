@@ -2,7 +2,7 @@
   "commandPalette": {
     "placeholder": "…دستوری تایپ کنید یا جستجو کنید",
     "groups": {
-      "apps": "برنامه\u200Cها",
+      "apps": "برنامه‌ها",
       "results": "نتایج",
       "commands": "دستورها"
     },
@@ -13,7 +13,16 @@
     },
     "hints": {
       "open": "باز کردن",
-      "navigate": "پیمایش"
+      "navigate": "پیمایش",
+      "actions": "عملیات‌ها",
+      "back": "بازگشت",
+      "run": "اجرا"
+    },
+    "actions": {
+      "heading": "عملیات‌ها",
+      "placeholder": "…برای یک عملیات جستجو کنید",
+      "open": "باز کردن",
+      "noResults": "عملیاتی پیدا نشد"
     }
   },
   "tray": {

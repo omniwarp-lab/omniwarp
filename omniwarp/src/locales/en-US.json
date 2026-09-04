@@ -13,7 +13,16 @@
     },
     "hints": {
       "open": "Open",
-      "navigate": "Navigate"
+      "navigate": "Navigate",
+      "actions": "Actions",
+      "back": "Back",
+      "run": "Run"
+    },
+    "actions": {
+      "heading": "Actions",
+      "placeholder": "Search for an action…",
+      "open": "Open",
+      "noResults": "No matching actions"
     }
   },
   "tray": {
