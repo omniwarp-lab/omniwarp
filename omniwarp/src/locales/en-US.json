@@ -24,6 +24,7 @@
       "open": "Open",
       "runAsAdmin": "Run as Administrator",
       "showInExplorer": "Show in File Explorer",
+      "copyPath": "Copy Path",
       "noResults": "No matching actions"
     }
   },

@@ -17,4 +17,14 @@ function openAppInExplorer(id: string): Promise<void> {
   return invoke('open_app_in_explorer', { id })
 }
 
-export { discoverApps, launchApp, focusApp, openAppInExplorer }
+function copyAppTargetPath(id: string): Promise<boolean> {
+  return invoke('copy_app_target_path', { id })
+}
+
+export {
+  discoverApps,
+  launchApp,
+  focusApp,
+  openAppInExplorer,
+  copyAppTargetPath,
+}

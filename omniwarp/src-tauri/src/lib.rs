@@ -16,7 +16,9 @@ struct AppState {
 
 use crate::shortcuts::Shortcuts;
 use crate::tray::Tray;
-use commands::apps::{discover_apps, focus_app, launch_app, open_app_in_explorer};
+use commands::apps::{
+    copy_app_target_path, discover_apps, focus_app, launch_app, open_app_in_explorer,
+};
 use commands::settings::open_settings_window;
 use commands::tray::update_tray_menu;
 
@@ -46,6 +48,7 @@ pub fn run() {
 
     builder
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
+        .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_autostart::init(
             MacosLauncher::LaunchAgent,
             None,
@@ -74,6 +77,7 @@ pub fn run() {
             launch_app,
             focus_app,
             open_app_in_explorer,
+            copy_app_target_path,
             update_tray_menu,
             open_settings_window
         ])

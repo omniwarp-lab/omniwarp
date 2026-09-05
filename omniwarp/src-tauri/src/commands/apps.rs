@@ -1,6 +1,7 @@
 use crate::apps::Apps;
 use crate::AppState;
 use tauri::Manager;
+use tauri_plugin_clipboard_manager::ClipboardExt;
 
 #[tauri::command]
 pub fn discover_apps(
@@ -66,4 +67,27 @@ pub fn open_app_in_explorer(
     if let Some(apps) = guard.as_ref() {
         apps.open_in_explorer(&id);
     }
+}
+
+#[tauri::command]
+pub fn copy_app_target_path(
+    app_handle: tauri::AppHandle,
+    window: tauri::WebviewWindow,
+    state: tauri::State<AppState>,
+    id: String,
+) -> bool {
+    let _ = window.hide();
+
+    let guard = state.apps.lock();
+    if let Some(apps) = guard.as_ref() {
+        if let Some(app) = apps.get(&id) {
+            if app.can_open_in_explorer && !app.target_path.is_empty() {
+                return app_handle
+                    .clipboard()
+                    .write_text(app.target_path.clone())
+                    .is_ok();
+            }
+        }
+    }
+    false
 }
