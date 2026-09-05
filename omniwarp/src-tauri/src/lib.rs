@@ -2,6 +2,7 @@ use crate::apps::Apps;
 use parking_lot::Mutex;
 use tauri::tray::TrayIcon;
 use tauri::{Emitter, Manager};
+use tauri_plugin_autostart::MacosLauncher;
 
 mod apps;
 mod commands;
@@ -45,6 +46,10 @@ pub fn run() {
 
     builder
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
+        .plugin(tauri_plugin_autostart::init(
+            MacosLauncher::LaunchAgent,
+            None,
+        ))
         .manage(AppState {
             apps: Mutex::new(None),
             tray: Mutex::new(None),

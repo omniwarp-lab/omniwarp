@@ -33,6 +33,8 @@
   },
   "settings": {
     "language": "Language",
-    "languageDescription": "Changes the language across OmniWarp"
+    "languageDescription": "Changes the language across OmniWarp",
+    "autostart": "Run at Startup",
+    "autostartDescription": "Starts OmniWarp automatically when you log in"
   }
 }

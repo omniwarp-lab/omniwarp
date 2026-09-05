@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { MinusIcon, XIcon } from 'lucide-react'
 import { getVersion } from '@tauri-apps/api/app'
 import { LanguageSetting } from '@/features/settings/components/language-setting'
+import { AutostartSetting } from '@/features/settings/components/autostart-setting'
 
 function SettingsComponent() {
   const { t } = useTranslation()
@@ -64,8 +65,9 @@ function SettingsComponent() {
         </div>
       </header>
 
-      <div className='flex-1 p-1.5'>
+      <div className='flex-1 p-1.5 flex flex-col gap-1'>
         <LanguageSetting />
+        <AutostartSetting />
       </div>
 
       <footer className='flex h-8 shrink-0 items-center justify-between border-t border-border bg-muted/40 px-4 text-xs text-muted-foreground'>

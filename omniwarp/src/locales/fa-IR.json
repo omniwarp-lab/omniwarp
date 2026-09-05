@@ -33,6 +33,8 @@
   },
   "settings": {
     "language": "زبان",
-    "languageDescription": "زبان مورد استفاده در سراسر OmniWarp را تغییر می‌دهد"
+    "languageDescription": "زبان مورد استفاده در سراسر OmniWarp را تغییر می‌دهد",
+    "autostart": "اجرا هنگام راه‌اندازی",
+    "autostartDescription": "با ورود به سیستم، OmniWarp به‌صورت خودکار اجرا می‌شود"
   }
 }
