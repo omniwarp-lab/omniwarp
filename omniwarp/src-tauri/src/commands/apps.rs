@@ -53,3 +53,17 @@ pub fn focus_app(window: tauri::WebviewWindow, state: tauri::State<AppState>, id
         false
     }
 }
+
+#[tauri::command]
+pub fn open_app_in_explorer(
+    window: tauri::WebviewWindow,
+    state: tauri::State<AppState>,
+    id: String,
+) {
+    let _ = window.hide();
+
+    let guard = state.apps.lock();
+    if let Some(apps) = guard.as_ref() {
+        apps.open_in_explorer(&id);
+    }
+}

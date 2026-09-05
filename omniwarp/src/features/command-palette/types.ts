@@ -5,6 +5,7 @@ interface CommandItemBase {
   icon: CommandIcon
   subgroup: string
   isRunning?: boolean
+  canOpenInExplorer?: boolean
 }
 
 interface AppCommandItem extends CommandItemBase {

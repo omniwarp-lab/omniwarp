@@ -1,5 +1,6 @@
 mod classify;
 mod discover;
+mod explorer;
 mod filter;
 mod focus;
 mod icons;

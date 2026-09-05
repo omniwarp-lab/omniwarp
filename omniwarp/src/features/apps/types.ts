@@ -8,6 +8,7 @@ interface AppInfo {
   iconPath: string | null
   kind: AppKind
   pids: number[]
+  canOpenInExplorer?: boolean
 }
 
 export type { Apps, AppKind, AppInfo }

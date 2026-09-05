@@ -55,6 +55,7 @@ pub struct AppInfo {
     pub args: String,
     pub kind: AppKind,
     pub pids: Vec<u32>,
+    pub can_open_in_explorer: bool,
 }
 
 #[cfg(target_os = "windows")]

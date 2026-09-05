@@ -1,6 +1,7 @@
 use crate::apps::windows::packages::package_roots;
 use crate::apps::{AppInfo, AppKind, Apps};
 use std::collections::HashMap;
+use std::path::Path;
 use windows::core::{Interface, Result, PWSTR};
 use windows::Win32::Foundation::PROPERTYKEY;
 use windows::Win32::Storage::EnhancedStorage::{PKEY_Link_Arguments, PKEY_Link_TargetParsingPath};
@@ -86,6 +87,7 @@ fn build_app(item: &IShellItem) -> Option<AppInfo> {
         .or_else(|| resolve_uwp_target_path(&id))
         .unwrap_or_default();
     let args = item_string(item2.as_ref(), &PKEY_Link_Arguments).unwrap_or_default();
+    let can_open_in_explorer = has_valid_explorer_target(&target_path);
 
     Some(AppInfo {
         name: name_p.into_string(),
@@ -95,7 +97,22 @@ fn build_app(item: &IShellItem) -> Option<AppInfo> {
         icon_path: None,
         kind: AppKind::App,
         pids: Vec::new(),
+        can_open_in_explorer,
     })
+}
+
+fn has_valid_explorer_target(target_path: &str) -> bool {
+    let trimmed = target_path
+        .trim()
+        .trim_matches(|c: char| c == '"' || c == '\'')
+        .trim();
+
+    if trimmed.is_empty() || trimmed.starts_with("::{") {
+        return false;
+    }
+
+    let path = Path::new(trimmed);
+    path.exists() || path.parent().map_or(false, |p| p.exists())
 }
 
 fn item_string(item2: Option<&IShellItem2>, key: &PROPERTYKEY) -> Option<String> {

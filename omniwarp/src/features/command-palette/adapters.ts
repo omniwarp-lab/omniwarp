@@ -13,6 +13,7 @@ function appToCommandItem(app: AppInfo): CommandItem {
     subgroup: app.kind,
     icon: { kind: 'image', src: app.iconPath ? app.iconPath : '' },
     isRunning: app.pids.length > 0,
+    canOpenInExplorer: app.canOpenInExplorer,
   }
 }
 
@@ -28,6 +29,7 @@ function toPaletteItem(
     subgroup: t(`commandPalette.subgroups.${item.subgroup}`),
     label: item.labelKey !== undefined ? t(item.labelKey) : item.label,
     isRunning: item.isRunning,
+    canOpenInExplorer: item.canOpenInExplorer,
   }
 }
 

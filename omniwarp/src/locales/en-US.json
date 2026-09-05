@@ -23,6 +23,7 @@
       "placeholder": "Search for an action…",
       "open": "Open",
       "runAsAdmin": "Run as Administrator",
+      "showInExplorer": "Show in File Explorer",
       "noResults": "No matching actions"
     }
   },
