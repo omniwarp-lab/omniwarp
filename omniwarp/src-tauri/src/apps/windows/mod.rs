@@ -1,4 +1,5 @@
 mod classify;
+mod close;
 mod discover;
 mod explorer;
 mod filter;

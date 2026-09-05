@@ -1,12 +1,25 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ArrowUpDown, Copy, CornerDownLeft, Folder, Search, Shield } from 'lucide-react'
+import {
+  ArrowUpDown,
+  Copy,
+  CornerDownLeft,
+  Folder,
+  Search,
+  Shield,
+  XCircleIcon,
+} from 'lucide-react'
 import { PaletteItem } from '@/features/command-palette/types'
 import { Kbd } from '@/components/ui/kbd'
 import { handleSelect } from '@/features/command-palette/handlers'
 import { CommandIconRenderer } from '@/features/command-palette/components/icon-renderer'
 import { cn } from '@/lib/utils'
-import { copyAppTargetPath, launchApp, openAppInExplorer } from '@/features/apps/commands'
+import {
+  closeApp,
+  copyAppTargetPath,
+  launchApp,
+  openAppInExplorer,
+} from '@/features/apps/commands'
 
 interface ActionsPopupProps {
   item: PaletteItem
@@ -77,6 +90,19 @@ function ActionsPopup({ item, onClose }: ActionsPopupProps) {
             },
           },
         )
+      }
+
+      if (item.isRunning) {
+        list.push({
+          id: 'close-app',
+          label: t('commandPalette.actions.close'),
+          icon: XCircleIcon,
+          execute: async () => {
+            onClose()
+            const rawId = item.id.slice(4)
+            await closeApp(rawId)
+          },
+        })
       }
     }
 

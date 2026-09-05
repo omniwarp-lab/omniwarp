@@ -22,6 +22,7 @@
       "heading": "Actions",
       "placeholder": "Search for an action…",
       "open": "Open",
+      "close": "Close",
       "runAsAdmin": "Run as Administrator",
       "showInExplorer": "Show in File Explorer",
       "copyPath": "Copy Path",

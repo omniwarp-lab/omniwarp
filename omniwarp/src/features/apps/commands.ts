@@ -13,6 +13,10 @@ function focusApp(id: string): Promise<boolean> {
   return invoke('focus_app', { id })
 }
 
+function closeApp(id: string): Promise<void> {
+  return invoke('close_app', { id })
+}
+
 function openAppInExplorer(id: string): Promise<void> {
   return invoke('open_app_in_explorer', { id })
 }
@@ -25,6 +29,7 @@ export {
   discoverApps,
   launchApp,
   focusApp,
+  closeApp,
   openAppInExplorer,
   copyAppTargetPath,
 }
