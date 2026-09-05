@@ -22,6 +22,7 @@
       "heading": "Actions",
       "placeholder": "Search for an action…",
       "open": "Open",
+      "runAsAdmin": "Run as Administrator",
       "noResults": "No matching actions"
     }
   },

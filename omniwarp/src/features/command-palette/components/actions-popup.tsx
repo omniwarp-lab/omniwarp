@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ArrowUpDown, CornerDownLeft, Search } from 'lucide-react'
+import { ArrowUpDown, CornerDownLeft, Search, Shield } from 'lucide-react'
 import { PaletteItem } from '@/features/command-palette/types'
 import { Kbd } from '@/components/ui/kbd'
 import { handleSelect } from '@/features/command-palette/handlers'
 import { CommandIconRenderer } from '@/features/command-palette/components/icon-renderer'
 import { cn } from '@/lib/utils'
+import { launchApp } from '@/features/apps/commands'
 
 interface ActionsPopupProps {
   item: PaletteItem
@@ -26,8 +27,10 @@ function ActionsPopup({ item, onClose }: ActionsPopupProps) {
   const [activeIndex, setActiveIndex] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
 
+  const isAppItem = Boolean(item.id.startsWith('app:'))
+
   const actions: ActionEntry[] = useMemo(() => {
-    return [
+    const list: ActionEntry[] = [
       {
         id: 'open',
         label: t('commandPalette.actions.open'),
@@ -38,7 +41,22 @@ function ActionsPopup({ item, onClose }: ActionsPopupProps) {
         },
       },
     ]
-  }, [item, t, onClose])
+
+    if (isAppItem) {
+      list.push({
+        id: 'run-as-admin',
+        label: t('commandPalette.actions.runAsAdmin'),
+        icon: Shield,
+        execute: async () => {
+          onClose()
+          const rawId = item.id.slice(4)
+          await launchApp(rawId, true)
+        },
+      })
+    }
+
+    return list
+  }, [item, isAppItem, t, onClose])
 
   const filteredActions = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -100,6 +118,7 @@ function ActionsPopup({ item, onClose }: ActionsPopupProps) {
 
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center p-4'>
+      {/* Subtle backdrop scrim to dismiss */}
       <div
         className='fixed inset-0 bg-black/40 backdrop-blur-[2px] transition-opacity animate-in fade-in-0 duration-150'
         onClick={onClose}
@@ -109,10 +128,12 @@ function ActionsPopup({ item, onClose }: ActionsPopupProps) {
         }}
       />
 
+      {/* Centered Modal Card */}
       <div
         data-slot='actions-popup'
         className='animate-in fade-in-0 zoom-in-95 duration-150 relative z-10 flex w-88 max-w-[90vw] flex-col overflow-hidden rounded-2xl border border-border/80 bg-popover/95 text-popover-foreground shadow-[0_20px_50px_rgba(0,0,0,0.5)] backdrop-blur-2xl outline-none select-none'
       >
+        {/* Selected Item Header */}
         <div className='flex items-center gap-3 px-4 pt-3.5 pb-3 border-b border-border/50'>
           <div className='flex size-7 shrink-0 items-center justify-center'>
             <CommandIconRenderer
@@ -136,6 +157,7 @@ function ActionsPopup({ item, onClose }: ActionsPopupProps) {
           </span>
         </div>
 
+        {/* Action Search Input */}
         <div className='px-3 pt-2.5 pb-1.5'>
           <div className='flex items-center gap-2 rounded-lg border border-border/60 bg-muted/30 px-2.5 py-1.5 text-xs transition-colors focus-within:border-border focus-within:bg-muted/70'>
             <Search className='size-3.5 shrink-0 text-muted-foreground' />
@@ -151,6 +173,7 @@ function ActionsPopup({ item, onClose }: ActionsPopupProps) {
           </div>
         </div>
 
+        {/* Actions List */}
         <div className='flex max-h-60 flex-col gap-0.5 p-2 overflow-y-auto'>
           {filteredActions.length === 0 ? (
             <div className='py-6 text-center text-xs text-muted-foreground'>
@@ -193,12 +216,15 @@ function ActionsPopup({ item, onClose }: ActionsPopupProps) {
           )}
         </div>
 
+        {/* Micro Footer Hints: Back on the left (physical left), Run & Navigate on the right (physical right) */}
         <div className='flex items-center justify-between border-t border-border/50 bg-muted/20 px-3.5 py-2 text-xs text-muted-foreground'>
+          {/* Left side: Back */}
           <span dir={dir} className='inline-flex items-center gap-1.5'>
             <Kbd dir='ltr'>Esc</Kbd>
             <span>{t('commandPalette.hints.back')}</span>
           </span>
 
+          {/* Right side: Navigate & Run */}
           <div className='flex items-center gap-2.5'>
             <span dir={dir} className='inline-flex items-center gap-1.5'>
               <Kbd dir='ltr'>

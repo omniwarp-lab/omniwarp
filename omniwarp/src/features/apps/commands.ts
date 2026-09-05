@@ -5,8 +5,8 @@ function discoverApps(): Promise<Apps> {
   return invoke('discover_apps')
 }
 
-function launchApp(id: string): Promise<void> {
-  return invoke('launch_app', { id })
+function launchApp(id: string, asAdmin = false): Promise<void> {
+  return invoke('launch_app', { id, asAdmin })
 }
 
 function focusApp(id: string): Promise<boolean> {
