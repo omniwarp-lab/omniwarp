@@ -17,7 +17,9 @@
       "navigate": "Navigate",
       "actions": "Actions",
       "back": "Back",
-      "run": "Run"
+      "run": "Run",
+      "jumpGroups": "Jump groups",
+      "shortcuts": "Shortcuts"
     },
     "actions": {
       "heading": "Actions",

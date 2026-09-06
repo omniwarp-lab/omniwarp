@@ -17,7 +17,9 @@
       "navigate": "پیمایش",
       "actions": "عملیات‌ها",
       "back": "بازگشت",
-      "run": "اجرا"
+      "run": "اجرا",
+      "jumpGroups": "پرش بین گروه‌ها",
+      "shortcuts": "کلیدهای میانبر"
     },
     "actions": {
       "heading": "عملیات‌ها",

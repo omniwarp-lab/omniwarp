@@ -20,6 +20,7 @@ function CommandPalette() {
   const { t } = useTranslation()
   const [query, setQuery] = useState('')
   const [activeItem, setActiveItem] = useState<PaletteItem | null>(null)
+  const [isShortcutsOpen, setIsShortcutsOpen] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const viewportRef = useRef<HTMLDivElement>(null)
@@ -100,6 +101,7 @@ function CommandPalette() {
     if (activeItem) {
       handleCloseActions()
     } else {
+      setIsShortcutsOpen(false)
       const target = resolveActiveItem()
       if (target) {
         setActiveItem(target)
@@ -116,9 +118,22 @@ function CommandPalette() {
       return
     }
 
+    if (
+      e.ctrlKey &&
+      !e.altKey &&
+      !e.metaKey &&
+      (e.key === '/' || e.key === '?' || e.code === 'Slash')
+    ) {
+      e.preventDefault()
+      setIsShortcutsOpen((prev) => !prev)
+      return
+    }
+
     if (e.key === 'Escape') {
       e.preventDefault()
-      if (activeItem) {
+      if (isShortcutsOpen) {
+        setIsShortcutsOpen(false)
+      } else if (activeItem) {
         handleCloseActions()
       } else if (query) {
         setQuery('')
@@ -167,7 +182,10 @@ function CommandPalette() {
             ))}
           </CommandList>
         </ScrollArea>
-        <CommandFooter />
+        <CommandFooter
+          open={isShortcutsOpen}
+          onOpenChange={setIsShortcutsOpen}
+        />
       </Command>
 
       {activeItem && (
