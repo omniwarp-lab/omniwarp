@@ -4,4 +4,8 @@ function lockScreen(): Promise<void> {
   return invoke('lock_screen')
 }
 
-export { lockScreen }
+function sleepSystem(): Promise<void> {
+  return invoke('sleep_system')
+}
+
+export { lockScreen, sleepSystem }

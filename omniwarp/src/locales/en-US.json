@@ -37,7 +37,8 @@
     "quit": "Quit"
   },
   "system": {
-    "lock": "Lock Screen"
+    "lock": "Lock Screen",
+    "sleep": "Sleep"
   },
   "omniwarp": {
     "settings": "Settings"

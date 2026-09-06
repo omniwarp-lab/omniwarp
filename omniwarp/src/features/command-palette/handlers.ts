@@ -1,6 +1,6 @@
 import { focusApp, launchApp } from '@/features/apps/commands.ts'
 import { openSettings } from '@/features/settings/commands.ts'
-import { lockScreen } from '@/features/system/commands.ts'
+import { lockScreen, sleepSystem } from '@/features/system/commands.ts'
 import { isAppRunning } from '@/features/command-palette/selectors.ts'
 
 async function handleSelect(value: string) {
@@ -24,6 +24,8 @@ async function handleSelect(value: string) {
         await openSettings()
       } else if (id === 'system.lock') {
         await lockScreen()
+      } else if (id === 'system.sleep') {
+        await sleepSystem()
       }
       break
   }
