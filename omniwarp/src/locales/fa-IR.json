@@ -10,7 +10,8 @@
     "subgroups": {
       "app": "برنامه",
       "game": "بازی",
-      "omniwarp": "OmniWarp"
+      "omniwarp": "OmniWarp",
+      "system": "سیستم"
     },
     "hints": {
       "open": "باز کردن",
@@ -34,6 +35,9 @@
   },
   "tray": {
     "quit": "خروج"
+  },
+  "system": {
+    "lock": "قفل کردن صفحه"
   },
   "omniwarp": {
     "settings": "تنظیمات"

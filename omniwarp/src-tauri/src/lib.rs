@@ -8,6 +8,7 @@ use tauri_plugin_autostart::MacosLauncher;
 mod apps;
 mod commands;
 mod shortcuts;
+mod system;
 mod tray;
 
 pub struct AppState {
@@ -22,6 +23,7 @@ use commands::apps::{
     close_app, copy_app_target_path, discover_apps, focus_app, launch_app, open_app_in_explorer,
 };
 use commands::settings::open_settings_window;
+use commands::system::lock_screen;
 use commands::tray::update_tray_menu;
 
 pub fn show_main_window(app: &tauri::AppHandle) {
@@ -92,7 +94,8 @@ pub fn run() {
             open_app_in_explorer,
             copy_app_target_path,
             update_tray_menu,
-            open_settings_window
+            open_settings_window,
+            lock_screen
         ])
         .run(tauri::generate_context!())
         .expect("Error while running OmniWarp");

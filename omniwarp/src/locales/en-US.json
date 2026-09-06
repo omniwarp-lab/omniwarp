@@ -10,7 +10,8 @@
     "subgroups": {
       "app": "App",
       "game": "Game",
-      "omniwarp": "OmniWarp"
+      "omniwarp": "OmniWarp",
+      "system": "System"
     },
     "hints": {
       "open": "Open",
@@ -34,6 +35,9 @@
   },
   "tray": {
     "quit": "Quit"
+  },
+  "system": {
+    "lock": "Lock Screen"
   },
   "omniwarp": {
     "settings": "Settings"

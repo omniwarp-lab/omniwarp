@@ -1,5 +1,6 @@
 import { focusApp, launchApp } from '@/features/apps/commands.ts'
 import { openSettings } from '@/features/settings/commands.ts'
+import { lockScreen } from '@/features/system/commands.ts'
 import { isAppRunning } from '@/features/command-palette/selectors.ts'
 
 async function handleSelect(value: string) {
@@ -21,6 +22,8 @@ async function handleSelect(value: string) {
     case 'commands':
       if (id === 'omniwarp.settings') {
         await openSettings()
+      } else if (id === 'system.lock') {
+        await lockScreen()
       }
       break
   }
