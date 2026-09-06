@@ -31,6 +31,11 @@
       "showInExplorer": "Show in File Explorer",
       "copyPath": "Copy Path",
       "noResults": "No matching actions"
+    },
+    "confirmation": {
+      "cancel": "Cancel",
+      "restart": "Are you sure you want to restart your computer?",
+      "shutdown": "Are you sure you want to shut down your computer?"
     }
   },
   "tray": {

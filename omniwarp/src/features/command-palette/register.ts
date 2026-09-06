@@ -56,12 +56,16 @@ async function registerCommandsGroup(): Promise<void> {
         icon: RotateCwIcon,
         subgroup: 'system',
         labelKey: 'system.restart',
+        destructive: true,
+        confirmationKey: 'commandPalette.confirmation.restart',
       },
       {
         id: 'commands:system.shutdown',
         icon: PowerIcon,
         subgroup: 'system',
         labelKey: 'system.shutdown',
+        destructive: true,
+        confirmationKey: 'commandPalette.confirmation.shutdown',
       },
     ],
     subgroupConfigs: {

@@ -6,6 +6,8 @@ interface CommandItemBase {
   subgroup: string
   isRunning?: boolean
   canOpenInExplorer?: boolean
+  destructive?: boolean
+  confirmationKey?: string
 }
 
 interface AppCommandItem extends CommandItemBase {

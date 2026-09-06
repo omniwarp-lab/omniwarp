@@ -6,12 +6,14 @@ import {
   CommandGroup,
   CommandInput,
   CommandItem,
+  ConfirmationDialog,
 } from '@/features/command-palette/components'
 import { ScrollArea } from '@/components/ui/scroll-area.tsx'
 import { useCommandStore } from '@/features/command-palette/store.ts'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useCommandPaletteSections } from '@/features/command-palette/hooks/useCommandPaletteSections.ts'
 import { useGroupNavigation } from '@/features/command-palette/hooks/useGroupNavigation.ts'
+import { useConfirmation } from '@/features/command-palette/hooks/useConfirmation.ts'
 import { PaletteItem } from '@/features/command-palette/types'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { useTranslation } from 'react-i18next'
@@ -24,6 +26,19 @@ function CommandPalette() {
   const inputRef = useRef<HTMLInputElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const viewportRef = useRef<HTMLDivElement>(null)
+
+  const {
+    confirmingItem,
+    handleItemSelect,
+    handleCloseConfirmation,
+    handleConfirmAction,
+  } = useConfirmation({
+    inputRef,
+    onOpenConfirmation: () => {
+      setActiveItem(null)
+      setIsShortcutsOpen(false)
+    },
+  })
 
   const groups = useCommandStore((s) => s.groups)
   const sections = useCommandPaletteSections(groups, query)
@@ -112,6 +127,8 @@ function CommandPalette() {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.defaultPrevented) return
 
+    if (confirmingItem) return
+
     if (e.altKey && (e.key.toLowerCase() === 'a' || e.code === 'KeyA')) {
       e.preventDefault()
       handleToggleActions()
@@ -173,6 +190,7 @@ function CommandPalette() {
                   <CommandItem
                     key={item.id}
                     item={item}
+                    onSelect={handleItemSelect}
                     onContextMenu={(_e, targetItem) =>
                       setActiveItem(targetItem)
                     }
@@ -189,7 +207,19 @@ function CommandPalette() {
       </Command>
 
       {activeItem && (
-        <ActionsPopup item={activeItem} onClose={handleCloseActions} />
+        <ActionsPopup
+          item={activeItem}
+          onClose={handleCloseActions}
+          onSelect={handleItemSelect}
+        />
+      )}
+
+      {confirmingItem && (
+        <ConfirmationDialog
+          item={confirmingItem}
+          onClose={handleCloseConfirmation}
+          onConfirm={handleConfirmAction}
+        />
       )}
     </div>
   )

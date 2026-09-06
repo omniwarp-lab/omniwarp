@@ -24,6 +24,7 @@ import {
 interface ActionsPopupProps {
   item: PaletteItem
   onClose: () => void
+  onSelect?: (item: PaletteItem) => void
 }
 
 interface ActionEntry {
@@ -33,7 +34,7 @@ interface ActionEntry {
   execute: () => Promise<void> | void
 }
 
-function ActionsPopup({ item, onClose }: ActionsPopupProps) {
+function ActionsPopup({ item, onClose, onSelect }: ActionsPopupProps) {
   const { t, i18n } = useTranslation()
   const dir = i18n.dir()
   const [query, setQuery] = useState('')
@@ -50,7 +51,11 @@ function ActionsPopup({ item, onClose }: ActionsPopupProps) {
         icon: CornerDownLeft,
         execute: async () => {
           onClose()
-          await handleSelect(item.id)
+          if (onSelect) {
+            onSelect(item)
+          } else {
+            await handleSelect(item.id)
+          }
         },
       },
     ]
@@ -107,7 +112,7 @@ function ActionsPopup({ item, onClose }: ActionsPopupProps) {
     }
 
     return list
-  }, [item, isAppItem, t, onClose])
+  }, [item, isAppItem, t, onClose, onSelect])
 
   const filteredActions = useMemo(() => {
     const q = query.trim().toLowerCase()

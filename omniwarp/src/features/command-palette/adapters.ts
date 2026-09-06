@@ -30,6 +30,8 @@ function toPaletteItem(
     label: item.labelKey !== undefined ? t(item.labelKey) : item.label,
     isRunning: item.isRunning,
     canOpenInExplorer: item.canOpenInExplorer,
+    destructive: item.destructive,
+    confirmationKey: item.confirmationKey,
   }
 }
 
