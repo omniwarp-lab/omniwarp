@@ -11,6 +11,7 @@ import { ScrollArea } from '@/components/ui/scroll-area.tsx'
 import { useCommandStore } from '@/features/command-palette/store.ts'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useCommandPaletteSections } from '@/features/command-palette/hooks/useCommandPaletteSections.ts'
+import { useGroupNavigation } from '@/features/command-palette/hooks/useGroupNavigation.ts'
 import { PaletteItem } from '@/features/command-palette/types'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { useTranslation } from 'react-i18next'
@@ -30,6 +31,16 @@ function CommandPalette() {
     () => sections.flatMap((section) => section.items),
     [sections],
   )
+
+  const {
+    handleKeyDown: handleGroupNavigationKeyDown,
+    getSelectedValue,
+    resetSelection,
+  } = useGroupNavigation({
+    containerRef,
+    viewportRef,
+    sections,
+  })
 
   useEffect(() => {
     const focusInput = () => {
@@ -55,6 +66,7 @@ function CommandPalette() {
   }, [])
 
   useEffect(() => {
+    resetSelection()
     if (!query) {
       if (viewportRef.current) {
         viewportRef.current.scrollTop = 0
@@ -66,13 +78,10 @@ function CommandPalette() {
         new PointerEvent('pointermove', { bubbles: true }),
       )
     }
-  }, [query])
+  }, [query, resetSelection])
 
   const resolveActiveItem = (): PaletteItem | null => {
-    const selectedEl = containerRef.current?.querySelector<HTMLElement>(
-      '[cmdk-item][aria-selected="true"]',
-    )
-    const selectedValue = selectedEl?.getAttribute('data-value')
+    const selectedValue = getSelectedValue()
     if (selectedValue) {
       const found = flatItems.find((item) => item.id === selectedValue)
       if (found) return found
@@ -99,6 +108,8 @@ function CommandPalette() {
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.defaultPrevented) return
+
     if (e.altKey && e.key.toLowerCase() === 'a') {
       e.preventDefault()
       handleToggleActions()
@@ -114,6 +125,12 @@ function CommandPalette() {
       } else {
         void getCurrentWindow().hide()
       }
+      return
+    }
+
+    if (activeItem) return
+
+    if (handleGroupNavigationKeyDown(e)) {
       return
     }
   }
