@@ -1,5 +1,6 @@
 use crate::apps::Apps;
 use parking_lot::Mutex;
+use std::sync::atomic::AtomicI64;
 use tauri::tray::TrayIcon;
 use tauri::{Emitter, Manager};
 use tauri_plugin_autostart::MacosLauncher;
@@ -9,9 +10,10 @@ mod commands;
 mod shortcuts;
 mod tray;
 
-struct AppState {
-    apps: Mutex<Option<Apps>>,
-    tray: Mutex<Option<TrayIcon>>,
+pub struct AppState {
+    pub apps: Mutex<Option<Apps>>,
+    pub tray: Mutex<Option<TrayIcon>>,
+    pub last_unfocus: AtomicI64,
 }
 
 use crate::shortcuts::Shortcuts;
@@ -56,6 +58,7 @@ pub fn run() {
         .manage(AppState {
             apps: Mutex::new(None),
             tray: Mutex::new(None),
+            last_unfocus: AtomicI64::new(0),
         })
         .setup(|app| {
             Tray::setup(app)?;
@@ -63,8 +66,17 @@ pub fn run() {
 
             if let Some(window) = app.get_webview_window("main") {
                 let window_clone = window.clone();
+                let app_handle = app.handle().clone();
                 window.on_window_event(move |event| {
                     if let tauri::WindowEvent::Focused(false) = event {
+                        let state = app_handle.state::<AppState>();
+                        let now = std::time::SystemTime::now()
+                            .duration_since(std::time::UNIX_EPOCH)
+                            .unwrap_or_default()
+                            .as_millis() as i64;
+                        state
+                            .last_unfocus
+                            .store(now, std::sync::atomic::Ordering::Relaxed);
                         let _ = window_clone.hide();
                     }
                 });
