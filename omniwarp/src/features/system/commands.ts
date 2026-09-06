@@ -8,4 +8,8 @@ function sleepSystem(): Promise<void> {
   return invoke('sleep_system')
 }
 
-export { lockScreen, sleepSystem }
+function restartSystem(): Promise<void> {
+  return invoke('restart_system')
+}
+
+export { lockScreen, sleepSystem, restartSystem }

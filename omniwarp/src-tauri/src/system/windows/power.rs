@@ -1,4 +1,7 @@
 use crate::system::System;
+use std::os::windows::process::CommandExt;
+
+const CREATE_NO_WINDOW: u32 = 0x08000000;
 
 #[link(name = "powrprof")]
 extern "system" {
@@ -28,6 +31,16 @@ impl System {
         if success == 0 {
             return Err("Failed to enter sleep state".to_string());
         }
+
+        Ok(())
+    }
+
+    pub fn restart() -> Result<(), String> {
+        std::process::Command::new("shutdown")
+            .args(["/r", "/t", "0"])
+            .creation_flags(CREATE_NO_WINDOW)
+            .spawn()
+            .map_err(|e| e.to_string())?;
 
         Ok(())
     }

@@ -7,6 +7,7 @@ import {
   Gamepad2Icon,
   LockIcon,
   MoonIcon,
+  RotateCwIcon,
 } from 'lucide-react'
 import { initAppsSync } from '@/features/apps/sync.ts'
 
@@ -48,6 +49,12 @@ async function registerCommandsGroup(): Promise<void> {
         icon: MoonIcon,
         subgroup: 'system',
         labelKey: 'system.sleep',
+      },
+      {
+        id: 'commands:system.restart',
+        icon: RotateCwIcon,
+        subgroup: 'system',
+        labelKey: 'system.restart',
       },
     ],
     subgroupConfigs: {

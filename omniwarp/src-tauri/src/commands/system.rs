@@ -11,3 +11,9 @@ pub fn sleep_system(window: tauri::WebviewWindow) -> Result<(), String> {
     let _ = window.hide();
     System::sleep()
 }
+
+#[tauri::command]
+pub fn restart_system(window: tauri::WebviewWindow) -> Result<(), String> {
+    let _ = window.hide();
+    System::restart()
+}
