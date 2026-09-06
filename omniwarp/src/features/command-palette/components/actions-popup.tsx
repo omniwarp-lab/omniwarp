@@ -160,7 +160,7 @@ function ActionsPopup({ item, onClose }: ActionsPopupProps) {
       return
     }
 
-    if (e.altKey && e.key.toLowerCase() === 'a') {
+    if (e.altKey && (e.key.toLowerCase() === 'a' || e.code === 'KeyA')) {
       e.preventDefault()
       onClose()
       return

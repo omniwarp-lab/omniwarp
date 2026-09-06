@@ -112,7 +112,7 @@ function CommandPalette() {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.defaultPrevented) return
 
-    if (e.altKey && e.key.toLowerCase() === 'a') {
+    if (e.altKey && (e.key.toLowerCase() === 'a' || e.code === 'KeyA')) {
       e.preventDefault()
       handleToggleActions()
       return
