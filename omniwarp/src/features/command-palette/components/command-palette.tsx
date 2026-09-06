@@ -1,6 +1,7 @@
 import { Command, CommandList } from 'cmdk'
 import {
   ActionsPopup,
+  CommandEmpty,
   CommandFooter,
   CommandGroup,
   CommandInput,
@@ -12,8 +13,10 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useCommandPaletteSections } from '@/features/command-palette/hooks/useCommandPaletteSections.ts'
 import { PaletteItem } from '@/features/command-palette/types'
 import { getCurrentWindow } from '@tauri-apps/api/window'
+import { useTranslation } from 'react-i18next'
 
 function CommandPalette() {
+  const { t } = useTranslation()
   const [query, setQuery] = useState('')
   const [activeItem, setActiveItem] = useState<PaletteItem | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -131,6 +134,7 @@ function CommandPalette() {
         />
         <ScrollArea viewportRef={viewportRef} className='min-h-0 flex-1 p-2'>
           <CommandList>
+            <CommandEmpty>{t('commandPalette.noResults')}</CommandEmpty>
             {sections.map((section) => (
               <CommandGroup key={section.key} heading={section.heading}>
                 {section.items.map((item) => (

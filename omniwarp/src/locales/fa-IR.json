@@ -1,6 +1,7 @@
 {
   "commandPalette": {
     "placeholder": "…دستوری تایپ کنید یا جستجو کنید",
+    "noResults": "نتیجه‌ای پیدا نشد",
     "groups": {
       "apps": "برنامه‌ها",
       "results": "نتایج",

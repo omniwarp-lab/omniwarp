@@ -37,6 +37,7 @@ function useCommandPaletteSections(
 
   return useMemo(() => {
     if (results) {
+      if (results.length === 0) return []
       return [
         {
           key: 'results',
@@ -45,11 +46,13 @@ function useCommandPaletteSections(
         },
       ]
     }
-    return groups.map((group) => ({
-      key: group.key,
-      heading: t(`commandPalette.groups.${group.key}`),
-      items: group.items.map((item) => toPaletteItem(item, group, t)),
-    }))
+    return groups
+      .map((group) => ({
+        key: group.key,
+        heading: t(`commandPalette.groups.${group.key}`),
+        items: group.items.map((item) => toPaletteItem(item, group, t)),
+      }))
+      .filter((section) => section.items.length > 0)
   }, [results, groups, t])
 }
 

@@ -1,6 +1,7 @@
 {
   "commandPalette": {
     "placeholder": "Type a command or search…",
+    "noResults": "No results found",
     "groups": {
       "apps": "Apps",
       "results": "Results",
