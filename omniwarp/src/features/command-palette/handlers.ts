@@ -3,6 +3,7 @@ import { openSettings } from '@/features/settings/commands.ts'
 import {
   lockScreen,
   restartSystem,
+  shutdownSystem,
   sleepSystem,
 } from '@/features/system/commands.ts'
 import { isAppRunning } from '@/features/command-palette/selectors.ts'
@@ -32,6 +33,8 @@ async function handleSelect(value: string) {
         await sleepSystem()
       } else if (id === 'system.restart') {
         await restartSystem()
+      } else if (id === 'system.shutdown') {
+        await shutdownSystem()
       }
       break
   }

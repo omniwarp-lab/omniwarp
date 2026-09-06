@@ -12,4 +12,8 @@ function restartSystem(): Promise<void> {
   return invoke('restart_system')
 }
 
-export { lockScreen, sleepSystem, restartSystem }
+function shutdownSystem(): Promise<void> {
+  return invoke('shutdown_system')
+}
+
+export { lockScreen, sleepSystem, restartSystem, shutdownSystem }

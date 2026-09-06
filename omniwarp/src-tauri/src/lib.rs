@@ -23,7 +23,7 @@ use commands::apps::{
     close_app, copy_app_target_path, discover_apps, focus_app, launch_app, open_app_in_explorer,
 };
 use commands::settings::open_settings_window;
-use commands::system::{lock_screen, restart_system, sleep_system};
+use commands::system::{lock_screen, restart_system, shutdown_system, sleep_system};
 use commands::tray::update_tray_menu;
 
 pub fn show_main_window(app: &tauri::AppHandle) {
@@ -97,7 +97,8 @@ pub fn run() {
             open_settings_window,
             lock_screen,
             sleep_system,
-            restart_system
+            restart_system,
+            shutdown_system
         ])
         .run(tauri::generate_context!())
         .expect("Error while running OmniWarp");
