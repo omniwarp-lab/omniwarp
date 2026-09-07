@@ -60,3 +60,6 @@ pub struct AppInfo {
 
 #[cfg(target_os = "windows")]
 mod windows;
+
+pub mod error;
+pub use error::{AppError, AppResult};

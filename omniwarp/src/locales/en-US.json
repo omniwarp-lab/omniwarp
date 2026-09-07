@@ -55,5 +55,13 @@
     "languageDescription": "Changes the language across OmniWarp",
     "autostart": "Run at Startup",
     "autostartDescription": "Starts OmniWarp automatically when you log in"
+  },
+  "errors": {
+    "apps": {
+      "launch": "Failed to launch application",
+      "discovery": "Failed to discover applications",
+      "cacheDir": "Failed to access cache directory",
+      "serialize": "Failed to process applications data"
+    }
   }
 }

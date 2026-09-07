@@ -1,4 +1,4 @@
-use crate::apps::{AppInfo, Apps};
+use crate::apps::{AppError, AppInfo, AppResult, Apps};
 use std::borrow::Cow;
 use windows::core::HSTRING;
 use windows::Win32::Foundation::HWND;
@@ -6,14 +6,15 @@ use windows::Win32::UI::Shell::ShellExecuteW;
 use windows::Win32::UI::WindowsAndMessaging::SW_SHOWNORMAL;
 
 impl Apps {
-    pub fn launch(&self, id: &str, as_admin: bool) {
-        if let Some(app) = self.get(id) {
-            launch_via_shell(app, as_admin);
-        }
+    pub fn launch(&self, id: &str, as_admin: bool) -> AppResult<()> {
+        let app = self
+            .get(id)
+            .expect("App ID must exist in discovered apps index");
+        launch_via_shell(app, as_admin)
     }
 }
 
-fn launch_via_shell(app: &AppInfo, as_admin: bool) {
+fn launch_via_shell(app: &AppInfo, as_admin: bool) -> AppResult<()> {
     let target = ensure_shell_uri_for_clsid(&app.target_path);
 
     let args = match app.args.trim().is_empty() {
@@ -36,9 +37,12 @@ fn launch_via_shell(app: &AppInfo, as_admin: bool) {
 
     let code = result.0 as isize;
     if code <= 32 {
-        eprintln!("ShellExecuteW ({verb}) failed: {code}");
+        Err(AppError::Launch {
+            app: app.name.clone(),
+            code,
+        })
     } else {
-        eprintln!("spawned ok");
+        Ok(())
     }
 }
 

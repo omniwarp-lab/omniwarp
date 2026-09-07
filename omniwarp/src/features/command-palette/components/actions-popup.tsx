@@ -68,7 +68,11 @@ function ActionsPopup({ item, onClose, onSelect }: ActionsPopupProps) {
         execute: async () => {
           onClose()
           const rawId = item.id.slice(4)
-          await launchApp(rawId, true)
+          try {
+            await launchApp(rawId, true)
+          } catch {
+            // TODO: handle error
+          }
         },
       })
 

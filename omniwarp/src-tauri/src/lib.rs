@@ -7,6 +7,7 @@ use tauri_plugin_autostart::MacosLauncher;
 
 mod apps;
 mod commands;
+mod logging;
 mod shortcuts;
 mod system;
 mod tray;
@@ -17,6 +18,7 @@ pub struct AppState {
     pub last_unfocus: AtomicI64,
 }
 
+use crate::logging::Logging;
 use crate::shortcuts::Shortcuts;
 use crate::tray::Tray;
 use commands::apps::{
@@ -63,6 +65,7 @@ pub fn run() {
             last_unfocus: AtomicI64::new(0),
         })
         .setup(|app| {
+            Logging::setup(app)?;
             Tray::setup(app)?;
             Shortcuts::setup(app)?;
 

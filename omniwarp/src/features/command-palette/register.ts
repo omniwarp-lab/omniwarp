@@ -13,19 +13,23 @@ import {
 import { initAppsSync } from '@/features/apps/sync.ts'
 
 async function registerAppsGroup(): Promise<void> {
-  const apps = await discoverApps()
+  try {
+    const apps = await discoverApps()
 
-  useCommandStore.getState().addGroup({
-    key: 'apps',
-    order: 1,
-    items: apps.map(appToCommandItem),
-    subgroupConfigs: {
-      game: { fallbackIcon: Gamepad2Icon },
-      app: { fallbackIcon: AppWindowIcon },
-    },
-  })
+    useCommandStore.getState().addGroup({
+      key: 'apps',
+      order: 1,
+      items: apps.map(appToCommandItem),
+      subgroupConfigs: {
+        game: { fallbackIcon: Gamepad2Icon },
+        app: { fallbackIcon: AppWindowIcon },
+      },
+    })
 
-  void initAppsSync()
+    void initAppsSync()
+  } catch {
+    // TODO: handle error
+  }
 }
 
 async function registerCommandsGroup(): Promise<void> {

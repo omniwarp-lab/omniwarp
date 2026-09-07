@@ -1,4 +1,4 @@
-use crate::apps::Apps;
+use crate::apps::{AppResult, Apps};
 use crate::AppState;
 use tauri::Manager;
 use tauri_plugin_clipboard_manager::ClipboardExt;
@@ -7,27 +7,31 @@ use tauri_plugin_clipboard_manager::ClipboardExt;
 pub fn discover_apps(
     app_handle: tauri::AppHandle,
     state: tauri::State<AppState>,
-) -> Result<serde_json::Value, String> {
+) -> AppResult<serde_json::Value> {
     let mut guard = state.apps.lock();
     if let Some(apps) = guard.as_ref() {
-        return serde_json::to_value(apps).map_err(|e| e.to_string());
+        return Ok(serde_json::to_value(apps)?);
     }
 
-    let mut apps = Apps::discover().map_err(|e| e.to_string())?;
-    let cache_dir = app_handle
-        .path()
-        .app_cache_dir()
-        .map_err(|e| e.to_string())?
-        .join("app-icons");
-    apps.filter();
-    apps.classify();
-    apps.cache_icons(&cache_dir);
-    apps.build_index();
-    apps.snapshot_running();
+    let result = (|| -> AppResult<serde_json::Value> {
+        let mut apps = Apps::discover()?;
+        let cache_dir = app_handle.path().app_cache_dir()?.join("app-icons");
+        apps.filter();
+        apps.classify();
+        apps.cache_icons(&cache_dir);
+        apps.build_index();
+        apps.snapshot_running();
 
-    let json = serde_json::to_value(&apps).map_err(|e| e.to_string())?;
-    *guard = Some(apps);
-    Ok(json)
+        let json = serde_json::to_value(&apps)?;
+        *guard = Some(apps);
+        Ok(json)
+    })();
+
+    if let Err(ref err) = result {
+        tracing::error!(error = %err);
+    }
+
+    result
 }
 
 #[tauri::command]
@@ -36,11 +40,20 @@ pub fn launch_app(
     state: tauri::State<AppState>,
     id: String,
     as_admin: Option<bool>,
-) {
+) -> AppResult<()> {
     let _ = window.hide();
 
     let guard = state.apps.lock();
-    guard.as_ref().unwrap().launch(&id, as_admin.unwrap_or(false));
+    let apps = guard
+        .as_ref()
+        .expect("Apps must be discovered before launching");
+    let result = apps.launch(&id, as_admin.unwrap_or(false));
+
+    if let Err(ref err) = result {
+        tracing::error!(error = %err);
+    }
+
+    result
 }
 
 #[tauri::command]

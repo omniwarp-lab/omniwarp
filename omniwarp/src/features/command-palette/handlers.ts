@@ -21,7 +21,11 @@ async function handleSelect(value: string) {
         const focused = await focusApp(id)
         if (focused) return
       }
-      await launchApp(id)
+      try {
+        await launchApp(id)
+      } catch {
+        // TODO: handle error
+      }
       break
     }
     case 'commands':
