@@ -74,7 +74,8 @@ pub fn run() {
             last_unfocus: AtomicI64::new(0),
         })
         .setup(|app| {
-            Logging::setup(app)?;
+            Logging::setup(app)
+                .inspect_err(|err| eprintln!("Failed to initialize logging: {err}"))?;
             Tray::setup(app).log_err()?;
             Shortcuts::setup(app).log_err()?;
             Hud::setup(app).log_err()?;
