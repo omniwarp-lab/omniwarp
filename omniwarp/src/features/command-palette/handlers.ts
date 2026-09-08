@@ -7,6 +7,7 @@ import {
   sleepSystem,
 } from '@/features/system/commands.ts'
 import { isAppRunning } from '@/features/command-palette/selectors.ts'
+import { showAppError } from '@/features/hud/errors'
 
 async function handleSelect(value: string) {
   const separator = value.indexOf(':')
@@ -23,8 +24,8 @@ async function handleSelect(value: string) {
       }
       try {
         await launchApp(id)
-      } catch {
-        // TODO: handle error
+      } catch (err) {
+        await showAppError(err)
       }
       break
     }

@@ -11,6 +11,7 @@ import {
   RotateCwIcon,
 } from 'lucide-react'
 import { initAppsSync } from '@/features/apps/sync.ts'
+import { showAppError } from '@/features/hud/errors'
 
 async function registerAppsGroup(): Promise<void> {
   try {
@@ -27,8 +28,8 @@ async function registerAppsGroup(): Promise<void> {
     })
 
     void initAppsSync()
-  } catch {
-    // TODO: handle error
+  } catch (err) {
+    await showAppError(err)
   }
 }
 

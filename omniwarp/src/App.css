@@ -140,3 +140,17 @@
     @apply font-sans;
   }
 }
+
+html:has([data-slot='hud-window']),
+body:has([data-slot='hud-window']) {
+  background: transparent !important;
+}
+
+@keyframes hud-drain {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}

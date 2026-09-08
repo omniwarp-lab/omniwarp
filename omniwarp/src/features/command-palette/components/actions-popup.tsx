@@ -20,6 +20,8 @@ import {
   launchApp,
   openAppInExplorer,
 } from '@/features/apps/commands'
+import { showCopyHud } from '@/features/hud/commands'
+import { showAppError } from '@/features/hud/errors'
 
 interface ActionsPopupProps {
   item: PaletteItem
@@ -70,8 +72,8 @@ function ActionsPopup({ item, onClose, onSelect }: ActionsPopupProps) {
           const rawId = item.id.slice(4)
           try {
             await launchApp(rawId, true)
-          } catch {
-            // TODO: handle error
+          } catch (err) {
+            await showAppError(err)
           }
         },
       })
@@ -95,7 +97,10 @@ function ActionsPopup({ item, onClose, onSelect }: ActionsPopupProps) {
             execute: async () => {
               onClose()
               const rawId = item.id.slice(4)
-              await copyAppTargetPath(rawId)
+              const copied = await copyAppTargetPath(rawId)
+              if (copied) {
+                await showCopyHud(t('hud.copiedPath'))
+              }
             },
           },
         )

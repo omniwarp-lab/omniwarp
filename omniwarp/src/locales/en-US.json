@@ -56,7 +56,12 @@
     "autostart": "Run at Startup",
     "autostartDescription": "Starts OmniWarp automatically when you log in"
   },
+  "hud": {
+    "copiedPath": "Copied path to clipboard"
+  },
   "errors": {
+    "generic": "An unexpected error occurred",
+    "checkLogs": "Check logs for details",
     "apps": {
       "launch": "Failed to launch application",
       "discovery": "Failed to discover applications",

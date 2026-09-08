@@ -7,6 +7,7 @@ use tauri_plugin_autostart::MacosLauncher;
 
 mod apps;
 mod commands;
+mod hud;
 mod logging;
 mod shortcuts;
 mod system;
@@ -18,12 +19,14 @@ pub struct AppState {
     pub last_unfocus: AtomicI64,
 }
 
+use crate::hud::Hud;
 use crate::logging::Logging;
 use crate::shortcuts::Shortcuts;
 use crate::tray::Tray;
 use commands::apps::{
     close_app, copy_app_target_path, discover_apps, focus_app, launch_app, open_app_in_explorer,
 };
+use commands::hud::show_hud;
 use commands::settings::open_settings_window;
 use commands::system::{lock_screen, restart_system, shutdown_system, sleep_system};
 use commands::tray::update_tray_menu;
@@ -68,6 +71,7 @@ pub fn run() {
             Logging::setup(app)?;
             Tray::setup(app)?;
             Shortcuts::setup(app)?;
+            Hud::setup(app)?;
 
             if let Some(window) = app.get_webview_window("main") {
                 let window_clone = window.clone();
@@ -98,6 +102,7 @@ pub fn run() {
             copy_app_target_path,
             update_tray_menu,
             open_settings_window,
+            show_hud,
             lock_screen,
             sleep_system,
             restart_system,
