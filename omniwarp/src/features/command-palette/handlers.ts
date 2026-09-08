@@ -30,16 +30,20 @@ async function handleSelect(value: string) {
       break
     }
     case 'commands':
-      if (id === 'omniwarp.settings') {
-        await openSettings()
-      } else if (id === 'system.lock') {
-        await lockScreen()
-      } else if (id === 'system.sleep') {
-        await sleepSystem()
-      } else if (id === 'system.restart') {
-        await restartSystem()
-      } else if (id === 'system.shutdown') {
-        await shutdownSystem()
+      try {
+        if (id === 'omniwarp.settings') {
+          await openSettings()
+        } else if (id === 'system.lock') {
+          await lockScreen()
+        } else if (id === 'system.sleep') {
+          await sleepSystem()
+        } else if (id === 'system.restart') {
+          await restartSystem()
+        } else if (id === 'system.shutdown') {
+          await shutdownSystem()
+        }
+      } catch (err) {
+        await showAppError(err)
       }
       break
   }

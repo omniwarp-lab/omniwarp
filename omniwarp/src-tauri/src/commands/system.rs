@@ -1,25 +1,41 @@
-use crate::system::System;
+use crate::system::{System, SystemResult};
 
 #[tauri::command]
-pub fn lock_screen(window: tauri::WebviewWindow) -> Result<(), String> {
+pub fn lock_screen(window: tauri::WebviewWindow) -> SystemResult<()> {
     let _ = window.hide();
-    System::lock()
+    let result = System::lock();
+    if let Err(ref err) = result {
+        tracing::error!(error = %err);
+    }
+    result
 }
 
 #[tauri::command]
-pub fn sleep_system(window: tauri::WebviewWindow) -> Result<(), String> {
+pub fn sleep_system(window: tauri::WebviewWindow) -> SystemResult<()> {
     let _ = window.hide();
-    System::sleep()
+    let result = System::sleep();
+    if let Err(ref err) = result {
+        tracing::error!(error = %err);
+    }
+    result
 }
 
 #[tauri::command]
-pub fn restart_system(window: tauri::WebviewWindow) -> Result<(), String> {
+pub fn restart_system(window: tauri::WebviewWindow) -> SystemResult<()> {
     let _ = window.hide();
-    System::restart()
+    let result = System::restart();
+    if let Err(ref err) = result {
+        tracing::error!(error = %err);
+    }
+    result
 }
 
 #[tauri::command]
-pub fn shutdown_system(window: tauri::WebviewWindow) -> Result<(), String> {
+pub fn shutdown_system(window: tauri::WebviewWindow) -> SystemResult<()> {
     let _ = window.hide();
-    System::shutdown()
+    let result = System::shutdown();
+    if let Err(ref err) = result {
+        tracing::error!(error = %err);
+    }
+    result
 }

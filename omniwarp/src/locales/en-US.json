@@ -67,6 +67,12 @@
       "discovery": "Failed to discover applications",
       "cacheDir": "Failed to access cache directory",
       "serialize": "Failed to process applications data"
+    },
+    "system": {
+      "lock": "Failed to lock screen",
+      "sleep": "Failed to enter sleep mode",
+      "restart": "Failed to restart computer",
+      "shutdown": "Failed to shut down computer"
     }
   }
 }

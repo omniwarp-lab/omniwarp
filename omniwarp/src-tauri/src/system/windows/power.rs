@@ -1,4 +1,4 @@
-use crate::system::System;
+use crate::system::{System, SystemError, SystemResult};
 use std::os::windows::process::CommandExt;
 use std::process::Command;
 
@@ -10,44 +10,44 @@ extern "system" {
 }
 
 impl System {
-    pub fn lock() -> Result<(), String> {
+    pub fn lock() -> SystemResult<()> {
         extern "system" {
             fn LockWorkStation() -> i32;
         }
 
         let success = unsafe { LockWorkStation() };
         if success == 0 {
-            return Err("Failed to lock workstation".to_string());
+            return Err(SystemError::Lock(std::io::Error::last_os_error()));
         }
 
         Ok(())
     }
 
-    pub fn sleep() -> Result<(), String> {
+    pub fn sleep() -> SystemResult<()> {
         let success = unsafe { SetSuspendState(0, 0, 0) };
         if success == 0 {
-            return Err("Failed to enter sleep state".to_string());
+            return Err(SystemError::Sleep(std::io::Error::last_os_error()));
         }
 
         Ok(())
     }
 
-    pub fn restart() -> Result<(), String> {
+    pub fn restart() -> SystemResult<()> {
         Command::new("shutdown")
             .args(["/r", "/t", "0"])
             .creation_flags(CREATE_NO_WINDOW)
             .spawn()
-            .map_err(|e| e.to_string())?;
+            .map_err(SystemError::Restart)?;
 
         Ok(())
     }
 
-    pub fn shutdown() -> Result<(), String> {
+    pub fn shutdown() -> SystemResult<()> {
         Command::new("shutdown")
             .args(["/s", "/t", "0"])
             .creation_flags(CREATE_NO_WINDOW)
             .spawn()
-            .map_err(|e| e.to_string())?;
+            .map_err(SystemError::Shutdown)?;
 
         Ok(())
     }
