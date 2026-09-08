@@ -4,6 +4,10 @@ use tauri::{
     WebviewWindowBuilder,
 };
 
+pub mod error;
+#[allow(unused_imports)]
+pub use error::{HudError, HudResult};
+
 pub const HUD_WINDOW_LABEL: &str = "hud";
 pub const HUD_WINDOW_URL: &str = "/hud";
 pub const HUD_MESSAGE_EVENT: &str = "omniwarp://hud-message";
@@ -30,7 +34,7 @@ impl Hud {
         Ok(())
     }
 
-    pub fn get_or_create_window(app: &AppHandle) -> Result<WebviewWindow, String> {
+    pub fn get_or_create_window(app: &AppHandle) -> HudResult<WebviewWindow> {
         if let Some(window) = app.get_webview_window(HUD_WINDOW_LABEL) {
             return Ok(window);
         }
@@ -53,7 +57,7 @@ impl Hud {
         .visible(false)
         .focused(false);
 
-        builder.build().map_err(|e| e.to_string())
+        builder.build().map_err(Into::into)
     }
 
     fn position_window(window: &WebviewWindow) {
@@ -87,12 +91,12 @@ impl Hud {
         }
     }
 
-    pub fn show(app: &AppHandle, payload: HudPayload) -> Result<(), String> {
+    pub fn show(app: &AppHandle, payload: HudPayload) -> HudResult<()> {
         let window = Self::get_or_create_window(app)?;
         Self::position_window(&window);
 
         let _ = window.emit(HUD_MESSAGE_EVENT, &payload);
-        window.show().map_err(|e| e.to_string())?;
+        window.show()?;
 
         Ok(())
     }

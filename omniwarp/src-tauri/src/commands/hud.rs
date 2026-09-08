@@ -1,7 +1,8 @@
-use crate::hud::{Hud, HudPayload};
+use crate::hud::{Hud, HudPayload, HudResult};
 use tauri::AppHandle;
 
 #[tauri::command]
-pub async fn show_hud(app: AppHandle, payload: HudPayload) -> Result<(), String> {
+#[tracing::instrument(skip_all, err)]
+pub async fn show_hud(app: AppHandle, payload: HudPayload) -> HudResult<()> {
     Hud::show(&app, payload)
 }
