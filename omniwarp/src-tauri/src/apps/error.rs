@@ -7,16 +7,16 @@ pub type AppResult<T> = Result<T, AppError>;
 #[derive(Error, Debug, IntoStaticStr)]
 #[strum(serialize_all = "camelCase", prefix = "apps.")]
 pub enum AppError {
-    #[error("Failed to launch app {app}: code {code}")]
+    #[error("[launch] {app}: code {code}")]
     Launch { app: String, code: isize },
 
-    #[error("Failed to discover applications: {0}")]
+    #[error("[discovery] {0}")]
     Discovery(#[from] windows::core::Error),
 
-    #[error("Failed to access cache directory: {0}")]
+    #[error("[cacheDir] {0}")]
     CacheDir(#[from] tauri::Error),
 
-    #[error("Failed to serialize applications: {0}")]
+    #[error("[serialize] {0}")]
     Serialize(#[from] serde_json::Error),
 }
 

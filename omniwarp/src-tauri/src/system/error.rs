@@ -7,16 +7,16 @@ pub type SystemResult<T> = Result<T, SystemError>;
 #[derive(Error, Debug, IntoStaticStr)]
 #[strum(serialize_all = "camelCase", prefix = "system.")]
 pub enum SystemError {
-    #[error("Failed to lock workstation: {0}")]
+    #[error("[lock] {0}")]
     Lock(std::io::Error),
 
-    #[error("Failed to enter sleep state: {0}")]
+    #[error("[sleep] {0}")]
     Sleep(std::io::Error),
 
-    #[error("Failed to restart system: {0}")]
+    #[error("[restart] {0}")]
     Restart(std::io::Error),
 
-    #[error("Failed to shut down system: {0}")]
+    #[error("[shutdown] {0}")]
     Shutdown(std::io::Error),
 }
 
