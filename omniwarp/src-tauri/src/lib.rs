@@ -5,6 +5,9 @@ use tauri::tray::TrayIcon;
 use tauri::{Emitter, Manager};
 use tauri_plugin_autostart::MacosLauncher;
 
+#[macro_use]
+mod macros;
+
 mod apps;
 mod commands;
 mod hud;
