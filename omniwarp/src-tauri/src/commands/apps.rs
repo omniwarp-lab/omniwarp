@@ -4,6 +4,7 @@ use tauri::Manager;
 use tauri_plugin_clipboard_manager::ClipboardExt;
 
 #[tauri::command]
+#[tracing::instrument(skip_all, err)]
 pub fn discover_apps(
     app_handle: tauri::AppHandle,
     state: tauri::State<AppState>,
@@ -13,28 +14,21 @@ pub fn discover_apps(
         return Ok(serde_json::to_value(apps)?);
     }
 
-    let result = (|| -> AppResult<serde_json::Value> {
-        let mut apps = Apps::discover()?;
-        let cache_dir = app_handle.path().app_cache_dir()?.join("app-icons");
-        apps.filter();
-        apps.classify();
-        apps.cache_icons(&cache_dir);
-        apps.build_index();
-        apps.snapshot_running();
+    let mut apps = Apps::discover()?;
+    let cache_dir = app_handle.path().app_cache_dir()?.join("app-icons");
+    apps.filter();
+    apps.classify();
+    apps.cache_icons(&cache_dir);
+    apps.build_index();
+    apps.snapshot_running();
 
-        let json = serde_json::to_value(&apps)?;
-        *guard = Some(apps);
-        Ok(json)
-    })();
-
-    if let Err(ref err) = result {
-        tracing::error!(error = %err);
-    }
-
-    result
+    let json = serde_json::to_value(&apps)?;
+    *guard = Some(apps);
+    Ok(json)
 }
 
 #[tauri::command]
+#[tracing::instrument(skip_all, err)]
 pub fn launch_app(
     window: tauri::WebviewWindow,
     state: tauri::State<AppState>,
@@ -47,13 +41,7 @@ pub fn launch_app(
     let apps = guard
         .as_ref()
         .expect("Apps must be discovered before launching");
-    let result = apps.launch(&id, as_admin.unwrap_or(false));
-
-    if let Err(ref err) = result {
-        tracing::error!(error = %err);
-    }
-
-    result
+    apps.launch(&id, as_admin.unwrap_or(false))
 }
 
 #[tauri::command]

@@ -1,41 +1,29 @@
 use crate::system::{System, SystemResult};
 
 #[tauri::command]
+#[tracing::instrument(skip_all, err)]
 pub fn lock_screen(window: tauri::WebviewWindow) -> SystemResult<()> {
     let _ = window.hide();
-    let result = System::lock();
-    if let Err(ref err) = result {
-        tracing::error!(error = %err);
-    }
-    result
+    System::lock()
 }
 
 #[tauri::command]
+#[tracing::instrument(skip_all, err)]
 pub fn sleep_system(window: tauri::WebviewWindow) -> SystemResult<()> {
     let _ = window.hide();
-    let result = System::sleep();
-    if let Err(ref err) = result {
-        tracing::error!(error = %err);
-    }
-    result
+    System::sleep()
 }
 
 #[tauri::command]
+#[tracing::instrument(skip_all, err)]
 pub fn restart_system(window: tauri::WebviewWindow) -> SystemResult<()> {
     let _ = window.hide();
-    let result = System::restart();
-    if let Err(ref err) = result {
-        tracing::error!(error = %err);
-    }
-    result
+    System::restart()
 }
 
 #[tauri::command]
+#[tracing::instrument(skip_all, err)]
 pub fn shutdown_system(window: tauri::WebviewWindow) -> SystemResult<()> {
     let _ = window.hide();
-    let result = System::shutdown();
-    if let Err(ref err) = result {
-        tracing::error!(error = %err);
-    }
-    result
+    System::shutdown()
 }
