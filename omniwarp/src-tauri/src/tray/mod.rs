@@ -2,17 +2,25 @@ use crate::AppState;
 use std::collections::HashMap;
 use tauri::menu::{Menu, MenuItem};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
-use tauri::{App, AppHandle, Manager, Result as TauriResult};
+use tauri::{App, AppHandle, Manager};
+
+pub mod error;
+#[allow(unused_imports)]
+pub use error::{TrayError, TrayResult};
 
 pub struct Tray;
 
 impl Tray {
-    pub fn setup(app: &App) -> TauriResult<()> {
+    pub fn setup(app: &App) -> TrayResult<()> {
         let default_labels = HashMap::new();
         let menu = Self::build_menu(app.handle(), &default_labels)?;
+        let icon = app
+            .default_window_icon()
+            .cloned()
+            .ok_or(TrayError::MissingIcon)?;
 
         let tray = TrayIconBuilder::new()
-            .icon(app.default_window_icon().unwrap().clone())
+            .icon(icon)
             .menu(&menu)
             .show_menu_on_left_click(false)
             .on_menu_event(Self::handle_tray_menu_event)
@@ -49,11 +57,12 @@ impl Tray {
     pub fn build_menu(
         app: &AppHandle,
         labels: &HashMap<String, String>,
-    ) -> TauriResult<Menu<tauri::Wry>> {
+    ) -> TrayResult<Menu<tauri::Wry>> {
         let quit_label = labels.get("quit").map(String::as_str).unwrap_or("Quit");
         let quit_item = MenuItem::with_id(app, "quit", quit_label, true, None::<&str>)?;
 
-        Menu::with_items(app, &[&quit_item])
+        let menu = Menu::with_items(app, &[&quit_item])?;
+        Ok(menu)
     }
 
     fn handle_tray_menu_event(app: &AppHandle, event: tauri::menu::MenuEvent) {

@@ -8,7 +8,7 @@ async function syncTrayLabels() {
     labels: {
       quit: i18n.t('tray.quit'),
     },
-  })
+  }).catch(() => {})
 }
 
 export { syncTrayLabels }
