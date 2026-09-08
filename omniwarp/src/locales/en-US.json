@@ -73,6 +73,9 @@
       "sleep": "Failed to enter sleep mode",
       "restart": "Failed to restart computer",
       "shutdown": "Failed to shut down computer"
+    },
+    "settings": {
+      "open": "Failed to open settings window"
     }
   }
 }

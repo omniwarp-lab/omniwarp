@@ -9,6 +9,7 @@ mod apps;
 mod commands;
 mod hud;
 mod logging;
+mod settings;
 mod shortcuts;
 mod system;
 mod tray;

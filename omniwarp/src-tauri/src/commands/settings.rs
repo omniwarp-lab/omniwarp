@@ -1,14 +1,16 @@
+use crate::settings::SettingsResult;
 use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindowBuilder};
 
 const SETTINGS_WINDOW_LABEL: &str = "settings";
 const SETTINGS_WINDOW_URL: &str = "/settings";
 
 #[tauri::command]
-pub async fn open_settings_window(app: AppHandle) -> Result<(), String> {
+#[tracing::instrument(skip_all, err)]
+pub async fn open_settings_window(app: AppHandle) -> SettingsResult<()> {
     if let Some(window) = app.get_webview_window(SETTINGS_WINDOW_LABEL) {
-        window.unminimize().map_err(|e| e.to_string())?;
-        window.show().map_err(|e| e.to_string())?;
-        window.set_focus().map_err(|e| e.to_string())?;
+        window.unminimize()?;
+        window.show()?;
+        window.set_focus()?;
         return Ok(());
     }
 
@@ -26,7 +28,7 @@ pub async fn open_settings_window(app: AppHandle) -> Result<(), String> {
     .visible(true)
     .focused(true);
 
-    builder.build().map_err(|e| e.to_string())?;
+    builder.build()?;
 
     Ok(())
 }
