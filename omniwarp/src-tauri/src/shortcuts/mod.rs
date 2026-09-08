@@ -1,10 +1,14 @@
-use tauri::{Manager, Result as TauriResult};
+use tauri::{App, Manager};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
+
+pub mod error;
+#[allow(unused_imports)]
+pub use error::{ShortcutError, ShortcutResult};
 
 pub struct Shortcuts;
 
 impl Shortcuts {
-    pub fn setup(app: &mut tauri::App) -> TauriResult<()> {
+    pub fn setup(app: &App) -> ShortcutResult<()> {
         let shortcut = Shortcut::new(Some(Modifiers::ALT), Code::Space);
 
         app.global_shortcut()
@@ -18,8 +22,8 @@ impl Shortcuts {
                         }
                     }
                 }
-            })
-            .unwrap();
+            })?;
+
         Ok(())
     }
 }
