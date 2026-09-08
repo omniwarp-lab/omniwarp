@@ -35,3 +35,16 @@ impl Logging {
         Ok(())
     }
 }
+
+pub trait ResultExt<T, E> {
+    fn log_err(self) -> Result<T, E>;
+}
+
+impl<T, E: std::fmt::Display> ResultExt<T, E> for Result<T, E> {
+    fn log_err(self) -> Result<T, E> {
+        if let Err(ref err) = self {
+            tracing::error!(error = %err);
+        }
+        self
+    }
+}

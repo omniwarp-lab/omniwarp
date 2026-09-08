@@ -17,6 +17,8 @@ mod shortcuts;
 mod system;
 mod tray;
 
+pub use logging::ResultExt;
+
 pub struct AppState {
     pub apps: Mutex<Option<Apps>>,
     pub tray: Mutex<Option<TrayIcon>>,
@@ -73,9 +75,9 @@ pub fn run() {
         })
         .setup(|app| {
             Logging::setup(app)?;
-            Tray::setup(app)?;
-            Shortcuts::setup(app)?;
-            Hud::setup(app)?;
+            Tray::setup(app).log_err()?;
+            Shortcuts::setup(app).log_err()?;
+            Hud::setup(app).log_err()?;
 
             if let Some(window) = app.get_webview_window("main") {
                 let window_clone = window.clone();

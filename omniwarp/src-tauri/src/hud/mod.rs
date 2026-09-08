@@ -29,8 +29,8 @@ pub struct HudPayload {
 pub struct Hud;
 
 impl Hud {
-    pub fn setup(app: &App) -> Result<(), Box<dyn std::error::Error>> {
-        let _ = Self::get_or_create_window(app.handle());
+    pub fn setup(app: &App) -> HudResult<()> {
+        Self::get_or_create_window(app.handle())?;
         Ok(())
     }
 
