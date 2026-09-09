@@ -33,21 +33,37 @@ impl System {
     }
 
     pub fn restart() -> SystemResult<()> {
-        Command::new("shutdown")
+        let status = Command::new("shutdown")
             .args(["/r", "/t", "0"])
             .creation_flags(CREATE_NO_WINDOW)
-            .spawn()
+            .status()
             .map_err(SystemError::Restart)?;
+
+        if !status.success() {
+            let err = match status.code() {
+                Some(code) => std::io::Error::from_raw_os_error(code),
+                None => std::io::Error::other("restart command failed"),
+            };
+            return Err(SystemError::Restart(err));
+        }
 
         Ok(())
     }
 
     pub fn shutdown() -> SystemResult<()> {
-        Command::new("shutdown")
+        let status = Command::new("shutdown")
             .args(["/s", "/t", "0"])
             .creation_flags(CREATE_NO_WINDOW)
-            .spawn()
+            .status()
             .map_err(SystemError::Shutdown)?;
+
+        if !status.success() {
+            let err = match status.code() {
+                Some(code) => std::io::Error::from_raw_os_error(code),
+                None => std::io::Error::other("shutdown command failed"),
+            };
+            return Err(SystemError::Shutdown(err));
+        }
 
         Ok(())
     }
