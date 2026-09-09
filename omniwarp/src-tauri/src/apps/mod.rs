@@ -12,7 +12,15 @@ pub struct Apps {
 }
 
 impl Apps {
-    pub fn get(&self, id: &str) -> Option<&AppInfo> {
+    pub fn get(&self, id: &str) -> &AppInfo {
+        let &i = self
+            .index
+            .get(id)
+            .expect("App ID must exist in discovered apps index");
+        &self.apps[i]
+    }
+
+    pub fn find(&self, id: &str) -> Option<&AppInfo> {
         self.index.get(id).map(|&i| &self.apps[i])
     }
 

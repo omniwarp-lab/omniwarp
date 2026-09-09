@@ -25,6 +25,14 @@ pub struct AppState {
     pub last_unfocus: AtomicI64,
 }
 
+impl AppState {
+    pub fn apps(&self) -> parking_lot::MappedMutexGuard<'_, Apps> {
+        parking_lot::MutexGuard::map(self.apps.lock(), |apps| {
+            apps.as_mut().expect("Apps must be discovered")
+        })
+    }
+}
+
 use crate::hud::Hud;
 use crate::logging::Logging;
 use crate::shortcuts::Shortcuts;

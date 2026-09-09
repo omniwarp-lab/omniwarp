@@ -7,10 +7,7 @@ use windows::Win32::UI::WindowsAndMessaging::SW_SHOWNORMAL;
 
 impl Apps {
     pub fn launch(&self, id: &str, as_admin: bool) -> AppResult<()> {
-        let app = self
-            .get(id)
-            .expect("App ID must exist in discovered apps index");
-        launch_via_shell(app, as_admin)
+        launch_via_shell(self.get(id), as_admin)
     }
 }
 

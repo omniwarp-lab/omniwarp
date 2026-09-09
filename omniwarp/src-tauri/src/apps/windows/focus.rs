@@ -17,9 +17,7 @@ struct SearchContext<'a> {
 
 impl Apps {
     pub fn focus(&self, id: &str) -> AppResult<()> {
-        let app = self
-            .get(id)
-            .expect("App ID must exist in discovered apps index");
+        let app = self.get(id);
         #[cfg(target_os = "windows")]
         if !app.pids.is_empty() && activate_window_for_pids(&app.pids) {
             return Ok(());

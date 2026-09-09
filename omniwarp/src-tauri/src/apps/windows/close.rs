@@ -13,9 +13,7 @@ struct CloseContext<'a> {
 
 impl Apps {
     pub fn close(&self, id: &str) -> AppResult<()> {
-        let app = self
-            .get(id)
-            .expect("App ID must exist in discovered apps index");
+        let app = self.get(id);
         if app.pids.is_empty() || !close_windows_for_pids(&app.pids) {
             return Err(AppError::Close {
                 app: app.name.clone(),

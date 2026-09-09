@@ -36,12 +36,7 @@ pub fn launch_app(
     as_admin: Option<bool>,
 ) -> AppResult<()> {
     let _ = window.hide();
-
-    let guard = state.apps.lock();
-    let apps = guard
-        .as_ref()
-        .expect("Apps must be discovered before launching");
-    apps.launch(&id, as_admin.unwrap_or(false))
+    state.apps().launch(&id, as_admin.unwrap_or(false))
 }
 
 #[tauri::command]
@@ -52,12 +47,7 @@ pub fn focus_app(
     id: String,
 ) -> AppResult<()> {
     let _ = window.hide();
-
-    let guard = state.apps.lock();
-    let apps = guard
-        .as_ref()
-        .expect("Apps must be discovered before focusing");
-    apps.focus(&id)
+    state.apps().focus(&id)
 }
 
 #[tauri::command]
@@ -68,12 +58,7 @@ pub fn close_app(
     id: String,
 ) -> AppResult<()> {
     let _ = window.hide();
-
-    let guard = state.apps.lock();
-    let apps = guard
-        .as_ref()
-        .expect("Apps must be discovered before closing");
-    apps.close(&id)
+    state.apps().close(&id)
 }
 
 #[tauri::command]
@@ -84,12 +69,7 @@ pub fn open_app_in_explorer(
     id: String,
 ) -> AppResult<()> {
     let _ = window.hide();
-
-    let guard = state.apps.lock();
-    let apps = guard
-        .as_ref()
-        .expect("Apps must be discovered before opening in explorer");
-    apps.open_in_explorer(&id)
+    state.apps().open_in_explorer(&id)
 }
 
 #[tauri::command]
@@ -102,13 +82,8 @@ pub fn copy_app_target_path(
 ) -> AppResult<()> {
     let _ = window.hide();
 
-    let guard = state.apps.lock();
-    let apps = guard
-        .as_ref()
-        .expect("Apps must be discovered before copying target path");
-    let app = apps
-        .get(&id)
-        .expect("App ID must exist in discovered apps index");
+    let apps = state.apps();
+    let app = apps.get(&id);
 
     if !app.can_open_in_explorer || app.target_path.is_empty() {
         return Err(AppError::CopyTargetPath {

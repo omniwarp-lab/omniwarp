@@ -7,10 +7,7 @@ use windows::Win32::UI::WindowsAndMessaging::SW_SHOWNORMAL;
 
 impl Apps {
     pub fn open_in_explorer(&self, id: &str) -> AppResult<()> {
-        let app = self
-            .get(id)
-            .expect("App ID must exist in discovered apps index");
-        open_target_in_explorer(app)
+        open_target_in_explorer(self.get(id))
     }
 }
 
