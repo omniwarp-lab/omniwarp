@@ -12,7 +12,7 @@ impl Apps {
 }
 
 fn launch_via_shell(app: &AppInfo, as_admin: bool) -> AppResult<()> {
-    let target = ensure_shell_uri_for_clsid(&app.target_path);
+    let target = resolve_target(app);
 
     let args = match app.args.trim().is_empty() {
         true => "",
@@ -40,6 +40,14 @@ fn launch_via_shell(app: &AppInfo, as_admin: bool) -> AppResult<()> {
         })
     } else {
         Ok(())
+    }
+}
+
+fn resolve_target(app: &AppInfo) -> Cow<'_, str> {
+    if app.target_path.trim().is_empty() {
+        Cow::Owned(format!(r"shell:AppsFolder\{}", app.id))
+    } else {
+        ensure_shell_uri_for_clsid(&app.target_path)
     }
 }
 
