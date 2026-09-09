@@ -1,3 +1,4 @@
+use crate::apps::windows::com::ComGuard;
 use crate::apps::windows::packages::package_roots;
 use crate::apps::Apps;
 use std::collections::HashSet;
@@ -21,6 +22,8 @@ impl Apps {
         if std::fs::create_dir_all(cache_dir).is_err() {
             return;
         }
+
+        let _com = ComGuard::new();
 
         for app in self.apps.iter_mut() {
             let icon_path = cache_dir.join(Self::icon_filename(&app.id));

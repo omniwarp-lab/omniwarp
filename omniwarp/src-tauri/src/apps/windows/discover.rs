@@ -1,3 +1,4 @@
+use crate::apps::windows::com::ComGuard;
 use crate::apps::windows::packages::package_roots;
 use crate::apps::{AppInfo, AppKind, Apps};
 use std::collections::HashMap;
@@ -5,28 +6,11 @@ use std::path::Path;
 use windows::core::{Interface, Result, PWSTR};
 use windows::Win32::Foundation::PROPERTYKEY;
 use windows::Win32::Storage::EnhancedStorage::{PKEY_Link_Arguments, PKEY_Link_TargetParsingPath};
-use windows::Win32::System::Com::{
-    CoInitializeEx, CoTaskMemFree, CoUninitialize, COINIT_APARTMENTTHREADED,
-};
+use windows::Win32::System::Com::CoTaskMemFree;
 use windows::Win32::UI::Shell::{
     BHID_EnumItems, FOLDERID_AppsFolder, IEnumShellItems, IShellItem, IShellItem2,
     SHGetKnownFolderItem, KNOWN_FOLDER_FLAG, SIGDN_DESKTOPABSOLUTEPARSING, SIGDN_NORMALDISPLAY,
 };
-
-struct ComGuard(bool);
-impl ComGuard {
-    fn new() -> Self {
-        let hr = unsafe { CoInitializeEx(None, COINIT_APARTMENTTHREADED) };
-        Self(hr.is_ok())
-    }
-}
-impl Drop for ComGuard {
-    fn drop(&mut self) {
-        if self.0 {
-            unsafe { CoUninitialize() };
-        }
-    }
-}
 
 const BATCH_SIZE: usize = 32;
 
