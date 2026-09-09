@@ -67,17 +67,19 @@ pub fn close_app(window: tauri::WebviewWindow, state: tauri::State<AppState>, id
 }
 
 #[tauri::command]
+#[tracing::instrument(skip_all, err)]
 pub fn open_app_in_explorer(
     window: tauri::WebviewWindow,
     state: tauri::State<AppState>,
     id: String,
-) {
+) -> AppResult<()> {
     let _ = window.hide();
 
     let guard = state.apps.lock();
-    if let Some(apps) = guard.as_ref() {
-        apps.open_in_explorer(&id);
-    }
+    let apps = guard
+        .as_ref()
+        .expect("Apps must be discovered before opening in explorer");
+    apps.open_in_explorer(&id)
 }
 
 #[tauri::command]

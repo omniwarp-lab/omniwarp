@@ -66,7 +66,8 @@
       "launch": "Failed to launch application",
       "discovery": "Failed to discover applications",
       "cacheDir": "Failed to access cache directory",
-      "serialize": "Failed to process applications data"
+      "serialize": "Failed to process applications data",
+      "openInExplorer": "Failed to open in File Explorer"
     },
     "system": {
       "lock": "Failed to lock screen",

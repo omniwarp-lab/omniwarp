@@ -87,7 +87,11 @@ function ActionsPopup({ item, onClose, onSelect }: ActionsPopupProps) {
             execute: async () => {
               onClose()
               const rawId = item.id.slice(4)
-              await openAppInExplorer(rawId)
+              try {
+                await openAppInExplorer(rawId)
+              } catch (err) {
+                await showAppError(err)
+              }
             },
           },
           {

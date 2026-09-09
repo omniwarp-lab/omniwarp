@@ -9,6 +9,9 @@ pub enum AppError {
     #[error("[launch] {app}: code {code}")]
     Launch { app: String, code: isize },
 
+    #[error("[openInExplorer] {app}: code {code}")]
+    OpenInExplorer { app: String, code: isize },
+
     #[error("[discovery] {0}")]
     Discovery(#[from] windows::core::Error),
 
