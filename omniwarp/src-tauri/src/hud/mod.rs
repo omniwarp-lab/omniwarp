@@ -95,7 +95,7 @@ impl Hud {
         let window = Self::get_or_create_window(app)?;
         Self::position_window(&window);
 
-        let _ = window.emit(HUD_MESSAGE_EVENT, &payload);
+        window.emit(HUD_MESSAGE_EVENT, &payload)?;
         window.show()?;
 
         Ok(())
