@@ -38,9 +38,7 @@ impl Apps {
 
         loop {
             let mut fetched = 0u32;
-            if unsafe { enum_items.Next(&mut buf, Some(&mut fetched)) }.is_err() {
-                break;
-            }
+            unsafe { enum_items.Next(&mut buf, Some(&mut fetched)) }?;
             if fetched == 0 {
                 break;
             }
