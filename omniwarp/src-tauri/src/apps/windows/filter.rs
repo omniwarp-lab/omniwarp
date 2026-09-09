@@ -232,21 +232,20 @@ unsafe fn get_string_value(hkey: HKEY, name: &str) -> Option<String> {
         return None;
     }
 
-    let mut buf: Vec<u8> = vec![0; buf_len as usize];
+    let mut buf: Vec<u16> = vec![0u16; buf_len.div_ceil(2) as usize];
     let result = RegQueryValueExW(
         hkey,
         PCWSTR(wname.as_ptr()),
         None,
         None,
-        Some(buf.as_mut_ptr()),
+        Some(buf.as_mut_ptr() as *mut u8),
         Some(&mut buf_len),
     );
     if result != ERROR_SUCCESS {
         return None;
     }
 
-    let (_, u16_buf, _) = buf.align_to::<u16>();
-    Some(from_wide(u16_buf))
+    Some(from_wide(&buf))
 }
 
 fn split_cmdline(raw: &str) -> (String, String) {
