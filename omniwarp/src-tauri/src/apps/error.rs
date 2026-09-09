@@ -15,8 +15,8 @@ pub enum AppError {
     #[error("[focus] {app}")]
     Focus { app: String },
 
-    #[error("[close] {app}")]
-    Close { app: String },
+    #[error("[close] {app}{}", format_code(.code))]
+    Close { app: String, code: Option<u32> },
 
     #[error("[copyTargetPath] {app}")]
     CopyTargetPath { app: String },
@@ -29,6 +29,13 @@ pub enum AppError {
 
     #[error("[serialize] {0}")]
     Serialize(#[from] serde_json::Error),
+}
+
+fn format_code(code: &Option<u32>) -> String {
+    match code {
+        Some(c) => format!(": code {c}"),
+        None => String::new(),
+    }
 }
 
 impl_error_serialize!(AppError);
