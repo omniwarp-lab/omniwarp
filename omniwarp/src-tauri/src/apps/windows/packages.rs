@@ -1,12 +1,13 @@
 use crate::apps::windows::env::expand_env_vars;
+use crate::apps::windows::registry::enum_subkeys;
 use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::OnceLock;
 use windows::core::HSTRING;
 use windows::Win32::Foundation::ERROR_SUCCESS;
 use windows::Win32::System::Registry::{
-    RegCloseKey, RegEnumKeyW, RegOpenKeyExW, RegQueryValueExW, HKEY, HKEY_CURRENT_USER, KEY_READ,
-    REG_EXPAND_SZ, REG_SZ,
+    RegCloseKey, RegOpenKeyExW, RegQueryValueExW, HKEY, HKEY_CURRENT_USER, KEY_READ, REG_EXPAND_SZ,
+    REG_SZ,
 };
 
 struct RegKey(HKEY);
@@ -57,24 +58,6 @@ fn build_package_roots() -> HashMap<String, PathBuf> {
     }
 
     map
-}
-
-fn enum_subkeys(hkey: HKEY) -> Vec<String> {
-    let mut names = Vec::new();
-    let mut buffer = [0u16; 256];
-    let mut index = 0u32;
-
-    loop {
-        let result = unsafe { RegEnumKeyW(hkey, index, Some(&mut buffer)) };
-        if result != ERROR_SUCCESS {
-            break; // ERROR_NO_MORE_ITEMS in the normal case
-        }
-        let len = buffer.iter().position(|&c| c == 0).unwrap_or(buffer.len());
-        names.push(String::from_utf16_lossy(&buffer[..len]));
-        index += 1;
-    }
-
-    names
 }
 
 // Windows package full names look like `<Name>_<Version>_<Arch>__<PublisherId>`

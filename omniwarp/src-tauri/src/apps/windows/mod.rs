@@ -9,4 +9,5 @@ mod focus;
 mod icons;
 mod launch;
 mod packages;
+mod registry;
 mod snapshot;

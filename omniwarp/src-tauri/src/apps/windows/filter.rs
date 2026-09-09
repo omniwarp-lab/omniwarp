@@ -1,12 +1,13 @@
 use crate::apps::windows::env::expand_env_vars;
+use crate::apps::windows::registry::enum_subkeys;
 use crate::apps::Apps;
 use std::collections::HashSet;
 use std::path::Path;
 use windows::core::PCWSTR;
 use windows::Win32::Foundation::ERROR_SUCCESS;
 use windows::Win32::System::Registry::{
-    RegCloseKey, RegEnumKeyW, RegOpenKeyExW, RegQueryValueExW, HKEY, HKEY_CURRENT_USER,
-    HKEY_LOCAL_MACHINE, KEY_READ, REG_EXPAND_SZ, REG_SZ, REG_VALUE_TYPE,
+    RegCloseKey, RegOpenKeyExW, RegQueryValueExW, HKEY, HKEY_CURRENT_USER, HKEY_LOCAL_MACHINE,
+    KEY_READ, REG_EXPAND_SZ, REG_SZ, REG_VALUE_TYPE,
 };
 
 impl Apps {
@@ -179,24 +180,6 @@ fn to_wide(s: &str) -> Vec<u16> {
 fn from_wide(buf: &[u16]) -> String {
     let len = buf.iter().position(|&c| c == 0).unwrap_or(buf.len());
     String::from_utf16_lossy(&buf[..len])
-}
-
-fn enum_subkeys(hkey: HKEY) -> Vec<String> {
-    let mut names = Vec::new();
-    let mut buffer = [0u16; 256];
-    let mut index = 0u32;
-
-    loop {
-        let result = unsafe { RegEnumKeyW(hkey, index, Some(&mut buffer)) };
-        if result != ERROR_SUCCESS {
-            break; // ERROR_NO_MORE_ITEMS in the normal case
-        }
-        let len = buffer.iter().position(|&c| c == 0).unwrap_or(buffer.len());
-        names.push(String::from_utf16_lossy(&buffer[..len]));
-        index += 1;
-    }
-
-    names
 }
 
 unsafe fn get_string_value(hkey: HKEY, name: &str) -> Option<String> {
