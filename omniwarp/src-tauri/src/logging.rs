@@ -30,7 +30,7 @@ impl Logging {
             .with_line_number(true)
             .with_filter(LevelFilter::INFO);
 
-        tracing_subscriber::registry().with(file_layer).init();
+        tracing_subscriber::registry().with(file_layer).try_init()?;
 
         Ok(())
     }
