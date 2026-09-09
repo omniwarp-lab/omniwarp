@@ -54,6 +54,7 @@ pub fn show_main_window(app: &tauri::AppHandle) {
             let running = apps.running_map();
             let _ = window.emit("omniwarp://apps-running-updated", running);
         }
+        let _ = window.unminimize();
         let _ = window.show();
         let _ = window.set_focus();
     }
