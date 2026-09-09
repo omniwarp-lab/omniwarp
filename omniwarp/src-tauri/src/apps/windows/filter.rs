@@ -1,3 +1,4 @@
+use crate::apps::windows::env::expand_env_vars;
 use crate::apps::Apps;
 use std::collections::HashSet;
 use std::path::Path;
@@ -151,37 +152,24 @@ pub fn collect_uninstall_targets() -> HashSet<String> {
         ),
     ];
 
-    unsafe {
-        for (root, path) in roots {
-            let Some(uninstall_key) = OwnedHKey::open(root, path) else {
+    for (root, path) in roots {
+        let Some(uninstall_key) = OwnedHKey::open(root, path) else {
+            continue;
+        };
+
+        for sub_name in enum_subkeys(*uninstall_key) {
+            let Some(sub_key) = OwnedHKey::open(*uninstall_key, &sub_name) else {
                 continue;
             };
 
-            for sub_name in unsafe { enum_subkeys(*uninstall_key) } {
-                let Some(sub_key) = OwnedHKey::open(*uninstall_key, &sub_name) else {
-                    continue;
-                };
-
-                if let Some(raw) = unsafe { get_string_value(*sub_key, "UninstallString") } {
-                    let (exe, args) = split_cmdline(&raw);
-                    set.insert(key(&exe, &args));
-                }
+            if let Some(raw) = unsafe { get_string_value(*sub_key, "UninstallString") } {
+                let (exe, args) = split_cmdline(&raw);
+                set.insert(key(&exe, &args));
             }
         }
     }
 
     set
-}
-
-unsafe fn open_key(root: HKEY, path: &str) -> Option<HKEY> {
-    let wpath = to_wide(path);
-    let mut hkey = HKEY(std::ptr::null_mut());
-    let result = RegOpenKeyExW(root, PCWSTR(wpath.as_ptr()), Some(0), KEY_READ, &mut hkey);
-    if result == ERROR_SUCCESS {
-        Some(hkey)
-    } else {
-        None
-    }
 }
 
 fn to_wide(s: &str) -> Vec<u16> {
@@ -245,7 +233,11 @@ unsafe fn get_string_value(hkey: HKEY, name: &str) -> Option<String> {
         return None;
     }
 
-    Some(from_wide(&buf))
+    let mut val = from_wide(&buf);
+    if value_type == REG_EXPAND_SZ || val.contains('%') {
+        val = expand_env_vars(&val);
+    }
+    Some(val)
 }
 
 fn split_cmdline(raw: &str) -> (String, String) {

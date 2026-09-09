@@ -2,6 +2,7 @@ mod classify;
 mod close;
 mod com;
 mod discover;
+mod env;
 mod explorer;
 mod filter;
 mod focus;

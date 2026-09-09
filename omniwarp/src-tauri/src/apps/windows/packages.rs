@@ -1,9 +1,9 @@
+use crate::apps::windows::env::expand_env_vars;
 use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::OnceLock;
-use windows::core::{HSTRING, PCWSTR};
+use windows::core::HSTRING;
 use windows::Win32::Foundation::ERROR_SUCCESS;
-use windows::Win32::System::Environment::ExpandEnvironmentStringsW;
 use windows::Win32::System::Registry::{
     RegCloseKey, RegEnumKeyW, RegOpenKeyExW, RegQueryValueExW, HKEY, HKEY_CURRENT_USER, KEY_READ,
     REG_EXPAND_SZ, REG_SZ,
@@ -140,23 +140,4 @@ fn reg_read_string(hkey: HKEY, value: &str) -> Option<String> {
 
     let len = buffer.iter().position(|&c| c == 0).unwrap_or(buffer.len());
     Some(String::from_utf16_lossy(&buffer[..len]))
-}
-
-fn expand_env_vars(input: &str) -> String {
-    let wide: Vec<u16> = input.encode_utf16().chain(std::iter::once(0)).collect();
-    let src = PCWSTR(wide.as_ptr());
-
-    let needed = unsafe { ExpandEnvironmentStringsW(src, None) };
-    if needed == 0 {
-        return input.to_string();
-    }
-
-    let mut buffer = vec![0u16; needed as usize];
-    let written = unsafe { ExpandEnvironmentStringsW(src, Some(&mut buffer)) };
-    if written == 0 {
-        return input.to_string();
-    }
-
-    let len = buffer.iter().position(|&c| c == 0).unwrap_or(buffer.len());
-    String::from_utf16_lossy(&buffer[..len])
 }
