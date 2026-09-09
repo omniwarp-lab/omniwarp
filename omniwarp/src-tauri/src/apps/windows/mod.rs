@@ -11,3 +11,4 @@ mod launch;
 mod packages;
 mod registry;
 mod snapshot;
+mod window;

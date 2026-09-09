@@ -1,10 +1,9 @@
+use crate::apps::windows::window::window_matches_pids;
 use crate::apps::{AppError, AppResult, Apps};
 use std::collections::HashSet;
 use windows::core::BOOL;
 use windows::Win32::Foundation::{HWND, LPARAM, WPARAM};
-use windows::Win32::UI::WindowsAndMessaging::{
-    EnumWindows, GetWindowThreadProcessId, IsWindowVisible, PostMessageW, WM_CLOSE,
-};
+use windows::Win32::UI::WindowsAndMessaging::{EnumWindows, IsWindowVisible, PostMessageW, WM_CLOSE};
 
 struct CloseContext<'a> {
     pids: &'a HashSet<u32>,
@@ -47,10 +46,7 @@ unsafe extern "system" fn enum_close_proc(hwnd: HWND, lparam: LPARAM) -> BOOL {
         return BOOL(1);
     }
 
-    let mut process_id = 0u32;
-    GetWindowThreadProcessId(hwnd, Some(&mut process_id));
-
-    if ctx.pids.contains(&process_id) {
+    if window_matches_pids(hwnd, ctx.pids) {
         let res = PostMessageW(Some(hwnd), WM_CLOSE, WPARAM(0), LPARAM(0));
         if res.is_ok() {
             ctx.closed += 1;

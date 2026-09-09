@@ -1,3 +1,4 @@
+use crate::apps::windows::window::window_matches_pids;
 use crate::apps::{AppError, AppResult, Apps};
 use std::collections::HashSet;
 use windows::core::BOOL;
@@ -64,10 +65,7 @@ unsafe extern "system" fn enum_windows_proc(hwnd: HWND, lparam: LPARAM) -> BOOL 
         }
     }
 
-    let mut process_id = 0u32;
-    GetWindowThreadProcessId(hwnd, Some(&mut process_id));
-
-    if ctx.pids.contains(&process_id) {
+    if window_matches_pids(hwnd, ctx.pids) {
         ctx.found = Some(hwnd);
         return BOOL(0);
     }
