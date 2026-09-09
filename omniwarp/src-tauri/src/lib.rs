@@ -91,8 +91,8 @@ pub fn run() {
             if let Some(window) = app.get_webview_window("main") {
                 let window_clone = window.clone();
                 let app_handle = app.handle().clone();
-                window.on_window_event(move |event| {
-                    if let tauri::WindowEvent::Focused(false) = event {
+                window.on_window_event(move |event| match event {
+                    tauri::WindowEvent::Focused(false) => {
                         let state = app_handle.state::<AppState>();
                         let now = std::time::SystemTime::now()
                             .duration_since(std::time::UNIX_EPOCH)
@@ -103,6 +103,11 @@ pub fn run() {
                             .store(now, std::sync::atomic::Ordering::Relaxed);
                         let _ = window_clone.hide();
                     }
+                    tauri::WindowEvent::CloseRequested { api, .. } => {
+                        api.prevent_close();
+                        let _ = window_clone.hide();
+                    }
+                    _ => {}
                 });
             }
 
@@ -123,6 +128,13 @@ pub fn run() {
             restart_system,
             shutdown_system
         ])
-        .run(tauri::generate_context!())
-        .expect("Error while running OmniWarp");
+        .build(tauri::generate_context!())
+        .expect("Error while running OmniWarp")
+        .run(|app_handle, event| {
+            if let tauri::RunEvent::ExitRequested { .. } = event {
+                for (_, window) in app_handle.webview_windows() {
+                    let _ = window.destroy();
+                }
+            }
+        });
 }
