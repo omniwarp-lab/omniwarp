@@ -65,11 +65,27 @@ fn build_app(item: &IShellItem) -> Option<AppInfo> {
 
     let item2: Option<IShellItem2> = item.cast().ok();
     let id = id_p.into_string();
+
+    let (family, app_id) = id.split_once('!').unzip();
+    let uwp_manifest = family
+        .and_then(|f| package_roots().get(f))
+        .and_then(|root| std::fs::read_to_string(root.join("AppxManifest.xml")).ok());
+
     let target_path = item_string(item2.as_ref(), &PKEY_Link_TargetParsingPath)
-        .or_else(|| resolve_uwp_target_path(&id))
+        .or_else(|| {
+            let f = family?;
+            let aid = app_id?;
+            let root = package_roots().get(f)?;
+            let manifest = uwp_manifest.as_deref()?;
+            let exe = manifest_executable(manifest, aid)?;
+            Some(root.join(exe).to_string_lossy().into_owned())
+        })
         .unwrap_or_default();
+
     let args = item_string(item2.as_ref(), &PKEY_Link_Arguments).unwrap_or_default();
     let can_open_in_explorer = has_valid_explorer_target(&target_path);
+    let can_run_as_admin =
+        has_valid_run_as_admin_target(&target_path, &id, uwp_manifest.as_deref());
 
     Some(AppInfo {
         name: name_p.into_string(),
@@ -80,6 +96,48 @@ fn build_app(item: &IShellItem) -> Option<AppInfo> {
         kind: AppKind::App,
         pids: Vec::new(),
         can_open_in_explorer,
+        can_run_as_admin,
+    })
+}
+
+fn has_valid_run_as_admin_target(target_path: &str, id: &str, uwp_manifest: Option<&str>) -> bool {
+    let trimmed = target_path
+        .trim()
+        .trim_matches(|c: char| c == '"' || c == '\'')
+        .trim();
+
+    if trimmed.starts_with("::{") || trimmed.contains("://") {
+        return false;
+    }
+
+    if id.contains('!') {
+        return uwp_manifest.is_some_and(manifest_has_run_full_trust);
+    }
+
+    if trimmed.is_empty() {
+        return false;
+    }
+
+    const EXECUTABLE_EXTS: &[&str] = &["exe", "com", "bat", "cmd", "msc"];
+    Path::new(trimmed)
+        .extension()
+        .and_then(|e| e.to_str())
+        .map(|e| {
+            EXECUTABLE_EXTS
+                .iter()
+                .any(|ext| e.eq_ignore_ascii_case(ext))
+        })
+        .unwrap_or(false)
+}
+
+fn manifest_has_run_full_trust(manifest: &str) -> bool {
+    let Ok(doc) = roxmltree::Document::parse(manifest) else {
+        return false;
+    };
+    doc.descendants().any(|n| {
+        n.tag_name().name() == "Capability"
+            && n.attribute("Name")
+                .is_some_and(|name| name == "runFullTrust")
     })
 }
 
@@ -102,14 +160,6 @@ fn item_string(item2: Option<&IShellItem2>, key: &PROPERTYKEY) -> Option<String>
     unsafe { i2.GetString(key) }
         .ok()
         .map(|p| OwnedPwstr(p).into_string())
-}
-
-fn resolve_uwp_target_path(aumid: &str) -> Option<String> {
-    let (family, app_id) = aumid.split_once('!')?;
-    let root = package_roots().get(family)?;
-    let manifest = std::fs::read_to_string(root.join("AppxManifest.xml")).ok()?;
-    let exe = manifest_executable(&manifest, app_id)?;
-    Some(root.join(exe).to_string_lossy().into_owned())
 }
 
 fn manifest_executable(manifest: &str, app_id: &str) -> Option<String> {

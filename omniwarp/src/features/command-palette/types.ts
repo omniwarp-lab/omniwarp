@@ -6,6 +6,7 @@ interface CommandItemBase {
   subgroup: string
   isRunning?: boolean
   canOpenInExplorer?: boolean
+  canRunAsAdmin?: boolean
   destructive?: boolean
   confirmationKey?: string
 }

@@ -63,20 +63,22 @@ function ActionsPopup({ item, onClose, onSelect }: ActionsPopupProps) {
     ]
 
     if (isAppItem) {
-      list.push({
-        id: 'run-as-admin',
-        label: t('commandPalette.actions.runAsAdmin'),
-        icon: Shield,
-        execute: async () => {
-          onClose()
-          const rawId = item.id.slice(4)
-          try {
-            await launchApp(rawId, true)
-          } catch (err) {
-            await showAppError(err)
-          }
-        },
-      })
+      if (item.canRunAsAdmin) {
+        list.push({
+          id: 'run-as-admin',
+          label: t('commandPalette.actions.runAsAdmin'),
+          icon: Shield,
+          execute: async () => {
+            onClose()
+            const rawId = item.id.slice(4)
+            try {
+              await launchApp(rawId, true)
+            } catch (err) {
+              await showAppError(err)
+            }
+          },
+        })
+      }
 
       if (item.canOpenInExplorer) {
         list.push(

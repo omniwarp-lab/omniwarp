@@ -44,7 +44,7 @@ fn launch_via_shell(app: &AppInfo, as_admin: bool) -> AppResult<()> {
 }
 
 fn resolve_target(app: &AppInfo) -> Cow<'_, str> {
-    if app.target_path.trim().is_empty() {
+    if app.target_path.trim().is_empty() || app.id.contains('!') {
         Cow::Owned(format!(r"shell:AppsFolder\{}", app.id))
     } else {
         ensure_shell_uri_for_clsid(&app.target_path)

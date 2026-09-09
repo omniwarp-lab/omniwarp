@@ -9,6 +9,7 @@ interface AppInfo {
   kind: AppKind
   pids: number[]
   canOpenInExplorer?: boolean
+  canRunAsAdmin?: boolean
 }
 
 export type { Apps, AppKind, AppInfo }

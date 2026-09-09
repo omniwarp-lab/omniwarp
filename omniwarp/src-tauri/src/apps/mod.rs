@@ -64,6 +64,7 @@ pub struct AppInfo {
     pub kind: AppKind,
     pub pids: Vec<u32>,
     pub can_open_in_explorer: bool,
+    pub can_run_as_admin: bool,
 }
 
 #[cfg(target_os = "windows")]

@@ -14,6 +14,7 @@ function appToCommandItem(app: AppInfo): CommandItem {
     icon: { kind: 'image', src: app.iconPath ? app.iconPath : '' },
     isRunning: app.pids.length > 0,
     canOpenInExplorer: app.canOpenInExplorer,
+    canRunAsAdmin: app.canRunAsAdmin,
   }
 }
 
@@ -30,6 +31,7 @@ function toPaletteItem(
     label: item.labelKey !== undefined ? t(item.labelKey) : item.label,
     isRunning: item.isRunning,
     canOpenInExplorer: item.canOpenInExplorer,
+    canRunAsAdmin: item.canRunAsAdmin,
     destructive: item.destructive,
     confirmationKey: item.confirmationKey,
   }
