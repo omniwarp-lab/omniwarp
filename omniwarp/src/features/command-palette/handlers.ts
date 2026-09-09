@@ -19,8 +19,12 @@ async function handleSelect(value: string) {
   switch (kind) {
     case 'app': {
       if (isAppRunning(id)) {
-        const focused = await focusApp(id)
-        if (focused) return
+        try {
+          await focusApp(id)
+          return
+        } catch {
+          // If focusing fails, attempt to launch
+        }
       }
       try {
         await launchApp(id)

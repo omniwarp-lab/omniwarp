@@ -101,9 +101,11 @@ function ActionsPopup({ item, onClose, onSelect }: ActionsPopupProps) {
             execute: async () => {
               onClose()
               const rawId = item.id.slice(4)
-              const copied = await copyAppTargetPath(rawId)
-              if (copied) {
+              try {
+                await copyAppTargetPath(rawId)
                 await showCopyHud(t('hud.copiedPath'))
+              } catch (err) {
+                await showAppError(err)
               }
             },
           },
@@ -118,7 +120,11 @@ function ActionsPopup({ item, onClose, onSelect }: ActionsPopupProps) {
           execute: async () => {
             onClose()
             const rawId = item.id.slice(4)
-            await closeApp(rawId)
+            try {
+              await closeApp(rawId)
+            } catch (err) {
+              await showAppError(err)
+            }
           },
         })
       }

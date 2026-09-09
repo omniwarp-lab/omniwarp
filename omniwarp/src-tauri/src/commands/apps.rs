@@ -1,4 +1,4 @@
-use crate::apps::{AppResult, Apps};
+use crate::apps::{AppError, AppResult, Apps};
 use crate::AppState;
 use tauri::Manager;
 use tauri_plugin_clipboard_manager::ClipboardExt;
@@ -45,25 +45,35 @@ pub fn launch_app(
 }
 
 #[tauri::command]
-pub fn focus_app(window: tauri::WebviewWindow, state: tauri::State<AppState>, id: String) -> bool {
+#[tracing::instrument(skip_all, err)]
+pub fn focus_app(
+    window: tauri::WebviewWindow,
+    state: tauri::State<AppState>,
+    id: String,
+) -> AppResult<()> {
     let _ = window.hide();
 
     let guard = state.apps.lock();
-    if let Some(apps) = guard.as_ref() {
-        apps.focus(&id)
-    } else {
-        false
-    }
+    let apps = guard
+        .as_ref()
+        .expect("Apps must be discovered before focusing");
+    apps.focus(&id)
 }
 
 #[tauri::command]
-pub fn close_app(window: tauri::WebviewWindow, state: tauri::State<AppState>, id: String) {
+#[tracing::instrument(skip_all, err)]
+pub fn close_app(
+    window: tauri::WebviewWindow,
+    state: tauri::State<AppState>,
+    id: String,
+) -> AppResult<()> {
     let _ = window.hide();
 
     let guard = state.apps.lock();
-    if let Some(apps) = guard.as_ref() {
-        apps.close(&id);
-    }
+    let apps = guard
+        .as_ref()
+        .expect("Apps must be discovered before closing");
+    apps.close(&id)
 }
 
 #[tauri::command]
@@ -83,24 +93,35 @@ pub fn open_app_in_explorer(
 }
 
 #[tauri::command]
+#[tracing::instrument(skip_all, err)]
 pub fn copy_app_target_path(
     app_handle: tauri::AppHandle,
     window: tauri::WebviewWindow,
     state: tauri::State<AppState>,
     id: String,
-) -> bool {
+) -> AppResult<()> {
     let _ = window.hide();
 
     let guard = state.apps.lock();
-    if let Some(apps) = guard.as_ref() {
-        if let Some(app) = apps.get(&id) {
-            if app.can_open_in_explorer && !app.target_path.is_empty() {
-                return app_handle
-                    .clipboard()
-                    .write_text(app.target_path.clone())
-                    .is_ok();
-            }
-        }
+    let apps = guard
+        .as_ref()
+        .expect("Apps must be discovered before copying target path");
+    let app = apps
+        .get(&id)
+        .expect("App ID must exist in discovered apps index");
+
+    if !app.can_open_in_explorer || app.target_path.is_empty() {
+        return Err(AppError::CopyTargetPath {
+            app: app.name.clone(),
+        });
     }
-    false
+
+    app_handle
+        .clipboard()
+        .write_text(app.target_path.clone())
+        .map_err(|_| AppError::CopyTargetPath {
+            app: app.name.clone(),
+        })?;
+
+    Ok(())
 }

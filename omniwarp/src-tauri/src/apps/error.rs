@@ -12,6 +12,15 @@ pub enum AppError {
     #[error("[openInExplorer] {app}: code {code}")]
     OpenInExplorer { app: String, code: isize },
 
+    #[error("[focus] {app}")]
+    Focus { app: String },
+
+    #[error("[close] {app}")]
+    Close { app: String },
+
+    #[error("[copyTargetPath] {app}")]
+    CopyTargetPath { app: String },
+
     #[error("[discovery] {0}")]
     Discovery(#[from] windows::core::Error),
 

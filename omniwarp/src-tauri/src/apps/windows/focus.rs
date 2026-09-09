@@ -1,4 +1,4 @@
-use crate::apps::Apps;
+use crate::apps::{AppError, AppResult, Apps};
 use std::collections::HashSet;
 use windows::core::BOOL;
 use windows::Win32::Foundation::{HWND, LPARAM};
@@ -16,14 +16,18 @@ struct SearchContext<'a> {
 }
 
 impl Apps {
-    pub fn focus(&self, id: &str) -> bool {
-        if let Some(app) = self.get(id) {
-            #[cfg(target_os = "windows")]
-            if !app.pids.is_empty() {
-                return activate_window_for_pids(&app.pids);
-            }
+    pub fn focus(&self, id: &str) -> AppResult<()> {
+        let app = self
+            .get(id)
+            .expect("App ID must exist in discovered apps index");
+        #[cfg(target_os = "windows")]
+        if !app.pids.is_empty() && activate_window_for_pids(&app.pids) {
+            return Ok(());
         }
-        false
+
+        Err(AppError::Focus {
+            app: app.name.clone(),
+        })
     }
 }
 

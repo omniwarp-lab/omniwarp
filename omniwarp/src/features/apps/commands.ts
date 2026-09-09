@@ -9,7 +9,7 @@ function launchApp(id: string, asAdmin = false): Promise<void> {
   return invoke('launch_app', { id, asAdmin })
 }
 
-function focusApp(id: string): Promise<boolean> {
+function focusApp(id: string): Promise<void> {
   return invoke('focus_app', { id })
 }
 
@@ -21,7 +21,7 @@ function openAppInExplorer(id: string): Promise<void> {
   return invoke('open_app_in_explorer', { id })
 }
 
-function copyAppTargetPath(id: string): Promise<boolean> {
+function copyAppTargetPath(id: string): Promise<void> {
   return invoke('copy_app_target_path', { id })
 }
 
