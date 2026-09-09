@@ -7,8 +7,8 @@ use std::path::{Path, PathBuf};
 use windows::core::{Interface, HSTRING};
 use windows::Win32::Foundation::SIZE;
 use windows::Win32::Graphics::Gdi::{
-    CreateCompatibleDC, DeleteDC, DeleteObject, GetDIBits, GetObjectW, SelectObject, BITMAP,
-    BITMAPINFO, BITMAPINFOHEADER, BI_RGB, DIB_RGB_COLORS, HBITMAP, HDC, HGDIOBJ,
+    CreateCompatibleDC, DeleteDC, DeleteObject, GetDIBits, GetObjectW, BITMAP, BITMAPINFO,
+    BITMAPINFOHEADER, BI_RGB, DIB_RGB_COLORS, HBITMAP, HDC,
 };
 use windows::Win32::UI::Shell::{
     IShellItem, IShellItemImageFactory, SHCreateItemFromParsingName, SIIGBF_ICONONLY,
@@ -262,30 +262,6 @@ impl Drop for MemoryDc {
     }
 }
 
-struct SelectedBitmap<'a> {
-    dc: &'a MemoryDc,
-    previous: HGDIOBJ,
-}
-impl<'a> SelectedBitmap<'a> {
-    fn new(dc: &'a MemoryDc, bitmap: HBITMAP) -> Self {
-        let previous = unsafe { SelectObject(dc.0, bitmap.into()) };
-        Self { dc, previous }
-    }
-}
-impl Drop for SelectedBitmap<'_> {
-    fn drop(&mut self) {
-        // `_selected` and `mem_dc` are separate LOCAL VARIABLES in
-        // hbitmap_to_png, so they drop in reverse declaration order —
-        // `_selected` first, restoring the DC's previous bitmap before
-        // `mem_dc`'s DeleteDC runs. (Struct fields would drop forward,
-        // the opposite rule — this guarantee comes from the caller's
-        // local-variable order, not from this struct's own fields.)
-        unsafe {
-            let _ = SelectObject(self.dc.0, self.previous);
-        }
-    }
-}
-
 fn hbitmap_to_png(hbitmap: HBITMAP) -> Option<Vec<u8>> {
     let mut bitmap = BITMAP::default();
     let written = unsafe {
@@ -302,7 +278,6 @@ fn hbitmap_to_png(hbitmap: HBITMAP) -> Option<Vec<u8>> {
     let height = bitmap.bmHeight as u32;
 
     let mem_dc = MemoryDc::new()?;
-    let _selected = SelectedBitmap::new(&mem_dc, hbitmap);
 
     let mut bmi = BITMAPINFO {
         bmiHeader: BITMAPINFOHEADER {
