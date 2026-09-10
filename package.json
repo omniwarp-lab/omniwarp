@@ -1,6 +1,7 @@
 {
   "name": "omniwarp-monorepo",
   "private": true,
+  "license": "PolyForm-Noncommercial-1.0.0",
   "scripts": {
     "dev": "turbo run tauri --filter=omniwarp -- dev"
   },
