@@ -146,11 +146,21 @@ body:has([data-slot='hud-window']) {
   background: transparent !important;
 }
 
-@keyframes hud-drain {
+@keyframes hud-ring-drain {
   from {
-    transform: scaleX(1);
+    stroke-dashoffset: 0;
   }
   to {
-    transform: scaleX(0);
+    stroke-dashoffset: 100;
+  }
+}
+
+.hud-ring {
+  animation: hud-ring-drain linear forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hud-ring {
+    animation: none;
   }
 }

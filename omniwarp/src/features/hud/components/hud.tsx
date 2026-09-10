@@ -11,15 +11,16 @@ const HUD_DURATION_MS = 3000
 
 function renderIcon(icon?: string) {
   if (icon === 'copy') {
-    return <Copy className='size-4 shrink-0 block stroke-[2.5]' />
+    return <Copy className='size-4 shrink-0' />
   }
-  return <AlertCircle className='size-4 shrink-0 block stroke-[2.5]' />
+  return <AlertCircle className='size-4 shrink-0' />
 }
 
 function HudComponent() {
   const { i18n } = useTranslation()
   const dir = i18n.dir()
   const [payload, setPayload] = useState<HudPayload | null>(null)
+  const [seq, setSeq] = useState(0)
 
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -29,6 +30,7 @@ function HudComponent() {
     }
 
     setPayload(newPayload)
+    setSeq((s) => s + 1)
 
     timerRef.current = setTimeout(() => {
       void getCurrentWindow().hide()
@@ -56,58 +58,68 @@ function HudComponent() {
     return null
   }
 
-  const variant = payload.variant
+  const isSuccess = payload.variant === 'success'
 
   return (
     <div
       data-slot='hud-window'
       dir={dir}
-      className='flex h-screen w-screen items-center justify-center p-2 bg-transparent select-none'
+      className='flex h-screen w-screen items-center justify-center bg-transparent p-2 select-none'
     >
       <div
+        key={seq}
         role='status'
         aria-live='polite'
-        className='group relative flex h-full w-full cursor-default items-center gap-3 overflow-hidden rounded-2xl border border-white/[0.12] bg-gradient-to-b from-[#232428] via-[#1b1c20] to-[#151619] px-3.5 py-2 text-foreground animate-in fade-in-0 duration-150'
+        className='flex h-full w-full cursor-default items-center gap-3 rounded-xl border border-border bg-card px-3 text-foreground shadow-none animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-200'
       >
-        {/* Icon Badge */}
-        <div
-          className={cn(
-            'flex size-7 shrink-0 items-center justify-center rounded-md border transition-colors',
-            variant === 'success'
-              ? 'border-emerald-500/30 bg-emerald-500/15 text-emerald-400'
-              : 'border-rose-500/35 bg-rose-500/15 text-rose-400',
-          )}
-        >
-          {renderIcon(payload.icon)}
-        </div>
+        <span className='relative flex size-9 shrink-0 items-center justify-center'>
+          <svg
+            viewBox='0 0 36 36'
+            className='absolute inset-0 size-full -rotate-90'
+          >
+            <circle
+              cx='18'
+              cy='18'
+              r='15.5'
+              fill='none'
+              strokeWidth='2.5'
+              className='stroke-muted'
+            />
+            <circle
+              cx='18'
+              cy='18'
+              r='15.5'
+              fill='none'
+              strokeWidth='2.5'
+              strokeLinecap='round'
+              pathLength={100}
+              strokeDasharray={100}
+              strokeDashoffset={0}
+              className={cn(
+                'hud-ring',
+                isSuccess ? 'stroke-emerald-500' : 'stroke-destructive',
+              )}
+              style={{ animationDuration: `${HUD_DURATION_MS}ms` }}
+            />
+          </svg>
+          <span
+            className={cn(
+              isSuccess ? 'text-emerald-400' : 'text-destructive',
+            )}
+          >
+            {renderIcon(payload.icon)}
+          </span>
+        </span>
 
-        {/* Message and optional description */}
         <div className='flex min-w-0 flex-1 flex-col justify-center gap-0.5 text-start'>
-          <span className='truncate text-xs font-semibold tracking-[-0.01em] text-zinc-100 leading-tight'>
+          <span className='truncate text-[13px] leading-snug font-medium'>
             {payload.message}
           </span>
           {payload.description && (
-            <span className='truncate text-[10px] text-zinc-400 leading-tight'>
+            <span className='truncate text-xs leading-snug text-muted-foreground'>
               {payload.description}
             </span>
           )}
-        </div>
-
-        {/* Countdown progress drain line */}
-        <div className='absolute bottom-0 inset-x-0 h-0.5 bg-white/4 overflow-hidden rounded-b-2xl'>
-          <div
-            key={payload.message}
-            className={cn(
-              'h-full transition-transform',
-              dir === 'rtl' ? 'origin-right' : 'origin-left',
-              variant === 'success'
-                ? 'bg-linear-to-r from-emerald-500 to-emerald-400'
-                : 'bg-linear-to-r from-rose-500 to-red-400',
-            )}
-            style={{
-              animation: `hud-drain ${HUD_DURATION_MS}ms linear forwards`,
-            }}
-          />
         </div>
       </div>
     </div>
