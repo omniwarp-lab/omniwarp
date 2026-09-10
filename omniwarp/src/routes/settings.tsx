@@ -26,6 +26,22 @@ function SettingsComponent() {
     }
   }, [])
 
+  useEffect(() => {
+    let cancelled = false
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (cancelled) return
+        const window = getCurrentWindow()
+        void window.show().then(() => window.setFocus())
+      })
+    })
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
   function handleMinimize(): void {
     void appWindow.minimize()
   }

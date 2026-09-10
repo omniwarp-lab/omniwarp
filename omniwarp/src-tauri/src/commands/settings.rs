@@ -6,7 +6,12 @@ const SETTINGS_WINDOW_URL: &str = "/settings";
 
 #[tauri::command]
 #[tracing::instrument(skip_all, err)]
-pub async fn open_settings_window(app: AppHandle) -> SettingsResult<()> {
+pub async fn open_settings_window(
+    window: tauri::WebviewWindow,
+    app: AppHandle,
+) -> SettingsResult<()> {
+    let _ = window.hide();
+
     if let Some(window) = app.get_webview_window(SETTINGS_WINDOW_LABEL) {
         window.unminimize()?;
         window.show()?;
@@ -25,8 +30,8 @@ pub async fn open_settings_window(app: AppHandle) -> SettingsResult<()> {
     .maximizable(false)
     .decorations(false)
     .center()
-    .visible(true)
-    .focused(true);
+    .visible(false)
+    .focused(false);
 
     builder.build()?;
 
