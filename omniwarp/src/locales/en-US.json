@@ -51,6 +51,8 @@
     "settings": "Settings"
   },
   "settings": {
+    "minimize": "Minimize",
+    "close": "Close",
     "language": "Language",
     "languageDescription": "Changes the language across OmniWarp",
     "autostart": "Run at Startup",

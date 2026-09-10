@@ -51,6 +51,8 @@
     "settings": "تنظیمات"
   },
   "settings": {
+    "minimize": "کوچک کردن",
+    "close": "بستن",
     "language": "زبان",
     "languageDescription": "زبان مورد استفاده در سراسر OmniWarp را تغییر می‌دهد",
     "autostart": "اجرا هنگام راه‌اندازی",

@@ -35,44 +35,55 @@ function SettingsComponent() {
   }
 
   return (
-    <main className='flex h-screen flex-col overflow-hidden bg-background'>
+    <main
+      dir='ltr'
+      className='flex h-screen flex-col overflow-hidden bg-background'
+    >
       <header
         data-tauri-drag-region
-        className='flex h-11 shrink-0 items-center gap-2.5 border-b border-border pl-3 pr-0'
+        className='flex h-12 shrink-0 items-center gap-2 border-b border-border px-3'
       >
         <h1
           data-tauri-drag-region
-          className='min-w-0 flex-1 cursor-default truncate text-sm font-medium tracking-normal'
+          className='min-w-0 flex-1 cursor-default truncate text-[13px] font-semibold tracking-normal'
         >
           {t('omniwarp.settings')}
         </h1>
 
-        <div className='flex h-full shrink-0 items-center'>
+        <div className='flex shrink-0 items-center gap-1'>
           <button
             type='button'
             onClick={handleMinimize}
-            className='flex h-full w-11 items-center justify-center text-muted-foreground transition-colors hover:bg-muted hover:text-foreground'
+            title={t('settings.minimize')}
+            aria-label={t('settings.minimize')}
+            className='flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-all outline-none hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50 active:scale-95'
           >
             <MinusIcon className='size-4' />
           </button>
           <button
             type='button'
             onClick={handleClose}
-            className='flex h-full w-11 items-center justify-center text-muted-foreground transition-colors hover:bg-destructive hover:text-destructive-foreground'
+            title={t('settings.close')}
+            aria-label={t('settings.close')}
+            className='flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-all outline-none hover:bg-destructive/10 hover:text-destructive focus-visible:ring-2 focus-visible:ring-ring/50 active:scale-95'
           >
             <XIcon className='size-4' />
           </button>
         </div>
       </header>
 
-      <div className='flex-1 p-1.5 flex flex-col gap-1'>
-        <LanguageSetting />
-        <AutostartSetting />
+      <div className='flex-1 p-3'>
+        <div className='divide-y divide-border overflow-hidden rounded-xl border border-border bg-card'>
+          <LanguageSetting />
+          <AutostartSetting />
+        </div>
       </div>
 
       <footer className='flex h-8 shrink-0 items-center justify-between border-t border-border bg-muted/40 px-4 text-xs text-muted-foreground'>
         <span className='font-medium'>OmniWarp</span>
-        {version !== null && <span>v{version}</span>}
+        {version !== null && (
+          <span className='tabular-nums'>v{version}</span>
+        )}
       </footer>
     </main>
   )
