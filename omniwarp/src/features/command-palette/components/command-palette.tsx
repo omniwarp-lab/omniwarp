@@ -20,7 +20,8 @@ import { useTranslation } from 'react-i18next'
 
 function CommandPalette() {
   const { t } = useTranslation()
-  const [query, setQuery] = useState('')
+  const query = useCommandStore((s) => s.query)
+  const setQuery = useCommandStore((s) => s.setQuery)
   const [activeItem, setActiveItem] = useState<PaletteItem | null>(null)
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)

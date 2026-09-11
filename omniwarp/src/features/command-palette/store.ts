@@ -3,12 +3,17 @@ import { CommandGroup } from '@/features/command-palette/types.ts'
 
 interface CommandStore {
   groups: CommandGroup[]
+  query: string
+  setQuery: (query: string) => void
   addGroup: (group: CommandGroup) => void
   updateRunningApps: (runningMap: Record<string, number[]>) => void
 }
 
 const useCommandStore = create<CommandStore>((set) => ({
   groups: [],
+  query: '',
+
+  setQuery: (query) => set({ query }),
 
   addGroup: (group) =>
     set(({ groups }) => ({
