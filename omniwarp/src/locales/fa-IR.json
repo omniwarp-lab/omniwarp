@@ -5,13 +5,15 @@
     "groups": {
       "apps": "برنامه‌ها",
       "results": "نتایج",
-      "commands": "دستورها"
+      "commands": "دستورها",
+      "searchProviders": "ارائه‌دهندگان جستجو"
     },
     "subgroups": {
       "app": "برنامه",
       "game": "بازی",
       "omniwarp": "OmniWarp",
-      "system": "سیستم"
+      "system": "سیستم",
+      "webSearch": "جستجوی وب"
     },
     "hints": {
       "open": "باز کردن",
@@ -82,6 +84,9 @@
     },
     "settings": {
       "open": "هنگام باز کردن پنجرهٔ تنظیمات خطایی رخ داد"
+    },
+    "webSearch": {
+      "open": "هنگام باز کردن نشانی وب خطایی رخ داد"
     }
   }
 }

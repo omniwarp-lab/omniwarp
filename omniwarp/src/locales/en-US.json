@@ -5,13 +5,15 @@
     "groups": {
       "apps": "Apps",
       "results": "Results",
-      "commands": "Commands"
+      "commands": "Commands",
+      "searchProviders": "Search Providers"
     },
     "subgroups": {
       "app": "App",
       "game": "Game",
       "omniwarp": "OmniWarp",
-      "system": "System"
+      "system": "System",
+      "webSearch": "Web Search"
     },
     "hints": {
       "open": "Open",
@@ -82,6 +84,9 @@
     },
     "settings": {
       "open": "Failed to open settings window"
+    },
+    "webSearch": {
+      "open": "Failed to open URL"
     }
   }
 }

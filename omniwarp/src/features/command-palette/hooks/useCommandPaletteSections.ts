@@ -6,6 +6,14 @@ import {
 import { useMemo } from 'react'
 import { toPaletteItem } from '@/features/command-palette/adapters.ts'
 import { useTranslation } from 'react-i18next'
+import { SEARCH_PROVIDERS } from '@/features/search-providers/providers'
+
+const SEARCH_PROVIDERS_GROUP: CommandGroup = {
+  key: 'search-providers',
+  order: 2,
+  subgroupConfigs: {},
+  items: [...SEARCH_PROVIDERS],
+}
 
 function useCommandPaletteSections(
   groups: CommandGroup[],
@@ -36,24 +44,38 @@ function useCommandPaletteSections(
   }, [query, fuse])
 
   return useMemo(() => {
-    if (results) {
-      if (results.length === 0) return []
-      return [
-        {
-          key: 'results',
-          heading: t('commandPalette.groups.results'),
-          items: results,
-        },
-      ]
-    }
-    return groups
-      .map((group) => ({
-        key: group.key,
-        heading: t(`commandPalette.groups.${group.key}`),
-        items: group.items.map((item) => toPaletteItem(item, group, t)),
-      }))
-      .filter((section) => section.items.length > 0)
-  }, [results, groups, t])
+    const trimmed = query.trim()
+    const base: CommandSection[] = results
+      ? results.length === 0
+        ? []
+        : [
+            {
+              key: 'results',
+              heading: t('commandPalette.groups.results'),
+              items: results,
+            },
+          ]
+      : groups
+          .map((group) => ({
+            key: group.key,
+            heading: t(`commandPalette.groups.${group.key}`),
+            items: group.items.map((item) => toPaletteItem(item, group, t)),
+          }))
+          .filter((section) => section.items.length > 0)
+
+    if (!trimmed) return base
+
+    return [
+      ...base,
+      {
+        key: 'search-providers',
+        heading: t('commandPalette.groups.searchProviders'),
+        items: SEARCH_PROVIDERS.map((item) =>
+          toPaletteItem(item, SEARCH_PROVIDERS_GROUP, t),
+        ),
+      },
+    ]
+  }, [results, groups, t, query])
 }
 
 export { useCommandPaletteSections }

@@ -49,9 +49,11 @@ function ImageIconRenderer({
     return <FallbackIcon className='size-6' />
   }
 
+  const resolvedSrc = src.startsWith('/') ? src : convertFileSrc(src)
+
   return (
     <img
-      src={convertFileSrc(src)}
+      src={resolvedSrc}
       className={cn('size-6', loading ? 'opacity-0' : 'opacity-100')}
       decoding='async'
       onError={() => setHasError(true)}

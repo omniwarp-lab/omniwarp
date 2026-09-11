@@ -8,6 +8,10 @@ import {
 } from '@/features/system/commands.ts'
 import { isAppRunning } from '@/features/command-palette/selectors.ts'
 import { showAppError } from '@/features/hud/errors'
+import { searchWeb } from '@/features/search-providers/commands'
+import { SEARCH_URLS } from '@/features/search-providers/providers'
+import { SearchProviderId } from '@/features/search-providers/types'
+import { useCommandStore } from '@/features/command-palette/store'
 
 async function handleSelect(value: string) {
   const separator = value.indexOf(':')
@@ -17,6 +21,16 @@ async function handleSelect(value: string) {
   const id = value.slice(separator + 1)
 
   switch (kind) {
+    case 'search-providers': {
+      const query = useCommandStore.getState().query
+      const base = SEARCH_URLS[id as SearchProviderId]
+      try {
+        await searchWeb(`${base}${encodeURIComponent(query.trim())}`)
+      } catch (err) {
+        await showAppError(err)
+      }
+      break
+    }
     case 'app': {
       if (isAppRunning(id)) {
         try {

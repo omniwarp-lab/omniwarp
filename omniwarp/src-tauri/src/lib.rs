@@ -16,6 +16,7 @@ mod settings;
 mod shortcuts;
 mod system;
 mod tray;
+mod web_search;
 
 pub use logging::ResultExt;
 
@@ -44,6 +45,7 @@ use commands::hud::show_hud;
 use commands::settings::open_settings_window;
 use commands::system::{lock_screen, restart_system, shutdown_system, sleep_system};
 use commands::tray::update_tray_menu;
+use commands::web_search::search_web;
 
 pub fn show_main_window(app: &tauri::AppHandle) {
     if let Some(window) = app.get_webview_window("main") {
@@ -73,6 +75,7 @@ pub fn run() {
     builder
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_clipboard_manager::init())
+        .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_autostart::init(
             MacosLauncher::LaunchAgent,
             None,
@@ -127,7 +130,8 @@ pub fn run() {
             lock_screen,
             sleep_system,
             restart_system,
-            shutdown_system
+            shutdown_system,
+            search_web
         ])
         .build(tauri::generate_context!())
         .expect("Error while running OmniWarp")
