@@ -128,6 +128,11 @@ function CommandPalette() {
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.defaultPrevented) return
 
+    if (e.key === 'Tab') {
+      e.preventDefault()
+      return
+    }
+
     if (confirmingItem) return
 
     if (e.altKey && (e.key.toLowerCase() === 'a' || e.code === 'KeyA')) {

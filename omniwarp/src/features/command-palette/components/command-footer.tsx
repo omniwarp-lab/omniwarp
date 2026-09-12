@@ -21,6 +21,7 @@ function CommandFooter({ open, onOpenChange }: CommandFooterProps) {
             openOnHover
             delay={150}
             closeDelay={150}
+            tabIndex={-1}
             className='flex cursor-pointer items-center gap-1.5 rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground outline-none focus-visible:ring-1 focus-visible:ring-ring'
             aria-label={t('commandPalette.hints.shortcuts')}
           >

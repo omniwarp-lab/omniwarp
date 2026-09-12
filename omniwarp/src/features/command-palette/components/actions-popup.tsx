@@ -150,6 +150,11 @@ function ActionsPopup({ item, onClose, onSelect }: ActionsPopupProps) {
   }, [])
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Tab') {
+      e.preventDefault()
+      return
+    }
+
     if (e.key === 'ArrowDown') {
       e.preventDefault()
       if (filteredActions.length > 0) {
@@ -265,6 +270,7 @@ function ActionsPopup({ item, onClose, onSelect }: ActionsPopupProps) {
                 <button
                   key={action.id}
                   type='button'
+                  tabIndex={-1}
                   onClick={() => void action.execute()}
                   onMouseEnter={() => setActiveIndex(index)}
                   className={cn(
