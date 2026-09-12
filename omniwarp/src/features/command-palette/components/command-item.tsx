@@ -9,11 +9,7 @@ interface CommandItemProps {
   onContextMenu?: (e: React.MouseEvent, item: PaletteItem) => void
 }
 
-function CommandItem({
-  item,
-  onSelect,
-  onContextMenu,
-}: CommandItemProps) {
+function CommandItem({ item, onSelect, onContextMenu }: CommandItemProps) {
   return (
     <CommandItemPrimitive
       value={item.id}
@@ -41,10 +37,10 @@ function CommandItem({
       />
 
       <span className='flex min-w-0 flex-1 flex-row justify-between antialiased'>
-        <span className='truncate tracking-normall font-medium leading-tight'>
+        <span className='truncate tracking-normal font-medium leading-tight'>
           {item.label}
         </span>
-        <span className='truncate tracking-normall font-medium leading-tight text-muted-foreground'>
+        <span className='truncate tracking-normal font-medium leading-tight text-muted-foreground'>
           {item.subgroup}
         </span>
       </span>
