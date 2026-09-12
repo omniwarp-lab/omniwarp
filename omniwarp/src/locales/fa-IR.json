@@ -41,6 +41,7 @@
     }
   },
   "tray": {
+    "settings": "تنظیمات",
     "quit": "خروج"
   },
   "system": {

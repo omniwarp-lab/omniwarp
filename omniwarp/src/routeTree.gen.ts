@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as HudRouteImport } from './routes/hud'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as TrayRouteImport } from './routes/tray'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,35 +29,44 @@ const SettingsRoute = SettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TrayRoute = TrayRouteImport.update({
+  id: '/tray',
+  path: '/tray',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/hud': typeof HudRoute
   '/settings': typeof SettingsRoute
+  '/tray': typeof TrayRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/hud': typeof HudRoute
   '/settings': typeof SettingsRoute
+  '/tray': typeof TrayRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/hud': typeof HudRoute
   '/settings': typeof SettingsRoute
+  '/tray': typeof TrayRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/hud' | '/settings'
+  fullPaths: '/' | '/hud' | '/settings' | '/tray'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/hud' | '/settings'
-  id: '__root__' | '/' | '/hud' | '/settings'
+  to: '/' | '/hud' | '/settings' | '/tray'
+  id: '__root__' | '/' | '/hud' | '/settings' | '/tray'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   HudRoute: typeof HudRoute
   SettingsRoute: typeof SettingsRoute
+  TrayRoute: typeof TrayRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -82,6 +92,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tray': {
+      id: '/tray'
+      path: '/tray'
+      fullPath: '/tray'
+      preLoaderRoute: typeof TrayRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -89,6 +106,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   HudRoute: HudRoute,
   SettingsRoute: SettingsRoute,
+  TrayRoute: TrayRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

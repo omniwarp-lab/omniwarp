@@ -20,4 +20,14 @@ async function storeLanguage(language: LanguageCode): Promise<void> {
   await settingsStore.set(LANGUAGE_STORAGE_KEY, language)
 }
 
-export { settingsStore, getStoredLanguage, storeLanguage }
+function onStoredLanguageChange(
+  callback: (language: LanguageCode) => void,
+): Promise<() => void> {
+  return settingsStore.onKeyChange<string>(LANGUAGE_STORAGE_KEY, (value) => {
+    if (isLanguageCode(value)) {
+      callback(value)
+    }
+  })
+}
+
+export { settingsStore, getStoredLanguage, storeLanguage, onStoredLanguageChange }

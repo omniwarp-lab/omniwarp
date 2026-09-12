@@ -24,6 +24,7 @@ pub struct AppState {
     pub apps: Mutex<Option<Apps>>,
     pub tray: Mutex<Option<TrayIcon>>,
     pub last_unfocus: AtomicI64,
+    pub last_tray_unfocus: AtomicI64,
 }
 
 impl AppState {
@@ -44,7 +45,7 @@ use commands::apps::{
 use commands::hud::show_hud;
 use commands::settings::open_settings_window;
 use commands::system::{lock_screen, restart_system, shutdown_system, sleep_system};
-use commands::tray::update_tray_menu;
+use commands::tray::exit_app;
 use commands::web_search::search_web;
 
 pub fn show_main_window(app: &tauri::AppHandle) {
@@ -85,6 +86,7 @@ pub fn run() {
             apps: Mutex::new(None),
             tray: Mutex::new(None),
             last_unfocus: AtomicI64::new(0),
+            last_tray_unfocus: AtomicI64::new(0),
         })
         .setup(|app| {
             Logging::setup(app)
@@ -125,7 +127,7 @@ pub fn run() {
             close_app,
             open_app_in_explorer,
             copy_app_target_path,
-            update_tray_menu,
+            exit_app,
             open_settings_window,
             show_hud,
             lock_screen,

@@ -41,6 +41,7 @@
     }
   },
   "tray": {
+    "settings": "Settings",
     "quit": "Quit"
   },
   "system": {
