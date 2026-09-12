@@ -2,7 +2,7 @@ import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
 import enUS from './locales/en-US.json'
 import faIR from './locales/fa-IR.json'
-import { getStoredLanguage } from '@/features/settings/languages'
+import { DEFAULT_LANGUAGE } from '@/features/settings/languages'
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -14,7 +14,7 @@ i18n.use(initReactI18next).init({
     },
   },
 
-  lng: getStoredLanguage(),
+  lng: DEFAULT_LANGUAGE,
   fallbackLng: 'en-US',
 
   interpolation: {

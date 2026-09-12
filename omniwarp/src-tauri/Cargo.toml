@@ -31,6 +31,7 @@ parking_lot = "0.12.5"
 tauri-plugin-autostart = "2.5.1"
 tauri-plugin-clipboard-manager = "2.3.3"
 tauri-plugin-opener = "2.5.5"
+tauri-plugin-store = "2"
 
 [target.'cfg(windows)'.dependencies]
 windows = { version = "0.62.2", features = [

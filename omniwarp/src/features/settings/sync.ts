@@ -1,11 +1,10 @@
 import { listen } from '@tauri-apps/api/event'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import i18n from '@/i18n'
+import { syncTrayLabels } from '@/features/tray/commands'
 import { LanguageCode } from '@/features/settings/types'
-import {
-  getStoredLanguage,
-  isLanguageCode,
-} from '@/features/settings/languages'
+import { isLanguageCode } from '@/features/settings/languages'
+import { getStoredLanguage } from '@/features/settings/storage'
 import { useSettingsStore } from '@/features/settings/store'
 import {
   LANGUAGE_CHANGED_EVENT,
@@ -18,6 +17,7 @@ function applyRemoteLanguage(language: LanguageCode): void {
   if (useSettingsStore.getState().language === language) return
   useSettingsStore.setState({ language })
   void i18n.changeLanguage(language)
+  void syncTrayLabels()
 }
 
 async function initLanguageSync(): Promise<() => void> {
@@ -27,10 +27,14 @@ async function initLanguageSync(): Promise<() => void> {
   }
   syncActive = true
 
+  const initialLanguage = await getStoredLanguage()
+  applyRemoteLanguage(initialLanguage)
+
   const unlistenFocus = await getCurrentWindow().onFocusChanged(
-    ({ payload: focused }) => {
+    async ({ payload: focused }) => {
       if (!focused) return
-      applyRemoteLanguage(getStoredLanguage())
+      const stored = await getStoredLanguage()
+      applyRemoteLanguage(stored)
     },
   )
 
