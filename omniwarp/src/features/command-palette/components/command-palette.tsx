@@ -66,21 +66,31 @@ function CommandPalette() {
       })
     }
 
+    const handleFocusLoss = () => {
+      setActiveItem(null)
+      setIsShortcutsOpen(false)
+      handleCloseConfirmation()
+    }
+
     const unlisten = getCurrentWindow().onFocusChanged(
       ({ payload: focused }) => {
         if (focused) {
           focusInput()
+        } else {
+          handleFocusLoss()
         }
       },
     )
 
     window.addEventListener('focus', focusInput)
+    window.addEventListener('blur', handleFocusLoss)
 
     return () => {
       void unlisten.then((fn) => fn())
       window.removeEventListener('focus', focusInput)
+      window.removeEventListener('blur', handleFocusLoss)
     }
-  }, [])
+  }, [handleCloseConfirmation])
 
   useEffect(() => {
     resetSelection()
