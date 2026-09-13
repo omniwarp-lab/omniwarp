@@ -3,7 +3,8 @@
   "private": true,
   "license": "PolyForm-Noncommercial-1.0.0",
   "scripts": {
-    "dev": "turbo run tauri --filter=omniwarp -- dev"
+    "dev": "turbo run tauri --filter=omniwarp -- dev",
+    "build": "pnpm --filter omniwarp tauri build"
   },
   "devEngines": {
     "packageManager": {
