@@ -1,9 +1,10 @@
 import { LazyStore } from '@tauri-apps/plugin-store'
-import { LanguageCode } from '@/features/settings/types'
+import { LanguageCode, LogCleanupOption } from '@/features/settings/types'
 import { DEFAULT_LANGUAGE, isLanguageCode } from '@/features/settings/languages'
 
 const SETTINGS_STORE_FILE = 'settings.json'
 const LANGUAGE_STORAGE_KEY = 'language'
+const LOG_CLEANUP_STORAGE_KEY = 'logCleanup'
 
 const settingsStore = new LazyStore(SETTINGS_STORE_FILE, { autoSave: true })
 
@@ -30,4 +31,24 @@ function onStoredLanguageChange(
   })
 }
 
-export { settingsStore, getStoredLanguage, storeLanguage, onStoredLanguageChange }
+async function getStoredLogCleanup(): Promise<LogCleanupOption> {
+  try {
+    const stored = await settingsStore.get<LogCleanupOption>(LOG_CLEANUP_STORAGE_KEY)
+    return stored === '30days' || stored === 'never' ? stored : '7days'
+  } catch {
+    return '7days'
+  }
+}
+
+async function storeLogCleanup(option: LogCleanupOption): Promise<void> {
+  await settingsStore.set(LOG_CLEANUP_STORAGE_KEY, option)
+}
+
+export {
+  settingsStore,
+  getStoredLanguage,
+  storeLanguage,
+  onStoredLanguageChange,
+  getStoredLogCleanup,
+  storeLogCleanup,
+}

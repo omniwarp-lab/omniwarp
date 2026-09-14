@@ -2,10 +2,31 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { useEffect, useState } from 'react'
-import { MinusIcon, XIcon } from 'lucide-react'
+import {
+  MinusIcon,
+  ScrollTextIcon,
+  SlidersHorizontalIcon,
+  XIcon,
+} from 'lucide-react'
 import { getVersion } from '@tauri-apps/api/app'
-import { LanguageSetting } from '@/features/settings/components/language-setting'
-import { AutostartSetting } from '@/features/settings/components/autostart-setting'
+import { Tabs, TabsList, TabsPanel, TabsTab } from '@/components/ui/tabs'
+import { GeneralSection } from '@/features/settings/components/general-section'
+import { LogsSection } from '@/features/settings/components/logs-section'
+
+const SECTIONS = [
+  {
+    id: 'general',
+    titleKey: 'settings.sections.general',
+    icon: SlidersHorizontalIcon,
+    Component: GeneralSection,
+  },
+  {
+    id: 'logs',
+    titleKey: 'settings.sections.logs',
+    icon: ScrollTextIcon,
+    Component: LogsSection,
+  },
+] as const
 
 function SettingsComponent() {
   const { t } = useTranslation()
@@ -88,12 +109,30 @@ function SettingsComponent() {
         </div>
       </header>
 
-      <div className='flex-1 p-3'>
-        <div className='divide-y divide-border overflow-hidden rounded-xl border border-border bg-card'>
-          <LanguageSetting />
-          <AutostartSetting />
+      <Tabs
+        orientation='vertical'
+        defaultValue='general'
+        className='flex flex-1 flex-row overflow-hidden'
+      >
+        <aside className='flex w-45 shrink-0 flex-col border-r border-border bg-muted/20 p-2'>
+          <TabsList className='flex w-full flex-col items-stretch gap-1'>
+            {SECTIONS.map(({ id, titleKey, icon: Icon }) => (
+              <TabsTab key={id} value={id} className='w-full'>
+                <Icon className='size-4 shrink-0' />
+                <span className='truncate'>{t(titleKey)}</span>
+              </TabsTab>
+            ))}
+          </TabsList>
+        </aside>
+
+        <div className='w-130 flex-1 overflow-y-auto p-3'>
+          {SECTIONS.map(({ id, Component }) => (
+            <TabsPanel key={id} value={id}>
+              <Component />
+            </TabsPanel>
+          ))}
         </div>
-      </div>
+      </Tabs>
 
       <footer className='flex h-8 shrink-0 items-center justify-between border-t border-border bg-muted/40 px-4 text-xs text-muted-foreground'>
         <span className='font-medium'>OmniWarp</span>

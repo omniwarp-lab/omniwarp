@@ -25,7 +25,7 @@ pub async fn open_settings_window(
         WebviewUrl::App(SETTINGS_WINDOW_URL.into()),
     )
     .title("OmniWarp")
-    .inner_size(520.0, 460.0)
+    .inner_size(700.0, 460.0)
     .resizable(false)
     .maximizable(false)
     .decorations(false)

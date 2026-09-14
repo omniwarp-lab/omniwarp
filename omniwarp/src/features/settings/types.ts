@@ -5,4 +5,6 @@ interface LanguageOption {
   label: string
 }
 
-export type { LanguageCode, LanguageOption }
+type LogCleanupOption = '7days' | '30days' | 'never'
+
+export type { LanguageCode, LanguageOption, LogCleanupOption }

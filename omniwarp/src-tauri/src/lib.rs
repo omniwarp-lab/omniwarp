@@ -43,6 +43,7 @@ use commands::apps::{
     close_app, copy_app_target_path, discover_apps, focus_app, launch_app, open_app_in_explorer,
 };
 use commands::hud::show_hud;
+use commands::logging::open_logs_dir;
 use commands::settings::open_settings_window;
 use commands::system::{lock_screen, restart_system, shutdown_system, sleep_system};
 use commands::tray::exit_app;
@@ -134,7 +135,8 @@ pub fn run() {
             sleep_system,
             restart_system,
             shutdown_system,
-            search_web
+            search_web,
+            open_logs_dir
         ])
         .build(tauri::generate_context!())
         .expect("Error while running OmniWarp")

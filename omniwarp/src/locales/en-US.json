@@ -59,7 +59,23 @@
     "language": "Language",
     "languageDescription": "Changes the language across OmniWarp",
     "autostart": "Run at Startup",
-    "autostartDescription": "Starts OmniWarp automatically when you log in"
+    "autostartDescription": "Starts OmniWarp automatically when you log in",
+    "sections": {
+      "general": "General",
+      "logs": "Logs"
+    },
+    "logs": {
+      "openDir": "Logs Directory",
+      "openDirDescription": "Opens the folder containing OmniWarp log files in File Explorer",
+      "openDirButton": "Open",
+      "cleanup": "Auto Cleanup",
+      "cleanupDescription": "Automatically removes old log files when OmniWarp starts",
+      "options": {
+        "7days": "7 Days (Default)",
+        "30days": "30 Days",
+        "never": "Never"
+      }
+    }
   },
   "hud": {
     "copiedPath": "Copied path to clipboard"
@@ -85,6 +101,9 @@
     },
     "settings": {
       "open": "Failed to open settings window"
+    },
+    "logging": {
+      "openDir": "Failed to open logs directory"
     },
     "webSearch": {
       "open": "Failed to open URL"

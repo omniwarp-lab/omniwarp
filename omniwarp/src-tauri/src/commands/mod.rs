@@ -1,5 +1,6 @@
 pub mod apps;
 pub mod hud;
+pub mod logging;
 pub mod settings;
 pub mod system;
 pub mod tray;

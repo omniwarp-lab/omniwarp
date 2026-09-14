@@ -59,7 +59,23 @@
     "language": "زبان",
     "languageDescription": "زبان مورد استفاده در سراسر OmniWarp را تغییر می‌دهد",
     "autostart": "اجرا هنگام راه‌اندازی",
-    "autostartDescription": "با ورود به سیستم، OmniWarp به‌صورت خودکار اجرا می‌شود"
+    "autostartDescription": "با ورود به سیستم، OmniWarp به‌صورت خودکار اجرا می‌شود",
+    "sections": {
+      "general": "عمومی",
+      "logs": "لاگ‌ها"
+    },
+    "logs": {
+      "openDir": "پوشهٔ لاگ‌ها",
+      "openDirDescription": "پوشهٔ حاوی فایل‌های لاگ OmniWarp را باز می‌کند",
+      "openDirButton": "باز کردن",
+      "cleanup": "پاک‌سازی خودکار",
+      "cleanupDescription": "فایل‌های لاگ قدیمی را هنگام اجرای OmniWarp به‌صورت خودکار حذف می‌کند",
+      "options": {
+        "7days": "۷ روز (پیش‌فرض)",
+        "30days": "۳۰ روز",
+        "never": "هرگز"
+      }
+    }
   },
   "hud": {
     "copiedPath": "مسیر در کلیپ‌بورد کپی شد"
@@ -85,6 +101,9 @@
     },
     "settings": {
       "open": "هنگام باز کردن پنجرهٔ تنظیمات خطایی رخ داد"
+    },
+    "logging": {
+      "openDir": "هنگام باز کردن پوشهٔ لاگ‌ها خطایی رخ داد"
     },
     "webSearch": {
       "open": "هنگام باز کردن نشانی وب خطایی رخ داد"
