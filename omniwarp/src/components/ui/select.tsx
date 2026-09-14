@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Select as SelectPrimitive } from '@base-ui/react/select'
 import { CheckIcon, ChevronDownIcon } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/lib/utils'
 
@@ -48,11 +49,15 @@ function SelectContent({
   sideOffset?: SelectPrimitive.Positioner.Props['sideOffset']
   align?: SelectPrimitive.Positioner.Props['align']
 }) {
+  const { i18n } = useTranslation()
+  const dir = i18n.dir()
+
   return (
     <SelectPrimitive.Portal>
       <SelectPrimitive.Positioner
         sideOffset={sideOffset}
         align={align}
+        dir={dir}
         className='z-50 max-h-(--available-height) min-w-(--anchor-width)'
       >
         <SelectPrimitive.Popup

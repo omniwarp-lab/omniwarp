@@ -29,7 +29,8 @@ const SECTIONS = [
 ] as const
 
 function SettingsComponent() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const dir = i18n.dir()
   const appWindow = getCurrentWindow()
   const [version, setVersion] = useState<string | null>(null)
 
@@ -73,7 +74,7 @@ function SettingsComponent() {
 
   return (
     <main
-      dir='ltr'
+      dir={dir}
       className='flex h-screen flex-col overflow-hidden bg-background'
     >
       <header
@@ -114,7 +115,7 @@ function SettingsComponent() {
         defaultValue='general'
         className='flex flex-1 flex-row overflow-hidden'
       >
-        <aside className='flex w-45 shrink-0 flex-col border-r border-border bg-muted/20 p-2'>
+        <aside className='flex w-45 shrink-0 flex-col border-e border-border bg-muted/20 p-2'>
           <TabsList className='flex w-full flex-col items-stretch gap-1'>
             {SECTIONS.map(({ id, titleKey, icon: Icon }) => (
               <TabsTab key={id} value={id} className='w-full'>
@@ -134,11 +135,12 @@ function SettingsComponent() {
         </div>
       </Tabs>
 
-      <footer className='flex h-8 shrink-0 items-center justify-between border-t border-border bg-muted/40 px-4 text-xs text-muted-foreground'>
+      <footer
+        dir='ltr'
+        className='flex h-8 shrink-0 items-center justify-between border-t border-border bg-muted/40 px-4 text-xs text-muted-foreground'
+      >
         <span className='font-medium'>OmniWarp</span>
-        {version !== null && (
-          <span className='tabular-nums'>v{version}</span>
-        )}
+        {version !== null && <span className='tabular-nums'>v{version}</span>}
       </footer>
     </main>
   )
