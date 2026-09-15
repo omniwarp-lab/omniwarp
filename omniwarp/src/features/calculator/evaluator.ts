@@ -14,8 +14,13 @@ type Token =
         | 'COS'
         | 'TAN'
         | 'COTAN'
+        | 'SIND'
+        | 'COSD'
+        | 'TAND'
+        | 'COTAND'
         | 'FACTORIAL'
         | 'PERCENT'
+        | 'DEGREE'
         | 'LPAREN'
         | 'RPAREN'
     }
@@ -43,17 +48,19 @@ function normalizeExpression(expr: string): string {
     .replace(/٪/g, '%')
     .replace(/\bof\b/gi, '*')
     .replace(/[πΠ]/g, 'pi')
+    .replace(/[˚º]/g, '°')
+    .replace(/\bdegrees?\b/gi, 'deg')
 }
 
 function tokenize(expr: string): Token[] | null {
   const normalized = normalizeExpression(expr)
   const regex =
-    /\s*(?:(\d+(?:\.\d+)?|\.\d+)|(sqrt|sin|cos|tan|cotan|cot|ctg)\b|(pi)\b|(e)\b|([+\-*/^!%()])|(\S))/gi
+    /\s*(?:(\d+(?:\.\d+)?|\.\d+)|(sind|cosd|tand|cotand|cotd|ctgd|sin|cos|tan|cotan|cot|ctg|sqrt)\b|(pi)\b|(e)\b|(deg)\b|([+\-*/^!%°()])|(\S))/gi
   const rawTokens: Token[] = []
   let match: RegExpExecArray | null
 
   while ((match = regex.exec(normalized)) !== null) {
-    if (match[6] !== undefined) return null
+    if (match[7] !== undefined) return null
 
     if (match[1] !== undefined) {
       const val = Number(match[1])
@@ -62,6 +69,11 @@ function tokenize(expr: string): Token[] | null {
     } else if (match[2] !== undefined) {
       const fn = match[2].toLowerCase()
       if (fn === 'sqrt') rawTokens.push({ type: 'SQRT' })
+      else if (fn === 'sind') rawTokens.push({ type: 'SIND' })
+      else if (fn === 'cosd') rawTokens.push({ type: 'COSD' })
+      else if (fn === 'tand') rawTokens.push({ type: 'TAND' })
+      else if (fn === 'cotand' || fn === 'cotd' || fn === 'ctgd')
+        rawTokens.push({ type: 'COTAND' })
       else if (fn === 'sin') rawTokens.push({ type: 'SIN' })
       else if (fn === 'cos') rawTokens.push({ type: 'COS' })
       else if (fn === 'tan') rawTokens.push({ type: 'TAN' })
@@ -72,7 +84,9 @@ function tokenize(expr: string): Token[] | null {
     } else if (match[4] !== undefined) {
       rawTokens.push({ type: 'E' })
     } else if (match[5] !== undefined) {
-      const op = match[5]
+      rawTokens.push({ type: 'DEGREE' })
+    } else if (match[6] !== undefined) {
+      const op = match[6]
       if (op === '+') rawTokens.push({ type: 'PLUS' })
       else if (op === '-') rawTokens.push({ type: 'MINUS' })
       else if (op === '*') rawTokens.push({ type: 'MULTIPLY' })
@@ -80,6 +94,7 @@ function tokenize(expr: string): Token[] | null {
       else if (op === '^') rawTokens.push({ type: 'POWER' })
       else if (op === '!') rawTokens.push({ type: 'FACTORIAL' })
       else if (op === '%') rawTokens.push({ type: 'PERCENT' })
+      else if (op === '°') rawTokens.push({ type: 'DEGREE' })
       else if (op === '(') rawTokens.push({ type: 'LPAREN' })
       else if (op === ')') rawTokens.push({ type: 'RPAREN' })
     }
@@ -92,34 +107,41 @@ function tokenize(expr: string): Token[] | null {
     const current = rawTokens[i]
     if (i > 0) {
       const prev = rawTokens[i - 1]
-      const isPrevNumberOrParenOrFactOrPct =
+      const isPrevNumberOrParenOrFactOrPctOrDeg =
         prev.type === 'NUMBER' ||
         prev.type === 'PI' ||
         prev.type === 'E' ||
         prev.type === 'RPAREN' ||
         prev.type === 'FACTORIAL' ||
-        prev.type === 'PERCENT'
+        prev.type === 'PERCENT' ||
+        prev.type === 'DEGREE'
       const isCurrentFunction =
         current.type === 'SQRT' ||
         current.type === 'SIN' ||
         current.type === 'COS' ||
         current.type === 'TAN' ||
-        current.type === 'COTAN'
+        current.type === 'COTAN' ||
+        current.type === 'SIND' ||
+        current.type === 'COSD' ||
+        current.type === 'TAND' ||
+        current.type === 'COTAND'
       const isCurrentLParenOrFunction =
         current.type === 'LPAREN' || isCurrentFunction
       const isCurrentNumber = current.type === 'NUMBER'
       const isCurrentConstant = current.type === 'PI' || current.type === 'E'
 
       if (
-        (isPrevNumberOrParenOrFactOrPct && isCurrentLParenOrFunction) ||
+        (isPrevNumberOrParenOrFactOrPctOrDeg && isCurrentLParenOrFunction) ||
         ((prev.type === 'RPAREN' ||
           prev.type === 'FACTORIAL' ||
-          prev.type === 'PERCENT') &&
+          prev.type === 'PERCENT' ||
+          prev.type === 'DEGREE') &&
           isCurrentNumber) ||
         ((prev.type === 'NUMBER' ||
           prev.type === 'RPAREN' ||
           prev.type === 'FACTORIAL' ||
-          prev.type === 'PERCENT') &&
+          prev.type === 'PERCENT' ||
+          prev.type === 'DEGREE') &&
           isCurrentConstant)
       ) {
         tokens.push({ type: 'MULTIPLY' })
@@ -226,6 +248,51 @@ function parseAndEvaluate(
       return { value: Math.abs(val) < 1e-15 ? 0 : val, isPercent: false }
     }
 
+    if (token.type === 'SIND') {
+      index++
+      binaryOpCount++
+      const operand = parseUnary()
+      if (operand === null) return null
+      const rad = (operand.value * Math.PI) / 180
+      const val = Math.sin(rad)
+      return { value: Math.abs(val) < 1e-15 ? 0 : val, isPercent: false }
+    }
+
+    if (token.type === 'COSD') {
+      index++
+      binaryOpCount++
+      const operand = parseUnary()
+      if (operand === null) return null
+      const rad = (operand.value * Math.PI) / 180
+      const val = Math.cos(rad)
+      return { value: Math.abs(val) < 1e-15 ? 0 : val, isPercent: false }
+    }
+
+    if (token.type === 'TAND') {
+      index++
+      binaryOpCount++
+      const operand = parseUnary()
+      if (operand === null) return null
+      const rad = (operand.value * Math.PI) / 180
+      const cosVal = Math.cos(rad)
+      if (Math.abs(cosVal) < 1e-15) return null
+      const val = Math.tan(rad)
+      return { value: Math.abs(val) < 1e-15 ? 0 : val, isPercent: false }
+    }
+
+    if (token.type === 'COTAND') {
+      index++
+      binaryOpCount++
+      const operand = parseUnary()
+      if (operand === null) return null
+      const rad = (operand.value * Math.PI) / 180
+      const sinVal = Math.sin(rad)
+      if (Math.abs(sinVal) < 1e-15) return null
+      const cosVal = Math.cos(rad)
+      const val = cosVal / sinVal
+      return { value: Math.abs(val) < 1e-15 ? 0 : val, isPercent: false }
+    }
+
     return parsePrimary()
   }
 
@@ -245,6 +312,10 @@ function parseAndEvaluate(
         index++
         binaryOpCount++
         node = { value: node.value / 100, isPercent: true }
+      } else if (token.type === 'DEGREE') {
+        index++
+        binaryOpCount++
+        node = { value: (node.value * Math.PI) / 180, isPercent: false }
       } else {
         break
       }
@@ -382,6 +453,10 @@ function trimAndBalanceTokens(tokens: Token[]): Token[] | null {
     'COS',
     'TAN',
     'COTAN',
+    'SIND',
+    'COSD',
+    'TAND',
+    'COTAND',
     'LPAREN',
   ])
 
@@ -443,14 +518,22 @@ function formatCalculatorExpression(query: string): string {
     .replace(/^=\s*/, '')
     .replace(/(?<![a-zA-Z\\])pi(?![a-zA-Z])/gi, '\\pi')
     .replace(/(?<![a-zA-Z])E(?![a-zA-Z])/g, 'e')
+    .replace(/(?<![a-zA-Z\\])sind(?![a-zA-Z])/gi, '\\operatorname{sind}')
+    .replace(/(?<![a-zA-Z\\])cosd(?![a-zA-Z])/gi, '\\operatorname{cosd}')
+    .replace(/(?<![a-zA-Z\\])tand(?![a-zA-Z])/gi, '\\operatorname{tand}')
+    .replace(
+      /(?<![a-zA-Z\\])(?:cotand|cotd|ctgd)(?![a-zA-Z])/gi,
+      '\\operatorname{cotd}',
+    )
     .replace(/(?<![a-zA-Z\\])sin(?![a-zA-Z])/gi, '\\sin')
     .replace(/(?<![a-zA-Z\\])cos(?![a-zA-Z])/gi, '\\cos')
     .replace(/(?<![a-zA-Z\\])tan(?![a-zA-Z])/gi, '\\tan')
     .replace(/(?<![a-zA-Z\\])(?:cotan|cot|ctg)(?![a-zA-Z])/gi, '\\cot')
+    .replace(/\s*(?:deg|°)/gi, '^{\\circ}')
     .replace(/\s*([*×])\s*/g, ' × ')
     .replace(/\s*([/÷])\s*/g, ' ÷ ')
-    .replace(/([0-9)%!]|\\pi|e)\s*\+\s*/g, '$1 + ')
-    .replace(/([0-9)%!]|\\pi|e)\s*-\s*/g, '$1 - ')
+    .replace(/([0-9)%!}]|\\pi|e)\s*\+\s*/g, '$1 + ')
+    .replace(/([0-9)%!}]|\\pi|e)\s*-\s*/g, '$1 - ')
 
   while (/sqrt\s*\(([^()]*(\([^()]*\)[^()]*)*)\)/i.test(clean)) {
     clean = clean.replace(
