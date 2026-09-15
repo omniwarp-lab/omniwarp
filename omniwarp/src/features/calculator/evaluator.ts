@@ -1,5 +1,7 @@
 type Token =
   | { type: 'NUMBER'; value: number }
+  | { type: 'PI' }
+  | { type: 'E' }
   | {
       type:
         | 'PLUS'
@@ -36,16 +38,18 @@ function normalizeExpression(expr: string): string {
     .replace(/√/g, 'sqrt ')
     .replace(/٪/g, '%')
     .replace(/\bof\b/gi, '*')
+    .replace(/[πΠ]/g, 'pi')
 }
 
 function tokenize(expr: string): Token[] | null {
   const normalized = normalizeExpression(expr)
-  const regex = /\s*(?:(\d+(?:\.\d+)?|\.\d+)|(sqrt)|([+\-*/^!%()])|(\S))/gi
+  const regex =
+    /\s*(?:(\d+(?:\.\d+)?|\.\d+)|(sqrt)|(pi)\b|(e)\b|([+\-*/^!%()])|(\S))/gi
   const rawTokens: Token[] = []
   let match: RegExpExecArray | null
 
   while ((match = regex.exec(normalized)) !== null) {
-    if (match[4] !== undefined) return null
+    if (match[6] !== undefined) return null
 
     if (match[1] !== undefined) {
       const val = Number(match[1])
@@ -54,7 +58,11 @@ function tokenize(expr: string): Token[] | null {
     } else if (match[2] !== undefined) {
       rawTokens.push({ type: 'SQRT' })
     } else if (match[3] !== undefined) {
-      const op = match[3]
+      rawTokens.push({ type: 'PI' })
+    } else if (match[4] !== undefined) {
+      rawTokens.push({ type: 'E' })
+    } else if (match[5] !== undefined) {
+      const op = match[5]
       if (op === '+') rawTokens.push({ type: 'PLUS' })
       else if (op === '-') rawTokens.push({ type: 'MINUS' })
       else if (op === '*') rawTokens.push({ type: 'MULTIPLY' })
@@ -76,19 +84,27 @@ function tokenize(expr: string): Token[] | null {
       const prev = rawTokens[i - 1]
       const isPrevNumberOrParenOrFactOrPct =
         prev.type === 'NUMBER' ||
+        prev.type === 'PI' ||
+        prev.type === 'E' ||
         prev.type === 'RPAREN' ||
         prev.type === 'FACTORIAL' ||
         prev.type === 'PERCENT'
       const isCurrentLParenOrSqrt =
         current.type === 'LPAREN' || current.type === 'SQRT'
       const isCurrentNumber = current.type === 'NUMBER'
+      const isCurrentConstant = current.type === 'PI' || current.type === 'E'
 
       if (
         (isPrevNumberOrParenOrFactOrPct && isCurrentLParenOrSqrt) ||
         ((prev.type === 'RPAREN' ||
           prev.type === 'FACTORIAL' ||
           prev.type === 'PERCENT') &&
-          isCurrentNumber)
+          isCurrentNumber) ||
+        ((prev.type === 'NUMBER' ||
+          prev.type === 'RPAREN' ||
+          prev.type === 'FACTORIAL' ||
+          prev.type === 'PERCENT') &&
+          isCurrentConstant)
       ) {
         tokens.push({ type: 'MULTIPLY' })
       }
@@ -117,6 +133,16 @@ function parseAndEvaluate(
     if (token.type === 'NUMBER') {
       index++
       return { value: token.value, isPercent: false }
+    }
+
+    if (token.type === 'PI') {
+      index++
+      return { value: Math.PI, isPercent: false }
+    }
+
+    if (token.type === 'E') {
+      index++
+      return { value: Math.E, isPercent: false }
     }
 
     if (token.type === 'LPAREN') {
@@ -354,10 +380,12 @@ function evaluateCalculator(query: string): string | null {
 function formatCalculatorExpression(query: string): string {
   let clean = normalizeExpression(query.trim())
     .replace(/^=\s*/, '')
+    .replace(/(?<![a-zA-Z\\])pi(?![a-zA-Z])/gi, '\\pi')
+    .replace(/(?<![a-zA-Z])E(?![a-zA-Z])/g, 'e')
     .replace(/\s*([*×])\s*/g, ' × ')
     .replace(/\s*([/÷])\s*/g, ' ÷ ')
-    .replace(/([0-9)%!])\s*\+\s*/g, '$1 + ')
-    .replace(/([0-9)%!])\s*-\s*/g, '$1 - ')
+    .replace(/([0-9)%!]|\\pi|e)\s*\+\s*/g, '$1 + ')
+    .replace(/([0-9)%!]|\\pi|e)\s*-\s*/g, '$1 - ')
 
   while (/sqrt\s*\(([^()]+)\)/i.test(clean)) {
     clean = clean.replace(
@@ -366,7 +394,7 @@ function formatCalculatorExpression(query: string): string {
     )
   }
   clean = clean.replace(
-    /sqrt\s*(\d+(?:\.\d+)?!*)/gi,
+    /sqrt\s*(\d+(?:\.\d+)?!*|\\pi|e)/gi,
     (_, m: string) => `\\sqrt{${m}}`,
   )
 
@@ -382,8 +410,9 @@ function formatCalculatorExpression(query: string): string {
   }
 
   clean = clean.replace(/\^\s*(\\sqrt\{[^}]+\})/g, '^{$1}')
-  clean = clean.replace(/\^\s*(-[0-9.]+!*)/g, '^{$1}')
+  clean = clean.replace(/\^\s*(-(?:[0-9.]+!*|\\pi|e))/g, '^{$1}')
   clean = clean.replace(/\^\s*([0-9.]+!+)/g, '^{$1}')
+  clean = clean.replace(/\^\s*(\\pi)/g, '^{$1}')
   clean = clean.replace(/\^\s*$/, '^{}')
 
   clean = clean.replace(/%/g, () => '\\%')
