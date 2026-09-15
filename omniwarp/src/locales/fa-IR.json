@@ -6,14 +6,16 @@
       "apps": "برنامه‌ها",
       "results": "نتایج",
       "commands": "دستورها",
-      "searchProviders": "ارائه‌دهندگان جستجو"
+      "searchProviders": "ارائه‌دهندگان جستجو",
+      "calculator": "ماشین حساب"
     },
     "subgroups": {
       "app": "برنامه",
       "game": "بازی",
       "omniwarp": "OmniWarp",
       "system": "سیستم",
-      "webSearch": "جستجوی وب"
+      "webSearch": "جستجوی وب",
+      "calculator": "ماشین حساب"
     },
     "hints": {
       "open": "باز کردن",
@@ -32,6 +34,7 @@
       "runAsAdmin": "اجرا به عنوان مدیر",
       "showInExplorer": "نمایش محل برنامه",
       "copyPath": "کپی مسیر برنامه",
+      "copyResult": "کپی نتیجه",
       "noResults": "عملیاتی پیدا نشد"
     },
     "confirmation": {
@@ -78,11 +81,15 @@
     }
   },
   "hud": {
-    "copiedPath": "مسیر در کلیپ‌بورد کپی شد"
+    "copiedPath": "مسیر در کلیپ‌بورد کپی شد",
+    "copiedResult": "نتیجه در کلیپ‌بورد کپی شد"
   },
   "errors": {
     "generic": "خطای غیرمنتظره‌ای رخ داد",
     "checkLogs": "لاگ‌ها را بررسی کنید",
+    "clipboard": {
+      "write": "هنگام کپی در کلیپ‌بورد خطایی رخ داد"
+    },
     "apps": {
       "launch": "هنگام اجرای برنامه خطایی رخ داد",
       "discovery": "هنگام یافتن برنامه‌ها خطایی رخ داد",

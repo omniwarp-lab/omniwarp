@@ -2,6 +2,7 @@ import { CommandItem as CommandItemPrimitive } from 'cmdk'
 import type { PaletteItem } from '@/features/command-palette/types'
 import { handleSelect } from '@/features/command-palette/handlers.ts'
 import { CommandIconRenderer } from '@/features/command-palette/components/icon-renderer.tsx'
+import { CalculatorHeroItem } from '@/features/command-palette/components/calculator-hero-item.tsx'
 
 interface CommandItemProps {
   item: PaletteItem
@@ -10,6 +11,16 @@ interface CommandItemProps {
 }
 
 function CommandItem({ item, onSelect, onContextMenu }: CommandItemProps) {
+  if (item.id.startsWith('calc:')) {
+    return (
+      <CalculatorHeroItem
+        item={item}
+        onSelect={onSelect}
+        onContextMenu={onContextMenu}
+      />
+    )
+  }
+
   return (
     <CommandItemPrimitive
       value={item.id}

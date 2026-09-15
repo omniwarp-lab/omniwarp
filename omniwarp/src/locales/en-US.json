@@ -6,14 +6,16 @@
       "apps": "Apps",
       "results": "Results",
       "commands": "Commands",
-      "searchProviders": "Search Providers"
+      "searchProviders": "Search Providers",
+      "calculator": "Calculator"
     },
     "subgroups": {
       "app": "App",
       "game": "Game",
       "omniwarp": "OmniWarp",
       "system": "System",
-      "webSearch": "Web Search"
+      "webSearch": "Web Search",
+      "calculator": "Calculator"
     },
     "hints": {
       "open": "Open",
@@ -32,6 +34,7 @@
       "runAsAdmin": "Run as Administrator",
       "showInExplorer": "Show in File Explorer",
       "copyPath": "Copy Path",
+      "copyResult": "Copy Result",
       "noResults": "No matching actions"
     },
     "confirmation": {
@@ -78,11 +81,15 @@
     }
   },
   "hud": {
-    "copiedPath": "Copied path to clipboard"
+    "copiedPath": "Copied path to clipboard",
+    "copiedResult": "Copied result to clipboard"
   },
   "errors": {
     "generic": "An unexpected error occurred",
     "checkLogs": "Check logs for details",
+    "clipboard": {
+      "write": "Failed to copy to clipboard"
+    },
     "apps": {
       "launch": "Failed to launch application",
       "discovery": "Failed to discover applications",

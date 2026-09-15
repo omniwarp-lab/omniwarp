@@ -12,6 +12,9 @@ import { searchWeb } from '@/features/search-providers/commands'
 import { SEARCH_URLS } from '@/features/search-providers/providers'
 import { SearchProviderId } from '@/features/search-providers/types'
 import { useCommandStore } from '@/features/command-palette/store'
+import { copyToClipboard } from '@/features/clipboard/commands'
+import { showCopyHud } from '@/features/hud/commands'
+import i18n from '@/i18n'
 
 async function handleSelect(value: string) {
   const separator = value.indexOf(':')
@@ -21,6 +24,16 @@ async function handleSelect(value: string) {
   const id = value.slice(separator + 1)
 
   switch (kind) {
+    case 'calc': {
+      try {
+        await copyToClipboard(id)
+        await showCopyHud(i18n.t('hud.copiedResult'))
+        useCommandStore.getState().setQuery('')
+      } catch (err) {
+        await showAppError(err)
+      }
+      break
+    }
     case 'search-providers': {
       const query = useCommandStore.getState().query
       const base = SEARCH_URLS[id as SearchProviderId]

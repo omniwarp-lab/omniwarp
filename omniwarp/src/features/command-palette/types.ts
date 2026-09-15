@@ -9,6 +9,7 @@ interface CommandItemBase {
   canRunAsAdmin?: boolean
   destructive?: boolean
   confirmationKey?: string
+  expression?: string
 }
 
 interface AppCommandItem extends CommandItemBase {

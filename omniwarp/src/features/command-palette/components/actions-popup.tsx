@@ -44,8 +44,27 @@ function ActionsPopup({ item, onClose, onSelect }: ActionsPopupProps) {
   const inputRef = useRef<HTMLInputElement>(null)
 
   const isAppItem = Boolean(item.id.startsWith('app:'))
+  const isCalcItem = Boolean(item.id.startsWith('calc:'))
 
   const actions: ActionEntry[] = useMemo(() => {
+    if (isCalcItem) {
+      return [
+        {
+          id: 'copy-result',
+          label: t('commandPalette.actions.copyResult'),
+          icon: Copy,
+          execute: async () => {
+            onClose()
+            if (onSelect) {
+              onSelect(item)
+            } else {
+              await handleSelect(item.id)
+            }
+          },
+        },
+      ]
+    }
+
     const list: ActionEntry[] = [
       {
         id: 'open',
