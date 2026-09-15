@@ -7,7 +7,10 @@ import { useMemo } from 'react'
 import { toPaletteItem } from '@/features/command-palette/adapters.ts'
 import { useTranslation } from 'react-i18next'
 import { SEARCH_PROVIDERS } from '@/features/search-providers/providers'
-import { evaluateCalculator } from '@/features/calculator/evaluator.ts'
+import {
+  evaluateCalculator,
+  formatCalculatorExpression,
+} from '@/features/calculator/evaluator.ts'
 import { Calculator } from 'lucide-react'
 
 const SEARCH_PROVIDERS_GROUP: CommandGroup = {
@@ -60,7 +63,7 @@ function useCommandPaletteSections(
                 {
                   id: `calc:${calcResult}`,
                   label: calcResult,
-                  expression: `${trimmed.replace(/^=\s*/, '')} =`,
+                  expression: formatCalculatorExpression(query),
                   subgroup: t('commandPalette.subgroups.calculator'),
                   icon: Calculator,
                   subgroupConfig: {
