@@ -10,6 +10,10 @@ type Token =
         | 'DIVIDE'
         | 'POWER'
         | 'SQRT'
+        | 'SIN'
+        | 'COS'
+        | 'TAN'
+        | 'COTAN'
         | 'FACTORIAL'
         | 'PERCENT'
         | 'LPAREN'
@@ -44,7 +48,7 @@ function normalizeExpression(expr: string): string {
 function tokenize(expr: string): Token[] | null {
   const normalized = normalizeExpression(expr)
   const regex =
-    /\s*(?:(\d+(?:\.\d+)?|\.\d+)|(sqrt)|(pi)\b|(e)\b|([+\-*/^!%()])|(\S))/gi
+    /\s*(?:(\d+(?:\.\d+)?|\.\d+)|(sqrt|sin|cos|tan|cotan|cot|ctg)\b|(pi)\b|(e)\b|([+\-*/^!%()])|(\S))/gi
   const rawTokens: Token[] = []
   let match: RegExpExecArray | null
 
@@ -56,7 +60,13 @@ function tokenize(expr: string): Token[] | null {
       if (Number.isNaN(val)) return null
       rawTokens.push({ type: 'NUMBER', value: val })
     } else if (match[2] !== undefined) {
-      rawTokens.push({ type: 'SQRT' })
+      const fn = match[2].toLowerCase()
+      if (fn === 'sqrt') rawTokens.push({ type: 'SQRT' })
+      else if (fn === 'sin') rawTokens.push({ type: 'SIN' })
+      else if (fn === 'cos') rawTokens.push({ type: 'COS' })
+      else if (fn === 'tan') rawTokens.push({ type: 'TAN' })
+      else if (fn === 'cotan' || fn === 'cot' || fn === 'ctg')
+        rawTokens.push({ type: 'COTAN' })
     } else if (match[3] !== undefined) {
       rawTokens.push({ type: 'PI' })
     } else if (match[4] !== undefined) {
@@ -89,13 +99,19 @@ function tokenize(expr: string): Token[] | null {
         prev.type === 'RPAREN' ||
         prev.type === 'FACTORIAL' ||
         prev.type === 'PERCENT'
-      const isCurrentLParenOrSqrt =
-        current.type === 'LPAREN' || current.type === 'SQRT'
+      const isCurrentFunction =
+        current.type === 'SQRT' ||
+        current.type === 'SIN' ||
+        current.type === 'COS' ||
+        current.type === 'TAN' ||
+        current.type === 'COTAN'
+      const isCurrentLParenOrFunction =
+        current.type === 'LPAREN' || isCurrentFunction
       const isCurrentNumber = current.type === 'NUMBER'
       const isCurrentConstant = current.type === 'PI' || current.type === 'E'
 
       if (
-        (isPrevNumberOrParenOrFactOrPct && isCurrentLParenOrSqrt) ||
+        (isPrevNumberOrParenOrFactOrPct && isCurrentLParenOrFunction) ||
         ((prev.type === 'RPAREN' ||
           prev.type === 'FACTORIAL' ||
           prev.type === 'PERCENT') &&
@@ -167,6 +183,47 @@ function parseAndEvaluate(
       const operand = parseUnary()
       if (operand === null || operand.value < 0) return null
       return { value: Math.sqrt(operand.value), isPercent: false }
+    }
+
+    if (token.type === 'SIN') {
+      index++
+      binaryOpCount++
+      const operand = parseUnary()
+      if (operand === null) return null
+      const val = Math.sin(operand.value)
+      return { value: Math.abs(val) < 1e-15 ? 0 : val, isPercent: false }
+    }
+
+    if (token.type === 'COS') {
+      index++
+      binaryOpCount++
+      const operand = parseUnary()
+      if (operand === null) return null
+      const val = Math.cos(operand.value)
+      return { value: Math.abs(val) < 1e-15 ? 0 : val, isPercent: false }
+    }
+
+    if (token.type === 'TAN') {
+      index++
+      binaryOpCount++
+      const operand = parseUnary()
+      if (operand === null) return null
+      const cosVal = Math.cos(operand.value)
+      if (Math.abs(cosVal) < 1e-15) return null
+      const val = Math.tan(operand.value)
+      return { value: Math.abs(val) < 1e-15 ? 0 : val, isPercent: false }
+    }
+
+    if (token.type === 'COTAN') {
+      index++
+      binaryOpCount++
+      const operand = parseUnary()
+      if (operand === null) return null
+      const sinVal = Math.sin(operand.value)
+      if (Math.abs(sinVal) < 1e-15) return null
+      const cosVal = Math.cos(operand.value)
+      const val = cosVal / sinVal
+      return { value: Math.abs(val) < 1e-15 ? 0 : val, isPercent: false }
     }
 
     return parsePrimary()
@@ -321,6 +378,10 @@ function trimAndBalanceTokens(tokens: Token[]): Token[] | null {
     'DIVIDE',
     'POWER',
     'SQRT',
+    'SIN',
+    'COS',
+    'TAN',
+    'COTAN',
     'LPAREN',
   ])
 
@@ -382,14 +443,18 @@ function formatCalculatorExpression(query: string): string {
     .replace(/^=\s*/, '')
     .replace(/(?<![a-zA-Z\\])pi(?![a-zA-Z])/gi, '\\pi')
     .replace(/(?<![a-zA-Z])E(?![a-zA-Z])/g, 'e')
+    .replace(/(?<![a-zA-Z\\])sin(?![a-zA-Z])/gi, '\\sin')
+    .replace(/(?<![a-zA-Z\\])cos(?![a-zA-Z])/gi, '\\cos')
+    .replace(/(?<![a-zA-Z\\])tan(?![a-zA-Z])/gi, '\\tan')
+    .replace(/(?<![a-zA-Z\\])(?:cotan|cot|ctg)(?![a-zA-Z])/gi, '\\cot')
     .replace(/\s*([*×])\s*/g, ' × ')
     .replace(/\s*([/÷])\s*/g, ' ÷ ')
     .replace(/([0-9)%!]|\\pi|e)\s*\+\s*/g, '$1 + ')
     .replace(/([0-9)%!]|\\pi|e)\s*-\s*/g, '$1 - ')
 
-  while (/sqrt\s*\(([^()]+)\)/i.test(clean)) {
+  while (/sqrt\s*\(([^()]*(\([^()]*\)[^()]*)*)\)/i.test(clean)) {
     clean = clean.replace(
-      /sqrt\s*\(([^()]+)\)/gi,
+      /sqrt\s*\(([^()]*(\([^()]*\)[^()]*)*)\)/gi,
       (_, m: string) => `\\sqrt{${m}}`,
     )
   }
