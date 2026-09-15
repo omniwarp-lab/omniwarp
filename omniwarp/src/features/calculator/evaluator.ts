@@ -8,9 +8,19 @@ type Token =
         | 'DIVIDE'
         | 'POWER'
         | 'SQRT'
+        | 'FACTORIAL'
         | 'LPAREN'
         | 'RPAREN'
     }
+
+function factorial(n: number): number | null {
+  if (!Number.isInteger(n) || n < 0 || n > 170) return null
+  let result = 1
+  for (let i = 2; i <= n; i++) {
+    result *= i
+  }
+  return result
+}
 
 function normalizeExpression(expr: string): string {
   return expr
@@ -27,7 +37,7 @@ function normalizeExpression(expr: string): string {
 
 function tokenize(expr: string): Token[] | null {
   const normalized = normalizeExpression(expr)
-  const regex = /\s*(?:(\d+(?:\.\d+)?|\.\d+)|(sqrt)|([+\-*/^()])|(\S))/gi
+  const regex = /\s*(?:(\d+(?:\.\d+)?|\.\d+)|(sqrt)|([+\-*/^!()])|(\S))/gi
   const rawTokens: Token[] = []
   let match: RegExpExecArray | null
 
@@ -47,6 +57,7 @@ function tokenize(expr: string): Token[] | null {
       else if (op === '*') rawTokens.push({ type: 'MULTIPLY' })
       else if (op === '/') rawTokens.push({ type: 'DIVIDE' })
       else if (op === '^') rawTokens.push({ type: 'POWER' })
+      else if (op === '!') rawTokens.push({ type: 'FACTORIAL' })
       else if (op === '(') rawTokens.push({ type: 'LPAREN' })
       else if (op === ')') rawTokens.push({ type: 'RPAREN' })
     }
@@ -59,15 +70,18 @@ function tokenize(expr: string): Token[] | null {
     const current = rawTokens[i]
     if (i > 0) {
       const prev = rawTokens[i - 1]
-      const isPrevNumberOrRParen =
-        prev.type === 'NUMBER' || prev.type === 'RPAREN'
+      const isPrevNumberOrParenOrFact =
+        prev.type === 'NUMBER' ||
+        prev.type === 'RPAREN' ||
+        prev.type === 'FACTORIAL'
       const isCurrentLParenOrSqrt =
         current.type === 'LPAREN' || current.type === 'SQRT'
       const isCurrentNumber = current.type === 'NUMBER'
 
       if (
-        (isPrevNumberOrRParen && isCurrentLParenOrSqrt) ||
-        (prev.type === 'RPAREN' && isCurrentNumber)
+        (isPrevNumberOrParenOrFact && isCurrentLParenOrSqrt) ||
+        ((prev.type === 'RPAREN' || prev.type === 'FACTORIAL') &&
+          isCurrentNumber)
       ) {
         tokens.push({ type: 'MULTIPLY' })
       }
@@ -120,8 +134,22 @@ function parseAndEvaluate(
     return parsePrimary()
   }
 
+  function parsePostfix(): number | null {
+    let val = parseUnary()
+    if (val === null) return null
+
+    while (index < tokens.length && tokens[index].type === 'FACTORIAL') {
+      index++
+      binaryOpCount++
+      val = factorial(val)
+      if (val === null) return null
+    }
+
+    return val
+  }
+
   function parsePower(): number | null {
-    const base = parseUnary()
+    const base = parsePostfix()
     if (base === null) return null
 
     if (index < tokens.length && tokens[index].type === 'POWER') {
@@ -241,19 +269,24 @@ function formatCalculatorExpression(query: string): string {
     )
   }
   clean = clean.replace(
-    /sqrt\s*(\d+(?:\.\d+)?)/gi,
+    /sqrt\s*(\d+(?:\.\d+)?!*)/gi,
     (_, m: string) => `\\sqrt{${m}}`,
   )
+
+  while (/\^\s*([0-9.]+!*)\s*\^/.test(clean)) {
+    clean = clean.replace(
+      /\^\s*([0-9.]+!*)\s*\^\s*([0-9.]+!*)/g,
+      '^{$1^{$2}}',
+    )
+  }
 
   while (/\^\s*\(([^()]+)\)/.test(clean)) {
     clean = clean.replace(/\^\s*\(([^()]+)\)/g, '^{$1}')
   }
-  clean = clean.replace(/\^\s*(\\sqrt\{[^}]+\})/g, '^{$1}')
-  clean = clean.replace(/\^\s*(-(?:\d+(?:\.\d+)?|\\sqrt\{[^}]+\}))/g, '^{$1}')
 
-  while (/\^([^{}()\s]+)\^/.test(clean)) {
-    clean = clean.replace(/\^([^{}()\s]+)\^([^{}()\s]+)/g, '^{$1^{$2}}')
-  }
+  clean = clean.replace(/\^\s*(\\sqrt\{[^}]+\})/g, '^{$1}')
+  clean = clean.replace(/\^\s*(-[0-9.]+!*)/g, '^{$1}')
+  clean = clean.replace(/\^\s*([0-9.]+!+)/g, '^{$1}')
 
   return `${clean} =`
 }
