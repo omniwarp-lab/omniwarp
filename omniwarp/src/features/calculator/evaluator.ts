@@ -1,6 +1,16 @@
 type Token =
   | { type: 'NUMBER'; value: number }
-  | { type: 'PLUS' | 'MINUS' | 'MULTIPLY' | 'DIVIDE' | 'LPAREN' | 'RPAREN' }
+  | {
+      type:
+        | 'PLUS'
+        | 'MINUS'
+        | 'MULTIPLY'
+        | 'DIVIDE'
+        | 'POWER'
+        | 'SQRT'
+        | 'LPAREN'
+        | 'RPAREN'
+    }
 
 function normalizeExpression(expr: string): string {
   return expr
@@ -11,27 +21,32 @@ function normalizeExpression(expr: string): string {
     .replace(/÷/g, '/')
     .replace(/（/g, '(')
     .replace(/）/g, ')')
+    .replace(/\*\*/g, '^')
+    .replace(/√/g, 'sqrt ')
 }
 
 function tokenize(expr: string): Token[] | null {
   const normalized = normalizeExpression(expr)
-  const regex = /\s*(?:(\d+(?:\.\d+)?|\.\d+)|([+\-*/()])|(\S))/g
+  const regex = /\s*(?:(\d+(?:\.\d+)?|\.\d+)|(sqrt)|([+\-*/^()])|(\S))/gi
   const rawTokens: Token[] = []
   let match: RegExpExecArray | null
 
   while ((match = regex.exec(normalized)) !== null) {
-    if (match[3] !== undefined) return null
+    if (match[4] !== undefined) return null
 
     if (match[1] !== undefined) {
       const val = Number(match[1])
       if (Number.isNaN(val)) return null
       rawTokens.push({ type: 'NUMBER', value: val })
     } else if (match[2] !== undefined) {
-      const op = match[2]
+      rawTokens.push({ type: 'SQRT' })
+    } else if (match[3] !== undefined) {
+      const op = match[3]
       if (op === '+') rawTokens.push({ type: 'PLUS' })
       else if (op === '-') rawTokens.push({ type: 'MINUS' })
       else if (op === '*') rawTokens.push({ type: 'MULTIPLY' })
       else if (op === '/') rawTokens.push({ type: 'DIVIDE' })
+      else if (op === '^') rawTokens.push({ type: 'POWER' })
       else if (op === '(') rawTokens.push({ type: 'LPAREN' })
       else if (op === ')') rawTokens.push({ type: 'RPAREN' })
     }
@@ -46,11 +61,12 @@ function tokenize(expr: string): Token[] | null {
       const prev = rawTokens[i - 1]
       const isPrevNumberOrRParen =
         prev.type === 'NUMBER' || prev.type === 'RPAREN'
-      const isCurrentLParen = current.type === 'LPAREN'
+      const isCurrentLParenOrSqrt =
+        current.type === 'LPAREN' || current.type === 'SQRT'
       const isCurrentNumber = current.type === 'NUMBER'
 
       if (
-        (isPrevNumberOrRParen && isCurrentLParen) ||
+        (isPrevNumberOrRParen && isCurrentLParenOrSqrt) ||
         (prev.type === 'RPAREN' && isCurrentNumber)
       ) {
         tokens.push({ type: 'MULTIPLY' })
@@ -68,6 +84,59 @@ function parseAndEvaluate(
   let index = 0
   let binaryOpCount = 0
 
+  function parsePrimary(): number | null {
+    if (index >= tokens.length) return null
+    const token = tokens[index]
+
+    if (token.type === 'NUMBER') {
+      index++
+      return token.value
+    }
+
+    if (token.type === 'LPAREN') {
+      index++
+      const exprValue = parseExpression()
+      if (exprValue === null) return null
+      if (index >= tokens.length || tokens[index].type !== 'RPAREN') return null
+      index++
+      return exprValue
+    }
+
+    return null
+  }
+
+  function parseUnary(): number | null {
+    if (index >= tokens.length) return null
+    const token = tokens[index]
+
+    if (token.type === 'SQRT') {
+      index++
+      binaryOpCount++
+      const operand = parseUnary()
+      if (operand === null || operand < 0) return null
+      return Math.sqrt(operand)
+    }
+
+    return parsePrimary()
+  }
+
+  function parsePower(): number | null {
+    const base = parseUnary()
+    if (base === null) return null
+
+    if (index < tokens.length && tokens[index].type === 'POWER') {
+      index++
+      binaryOpCount++
+      const exponent = parseFactor(true)
+      if (exponent === null) return null
+      const val = Math.pow(base, exponent)
+      if (!Number.isFinite(val) || Number.isNaN(val)) return null
+      return val
+    }
+
+    return base
+  }
+
   function parseFactor(allowUnaryPlus: boolean): number | null {
     if (index >= tokens.length) return null
 
@@ -82,24 +151,10 @@ function parseAndEvaluate(
       index++
     }
 
-    if (index >= tokens.length) return null
-    const token = tokens[index]
+    const powerValue = parsePower()
+    if (powerValue === null) return null
 
-    if (token.type === 'NUMBER') {
-      index++
-      return sign * token.value
-    }
-
-    if (token.type === 'LPAREN') {
-      index++
-      const exprValue = parseExpression()
-      if (exprValue === null) return null
-      if (index >= tokens.length || tokens[index].type !== 'RPAREN') return null
-      index++
-      return sign * exprValue
-    }
-
-    return null
+    return sign * powerValue
   }
 
   function parseTerm(allowUnaryPlus: boolean): number | null {
@@ -174,10 +229,32 @@ function evaluateCalculator(query: string): string | null {
 }
 
 function formatCalculatorExpression(query: string): string {
-  const clean = normalizeExpression(query.trim())
+  let clean = normalizeExpression(query.trim())
     .replace(/^=\s*/, '')
     .replace(/\s*([*×])\s*/g, ' × ')
     .replace(/\s*([/÷])\s*/g, ' ÷ ')
+
+  while (/sqrt\s*\(([^()]+)\)/i.test(clean)) {
+    clean = clean.replace(
+      /sqrt\s*\(([^()]+)\)/gi,
+      (_, m: string) => `\\sqrt{${m}}`,
+    )
+  }
+  clean = clean.replace(
+    /sqrt\s*(\d+(?:\.\d+)?)/gi,
+    (_, m: string) => `\\sqrt{${m}}`,
+  )
+
+  while (/\^\s*\(([^()]+)\)/.test(clean)) {
+    clean = clean.replace(/\^\s*\(([^()]+)\)/g, '^{$1}')
+  }
+  clean = clean.replace(/\^\s*(\\sqrt\{[^}]+\})/g, '^{$1}')
+  clean = clean.replace(/\^\s*(-(?:\d+(?:\.\d+)?|\\sqrt\{[^}]+\}))/g, '^{$1}')
+
+  while (/\^([^{}()\s]+)\^/.test(clean)) {
+    clean = clean.replace(/\^([^{}()\s]+)\^([^{}()\s]+)/g, '^{$1^{$2}}')
+  }
+
   return `${clean} =`
 }
 
