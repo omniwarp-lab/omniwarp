@@ -9,6 +9,7 @@ type Token =
         | 'POWER'
         | 'SQRT'
         | 'FACTORIAL'
+        | 'PERCENT'
         | 'LPAREN'
         | 'RPAREN'
     }
@@ -33,11 +34,13 @@ function normalizeExpression(expr: string): string {
     .replace(/）/g, ')')
     .replace(/\*\*/g, '^')
     .replace(/√/g, 'sqrt ')
+    .replace(/٪/g, '%')
+    .replace(/\bof\b/gi, '*')
 }
 
 function tokenize(expr: string): Token[] | null {
   const normalized = normalizeExpression(expr)
-  const regex = /\s*(?:(\d+(?:\.\d+)?|\.\d+)|(sqrt)|([+\-*/^!()])|(\S))/gi
+  const regex = /\s*(?:(\d+(?:\.\d+)?|\.\d+)|(sqrt)|([+\-*/^!%()])|(\S))/gi
   const rawTokens: Token[] = []
   let match: RegExpExecArray | null
 
@@ -58,6 +61,7 @@ function tokenize(expr: string): Token[] | null {
       else if (op === '/') rawTokens.push({ type: 'DIVIDE' })
       else if (op === '^') rawTokens.push({ type: 'POWER' })
       else if (op === '!') rawTokens.push({ type: 'FACTORIAL' })
+      else if (op === '%') rawTokens.push({ type: 'PERCENT' })
       else if (op === '(') rawTokens.push({ type: 'LPAREN' })
       else if (op === ')') rawTokens.push({ type: 'RPAREN' })
     }
@@ -70,17 +74,20 @@ function tokenize(expr: string): Token[] | null {
     const current = rawTokens[i]
     if (i > 0) {
       const prev = rawTokens[i - 1]
-      const isPrevNumberOrParenOrFact =
+      const isPrevNumberOrParenOrFactOrPct =
         prev.type === 'NUMBER' ||
         prev.type === 'RPAREN' ||
-        prev.type === 'FACTORIAL'
+        prev.type === 'FACTORIAL' ||
+        prev.type === 'PERCENT'
       const isCurrentLParenOrSqrt =
         current.type === 'LPAREN' || current.type === 'SQRT'
       const isCurrentNumber = current.type === 'NUMBER'
 
       if (
-        (isPrevNumberOrParenOrFact && isCurrentLParenOrSqrt) ||
-        ((prev.type === 'RPAREN' || prev.type === 'FACTORIAL') &&
+        (isPrevNumberOrParenOrFactOrPct && isCurrentLParenOrSqrt) ||
+        ((prev.type === 'RPAREN' ||
+          prev.type === 'FACTORIAL' ||
+          prev.type === 'PERCENT') &&
           isCurrentNumber)
       ) {
         tokens.push({ type: 'MULTIPLY' })
@@ -92,19 +99,24 @@ function tokenize(expr: string): Token[] | null {
   return tokens
 }
 
+interface ParsedNode {
+  value: number
+  isPercent: boolean
+}
+
 function parseAndEvaluate(
   tokens: Token[],
 ): { value: number; binaryOpCount: number } | null {
   let index = 0
   let binaryOpCount = 0
 
-  function parsePrimary(): number | null {
+  function parsePrimary(): ParsedNode | null {
     if (index >= tokens.length) return null
     const token = tokens[index]
 
     if (token.type === 'NUMBER') {
       index++
-      return token.value
+      return { value: token.value, isPercent: false }
     }
 
     if (token.type === 'LPAREN') {
@@ -113,13 +125,13 @@ function parseAndEvaluate(
       if (exprValue === null) return null
       if (index >= tokens.length || tokens[index].type !== 'RPAREN') return null
       index++
-      return exprValue
+      return { value: exprValue.value, isPercent: false }
     }
 
     return null
   }
 
-  function parseUnary(): number | null {
+  function parseUnary(): ParsedNode | null {
     if (index >= tokens.length) return null
     const token = tokens[index]
 
@@ -127,28 +139,38 @@ function parseAndEvaluate(
       index++
       binaryOpCount++
       const operand = parseUnary()
-      if (operand === null || operand < 0) return null
-      return Math.sqrt(operand)
+      if (operand === null || operand.value < 0) return null
+      return { value: Math.sqrt(operand.value), isPercent: false }
     }
 
     return parsePrimary()
   }
 
-  function parsePostfix(): number | null {
-    let val = parseUnary()
-    if (val === null) return null
+  function parsePostfix(): ParsedNode | null {
+    let node = parseUnary()
+    if (node === null) return null
 
-    while (index < tokens.length && tokens[index].type === 'FACTORIAL') {
-      index++
-      binaryOpCount++
-      val = factorial(val)
-      if (val === null) return null
+    while (index < tokens.length) {
+      const token = tokens[index]
+      if (token.type === 'FACTORIAL') {
+        index++
+        binaryOpCount++
+        const val = factorial(node.value)
+        if (val === null) return null
+        node = { value: val, isPercent: false }
+      } else if (token.type === 'PERCENT') {
+        index++
+        binaryOpCount++
+        node = { value: node.value / 100, isPercent: true }
+      } else {
+        break
+      }
     }
 
-    return val
+    return node
   }
 
-  function parsePower(): number | null {
+  function parsePower(): ParsedNode | null {
     const base = parsePostfix()
     if (base === null) return null
 
@@ -157,15 +179,15 @@ function parseAndEvaluate(
       binaryOpCount++
       const exponent = parseFactor(true)
       if (exponent === null) return null
-      const val = Math.pow(base, exponent)
+      const val = Math.pow(base.value, exponent.value)
       if (!Number.isFinite(val) || Number.isNaN(val)) return null
-      return val
+      return { value: val, isPercent: false }
     }
 
     return base
   }
 
-  function parseFactor(allowUnaryPlus: boolean): number | null {
+  function parseFactor(allowUnaryPlus: boolean): ParsedNode | null {
     if (index >= tokens.length) return null
 
     let sign = 1
@@ -182,10 +204,13 @@ function parseAndEvaluate(
     const powerValue = parsePower()
     if (powerValue === null) return null
 
-    return sign * powerValue
+    return {
+      value: sign * powerValue.value,
+      isPercent: powerValue.isPercent,
+    }
   }
 
-  function parseTerm(allowUnaryPlus: boolean): number | null {
+  function parseTerm(allowUnaryPlus: boolean): ParsedNode | null {
     let term = parseFactor(allowUnaryPlus)
     if (term === null) return null
 
@@ -199,17 +224,23 @@ function parseAndEvaluate(
 
       binaryOpCount++
       if (opToken.type === 'MULTIPLY') {
-        term *= nextFactor
+        term = {
+          value: term.value * nextFactor.value,
+          isPercent: term.isPercent || nextFactor.isPercent,
+        }
       } else {
-        if (nextFactor === 0) return null
-        term /= nextFactor
+        if (nextFactor.value === 0) return null
+        term = {
+          value: term.value / nextFactor.value,
+          isPercent: term.isPercent && !nextFactor.isPercent,
+        }
       }
     }
 
     return term
   }
 
-  function parseExpression(): number | null {
+  function parseExpression(): ParsedNode | null {
     let expr = parseTerm(true)
     if (expr === null) return null
 
@@ -222,18 +253,38 @@ function parseAndEvaluate(
       if (nextTerm === null) return null
 
       binaryOpCount++
-      expr = opToken.type === 'PLUS' ? expr + nextTerm : expr - nextTerm
+      if (nextTerm.isPercent && !expr.isPercent) {
+        expr = {
+          value:
+            opToken.type === 'PLUS'
+              ? expr.value + expr.value * nextTerm.value
+              : expr.value - expr.value * nextTerm.value,
+          isPercent: false,
+        }
+      } else {
+        expr = {
+          value:
+            opToken.type === 'PLUS'
+              ? expr.value + nextTerm.value
+              : expr.value - nextTerm.value,
+          isPercent: expr.isPercent && nextTerm.isPercent,
+        }
+      }
     }
 
     return expr
   }
 
   const result = parseExpression()
-  if (result === null || index < tokens.length || !Number.isFinite(result)) {
+  if (
+    result === null ||
+    index < tokens.length ||
+    !Number.isFinite(result.value)
+  ) {
     return null
   }
 
-  return { value: result, binaryOpCount }
+  return { value: result.value, binaryOpCount }
 }
 
 function evaluateCalculator(query: string): string | null {
@@ -287,6 +338,8 @@ function formatCalculatorExpression(query: string): string {
   clean = clean.replace(/\^\s*(\\sqrt\{[^}]+\})/g, '^{$1}')
   clean = clean.replace(/\^\s*(-[0-9.]+!*)/g, '^{$1}')
   clean = clean.replace(/\^\s*([0-9.]+!+)/g, '^{$1}')
+
+  clean = clean.replace(/%/g, '\\%')
 
   return `${clean} =`
 }
