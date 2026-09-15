@@ -1,6 +1,6 @@
 type Token =
   | { type: 'NUMBER'; value: number }
-  | { type: 'PLUS' | 'MINUS' | 'MULTIPLY' | 'DIVIDE' }
+  | { type: 'PLUS' | 'MINUS' | 'MULTIPLY' | 'DIVIDE' | 'LPAREN' | 'RPAREN' }
 
 function normalizeExpression(expr: string): string {
   return expr
@@ -9,12 +9,14 @@ function normalizeExpression(expr: string): string {
     .replace(/−/g, '-')
     .replace(/×/g, '*')
     .replace(/÷/g, '/')
+    .replace(/（/g, '(')
+    .replace(/）/g, ')')
 }
 
 function tokenize(expr: string): Token[] | null {
   const normalized = normalizeExpression(expr)
-  const regex = /\s*(?:(\d+(?:\.\d+)?|\.\d+)|([+\-*/])|(\S))/g
-  const tokens: Token[] = []
+  const regex = /\s*(?:(\d+(?:\.\d+)?|\.\d+)|([+\-*/()])|(\S))/g
+  const rawTokens: Token[] = []
   let match: RegExpExecArray | null
 
   while ((match = regex.exec(normalized)) !== null) {
@@ -23,17 +25,41 @@ function tokenize(expr: string): Token[] | null {
     if (match[1] !== undefined) {
       const val = Number(match[1])
       if (Number.isNaN(val)) return null
-      tokens.push({ type: 'NUMBER', value: val })
+      rawTokens.push({ type: 'NUMBER', value: val })
     } else if (match[2] !== undefined) {
       const op = match[2]
-      if (op === '+') tokens.push({ type: 'PLUS' })
-      else if (op === '-') tokens.push({ type: 'MINUS' })
-      else if (op === '*') tokens.push({ type: 'MULTIPLY' })
-      else if (op === '/') tokens.push({ type: 'DIVIDE' })
+      if (op === '+') rawTokens.push({ type: 'PLUS' })
+      else if (op === '-') rawTokens.push({ type: 'MINUS' })
+      else if (op === '*') rawTokens.push({ type: 'MULTIPLY' })
+      else if (op === '/') rawTokens.push({ type: 'DIVIDE' })
+      else if (op === '(') rawTokens.push({ type: 'LPAREN' })
+      else if (op === ')') rawTokens.push({ type: 'RPAREN' })
     }
   }
 
-  return tokens.length > 0 ? tokens : null
+  if (rawTokens.length === 0) return null
+
+  const tokens: Token[] = []
+  for (let i = 0; i < rawTokens.length; i++) {
+    const current = rawTokens[i]
+    if (i > 0) {
+      const prev = rawTokens[i - 1]
+      const isPrevNumberOrRParen =
+        prev.type === 'NUMBER' || prev.type === 'RPAREN'
+      const isCurrentLParen = current.type === 'LPAREN'
+      const isCurrentNumber = current.type === 'NUMBER'
+
+      if (
+        (isPrevNumberOrRParen && isCurrentLParen) ||
+        (prev.type === 'RPAREN' && isCurrentNumber)
+      ) {
+        tokens.push({ type: 'MULTIPLY' })
+      }
+    }
+    tokens.push(current)
+  }
+
+  return tokens
 }
 
 function parseAndEvaluate(
@@ -57,11 +83,23 @@ function parseAndEvaluate(
     }
 
     if (index >= tokens.length) return null
-    const numToken = tokens[index]
-    if (numToken.type !== 'NUMBER') return null
+    const token = tokens[index]
 
-    index++
-    return sign * numToken.value
+    if (token.type === 'NUMBER') {
+      index++
+      return sign * token.value
+    }
+
+    if (token.type === 'LPAREN') {
+      index++
+      const exprValue = parseExpression()
+      if (exprValue === null) return null
+      if (index >= tokens.length || tokens[index].type !== 'RPAREN') return null
+      index++
+      return sign * exprValue
+    }
+
+    return null
   }
 
   function parseTerm(allowUnaryPlus: boolean): number | null {
@@ -94,7 +132,7 @@ function parseAndEvaluate(
 
     while (index < tokens.length) {
       const opToken = tokens[index]
-      if (opToken.type !== 'PLUS' && opToken.type !== 'MINUS') return null
+      if (opToken.type !== 'PLUS' && opToken.type !== 'MINUS') break
       index++
 
       const nextTerm = parseTerm(false)
