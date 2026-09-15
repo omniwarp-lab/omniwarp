@@ -287,6 +287,43 @@ function parseAndEvaluate(
   return { value: result.value, binaryOpCount }
 }
 
+function trimAndBalanceTokens(tokens: Token[]): Token[] | null {
+  const incompleteTypes = new Set<Token['type']>([
+    'PLUS',
+    'MINUS',
+    'MULTIPLY',
+    'DIVIDE',
+    'POWER',
+    'SQRT',
+    'LPAREN',
+  ])
+
+  const trimmed = [...tokens]
+  while (
+    trimmed.length > 0 &&
+    incompleteTypes.has(trimmed[trimmed.length - 1].type)
+  ) {
+    trimmed.pop()
+  }
+
+  if (trimmed.length === 0) return null
+
+  let openCount = 0
+  for (const t of trimmed) {
+    if (t.type === 'LPAREN') openCount++
+    else if (t.type === 'RPAREN') openCount--
+  }
+
+  if (openCount < 0) return null
+
+  const balanced = [...trimmed]
+  for (let i = 0; i < openCount; i++) {
+    balanced.push({ type: 'RPAREN' })
+  }
+
+  return balanced
+}
+
 function evaluateCalculator(query: string): string | null {
   const trimmed = query.trim()
   if (!trimmed) return null
@@ -298,7 +335,14 @@ function evaluateCalculator(query: string): string | null {
   const tokens = tokenize(expr)
   if (!tokens) return null
 
-  const evaluated = parseAndEvaluate(tokens)
+  let evaluated = parseAndEvaluate(tokens)
+  if (!evaluated) {
+    const balancedTokens = trimAndBalanceTokens(tokens)
+    if (balancedTokens) {
+      evaluated = parseAndEvaluate(balancedTokens)
+    }
+  }
+
   if (!evaluated || (!hasEqualPrefix && evaluated.binaryOpCount === 0)) {
     return null
   }
@@ -312,6 +356,8 @@ function formatCalculatorExpression(query: string): string {
     .replace(/^=\s*/, '')
     .replace(/\s*([*×])\s*/g, ' × ')
     .replace(/\s*([/÷])\s*/g, ' ÷ ')
+    .replace(/([0-9)%!])\s*\+\s*/g, '$1 + ')
+    .replace(/([0-9)%!])\s*-\s*/g, '$1 - ')
 
   while (/sqrt\s*\(([^()]+)\)/i.test(clean)) {
     clean = clean.replace(
@@ -338,8 +384,21 @@ function formatCalculatorExpression(query: string): string {
   clean = clean.replace(/\^\s*(\\sqrt\{[^}]+\})/g, '^{$1}')
   clean = clean.replace(/\^\s*(-[0-9.]+!*)/g, '^{$1}')
   clean = clean.replace(/\^\s*([0-9.]+!+)/g, '^{$1}')
+  clean = clean.replace(/\^\s*$/, '^{}')
 
-  clean = clean.replace(/%/g, '\\%')
+  clean = clean.replace(/%/g, () => '\\%')
+
+  clean = clean.trimEnd()
+  let openCount = 0
+  for (const ch of clean) {
+    if (ch === '(') openCount++
+    else if (ch === ')') openCount--
+  }
+  if (openCount > 0) {
+    clean += ')'.repeat(openCount)
+  }
+
+  clean = clean.replace(/\s+/g, ' ').trim()
 
   return `${clean} =`
 }
