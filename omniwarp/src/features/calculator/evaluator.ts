@@ -136,8 +136,7 @@ function evaluateCalculator(query: string): string | null {
 }
 
 function formatCalculatorExpression(query: string): string {
-  const clean = query
-    .trim()
+  const clean = normalizeExpression(query.trim())
     .replace(/^=\s*/, '')
     .replace(/\s*([*×])\s*/g, ' × ')
     .replace(/\s*([/÷])\s*/g, ' ÷ ')

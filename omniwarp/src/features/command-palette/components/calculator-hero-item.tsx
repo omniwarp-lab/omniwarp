@@ -2,6 +2,8 @@ import { CommandItem as CommandItemPrimitive } from 'cmdk'
 import type { PaletteItem } from '@/features/command-palette/types.ts'
 import { handleSelect } from '@/features/command-palette/handlers.ts'
 import { Calculator } from 'lucide-react'
+import { InlineMath } from 'react-katex'
+import 'katex/dist/katex.min.css'
 
 interface CalculatorHeroItemProps {
   item: PaletteItem
@@ -37,9 +39,9 @@ function CalculatorHeroItem({
       <div className='flex items-center justify-between gap-2 text-xs'>
         <span
           dir='ltr'
-          className='font-mono tracking-wide text-muted-foreground group-aria-selected/hero:text-accent-foreground/70'
+          className='tracking-wide text-muted-foreground group-aria-selected/hero:text-accent-foreground/70'
         >
-          {item.expression}
+          {item.expression && <InlineMath math={item.expression} />}
         </span>
       </div>
 
