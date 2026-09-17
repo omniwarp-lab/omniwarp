@@ -12,8 +12,13 @@ type Token =
         | 'MOD'
     }
   | { type: 'LPAREN' | 'RPAREN' | 'SQRT' }
+  | { type: 'TRIG'; fn: TrigFunctionName; unit: AngleUnit | null }
+  | { type: 'ANGLE_UNIT'; unit: AngleUnit }
 
 type BinaryOperator = '+' | '-' | '*' | '/' | '^' | 'mod'
+
+type TrigFunctionName = 'sin' | 'cos' | 'tan'
+type AngleUnit = 'deg' | 'rad'
 
 type ASTNode =
   | { type: 'Number'; value: number }
@@ -21,6 +26,7 @@ type ASTNode =
   | { type: 'Percent'; expr: ASTNode }
   | { type: 'PercentAddSub'; op: '+' | '-'; base: ASTNode; percent: ASTNode }
   | { type: 'Sqrt'; expr: ASTNode }
+  | { type: 'Trig'; fn: TrigFunctionName; unit: AngleUnit; expr: ASTNode }
   | { type: 'Factorial'; expr: ASTNode }
 
 type EvaluationResult = number | 'Undefined'
@@ -32,6 +38,8 @@ type CalculatorResult =
 export type {
   Token,
   BinaryOperator,
+  TrigFunctionName,
+  AngleUnit,
   ASTNode,
   EvaluationResult,
   CalculatorResult,

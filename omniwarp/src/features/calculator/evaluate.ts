@@ -1,6 +1,12 @@
-import type { ASTNode, EvaluationResult } from './types'
+import type { ASTNode, EvaluationResult, TrigFunctionName } from './types'
 
 const UNDEFINED_RESULT: EvaluationResult = 'Undefined'
+
+const TRIG_FUNCTIONS: Record<TrigFunctionName, (x: number) => number> = {
+  sin: Math.sin,
+  cos: Math.cos,
+  tan: Math.tan,
+}
 
 function evaluate(node: ASTNode): EvaluationResult {
   if (node.type === 'Number') {
@@ -46,6 +52,26 @@ function evaluate(node: ASTNode): EvaluationResult {
     if (typeof val !== 'number') return UNDEFINED_RESULT
     if (val < 0) return UNDEFINED_RESULT
     const result = Math.sqrt(val)
+    if (!Number.isFinite(result) || Number.isNaN(result)) {
+      return UNDEFINED_RESULT
+    }
+    if (Object.is(result, -0)) {
+      return 0
+    }
+    return result
+  }
+
+  if (node.type === 'Trig') {
+    const val = evaluate(node.expr)
+    if (typeof val !== 'number') return UNDEFINED_RESULT
+    const radians = node.unit === 'deg' ? val * (Math.PI / 180) : val
+    if (!Number.isFinite(radians) || Number.isNaN(radians)) {
+      return UNDEFINED_RESULT
+    }
+    if (node.fn === 'tan' && Math.abs(Math.cos(radians)) < 1e-12) {
+      return UNDEFINED_RESULT
+    }
+    const result = TRIG_FUNCTIONS[node.fn](radians)
     if (!Number.isFinite(result) || Number.isNaN(result)) {
       return UNDEFINED_RESULT
     }
@@ -127,4 +153,4 @@ function evaluate(node: ASTNode): EvaluationResult {
   return UNDEFINED_RESULT
 }
 
-export { UNDEFINED_RESULT, evaluate }
+export { UNDEFINED_RESULT, TRIG_FUNCTIONS, evaluate }

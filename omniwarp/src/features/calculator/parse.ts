@@ -1,4 +1,4 @@
-import type { ASTNode, BinaryOperator, Token } from './types'
+import type { AngleUnit, ASTNode, BinaryOperator, Token } from './types'
 
 function parse(rawTokens: readonly Token[]): ASTNode | null {
   // Drop trailing operators from incomplete input mid-typing
@@ -8,7 +8,8 @@ function parse(rawTokens: readonly Token[]): ASTNode | null {
     tokens[tokens.length - 1].type !== 'NUMBER' &&
     tokens[tokens.length - 1].type !== 'RPAREN' &&
     tokens[tokens.length - 1].type !== 'PERCENT' &&
-    tokens[tokens.length - 1].type !== 'FACTORIAL'
+    tokens[tokens.length - 1].type !== 'FACTORIAL' &&
+    tokens[tokens.length - 1].type !== 'ANGLE_UNIT'
   ) {
     tokens.pop()
   }
@@ -93,8 +94,8 @@ function parse(rawTokens: readonly Token[]): ASTNode | null {
           left: expr,
           right,
         }
-      } else if (check('LPAREN') || check('SQRT')) {
-        // Implicit multiplication before parenthesis or sqrt: 2(3) or 2 sqrt 9
+      } else if (check('LPAREN') || check('SQRT') || check('TRIG')) {
+        // Implicit multiplication before parenthesis, sqrt or trig: 2(3), 2 sqrt 9 or 2 sin 30
         const right = parsePower()
         expr = {
           type: 'BinaryOp',
@@ -159,6 +160,54 @@ function parse(rawTokens: readonly Token[]): ASTNode | null {
       }
       expr = {
         type: 'Sqrt',
+        expr: inner,
+      }
+    } else if (match('TRIG')) {
+      const prev = previous()
+      if (prev.type !== 'TRIG') {
+        throw new Error(`Unexpected token at position ${current}`)
+      }
+      const fn = prev.fn
+      const fnUnit = prev.unit
+      let inner: ASTNode
+      let explicitUnit: AngleUnit | null = null
+      if (match('LPAREN')) {
+        inner = parseExpression()
+        // Unit inside parens: sin(90deg)
+        if (match('ANGLE_UNIT')) {
+          const unitTok = previous()
+          if (unitTok.type === 'ANGLE_UNIT') {
+            explicitUnit = unitTok.unit
+          }
+        }
+        if (match('RPAREN')) {
+          // Closed
+        } else if (isAtEnd()) {
+          // Auto-close unclosed paren mid-typing
+        } else {
+          throw new Error('Expected )')
+        }
+        // Trailing unit outside parens: sin(90)deg
+        if (match('ANGLE_UNIT')) {
+          const unitTok = previous()
+          if (unitTok.type === 'ANGLE_UNIT') {
+            explicitUnit = unitTok.unit
+          }
+        }
+      } else {
+        // Bare form: sin 30, sin 30deg, sind 30
+        inner = parseFactor()
+        if (match('ANGLE_UNIT')) {
+          const unitTok = previous()
+          if (unitTok.type === 'ANGLE_UNIT') {
+            explicitUnit = unitTok.unit
+          }
+        }
+      }
+      expr = {
+        type: 'Trig',
+        fn,
+        unit: explicitUnit ?? fnUnit ?? 'rad',
         expr: inner,
       }
     } else if (match('LPAREN')) {

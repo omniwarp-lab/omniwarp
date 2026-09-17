@@ -54,6 +54,16 @@ function normalize(input: string): string {
     else if (ch === '√') {
       result += 'sqrt '
     }
+    // Degree symbols: ° (U+00B0), ˚ (U+02DA), º (U+00BA), ∘ (U+2218)
+    // Normalize to the `deg` angle-unit word so `90°` becomes `90deg`.
+    else if (
+      code === 0x00b0 ||
+      code === 0x02da ||
+      code === 0x00ba ||
+      code === 0x2218
+    ) {
+      result += 'deg'
+    }
     // Fullwidth exclamation mark: ！ (U+FF01)
     else if (code === 0xff01) {
       result += '!'

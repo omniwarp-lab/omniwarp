@@ -12,6 +12,7 @@ function hasOperator(node: ASTNode): boolean {
     node.type === 'Percent' ||
     node.type === 'PercentAddSub' ||
     node.type === 'Sqrt' ||
+    node.type === 'Trig' ||
     node.type === 'Factorial'
   ) {
     return true

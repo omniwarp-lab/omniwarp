@@ -31,6 +31,20 @@ function toLatex(node: ASTNode, parentPrecedence = 0): string {
     return `\\sqrt{${inner}}`
   }
 
+  if (node.type === 'Trig') {
+    const inner = toLatex(node.expr, 0)
+    if (node.unit === 'deg') {
+      // Keep `90°` style for plain numbers, but put the degree mark outside
+      // the parens for compound expressions so `sin(30+60deg)` doesn't render
+      // as `sin(30 + 60°)` (which reads as degrees applying to 60 only).
+      if (node.expr.type === 'Number') {
+        return `\\${node.fn}\\left(${inner}^{\\circ}\\right)`
+      }
+      return `\\${node.fn}\\left(${inner}\\right)^{\\circ}`
+    }
+    return `\\${node.fn}\\left(${inner}\\right)`
+  }
+
   if (node.type === 'Factorial') {
     const inner = toLatex(node.expr, 4)
     return `${inner}!`

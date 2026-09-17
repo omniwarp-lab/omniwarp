@@ -1,4 +1,29 @@
-import type { Token } from './types'
+import type { AngleUnit, Token, TrigFunctionName } from './types'
+
+const TRIG_NAMES: readonly TrigFunctionName[] = ['sin', 'cos', 'tan']
+
+function parseAngleUnit(word: string): AngleUnit | null {
+  if (word.length === 0) return null
+  if ('degrees'.startsWith(word)) return 'deg'
+  if ('radians'.startsWith(word)) return 'rad'
+  return null
+}
+
+function parseTrigWord(word: string): Token | null {
+  for (const fn of TRIG_NAMES) {
+    if (word === fn) {
+      return { type: 'TRIG', fn, unit: null }
+    }
+    if (word.startsWith(fn)) {
+      const rest = word.slice(fn.length)
+      const unit = parseAngleUnit(rest)
+      if (unit !== null) {
+        return { type: 'TRIG', fn, unit }
+      }
+    }
+  }
+  return null
+}
 
 class Scanner {
   private pos = 0
@@ -111,6 +136,16 @@ class Scanner {
         }
         if (word === 'mod') {
           tokens.push({ type: 'MOD' })
+          continue
+        }
+        const trig = parseTrigWord(word)
+        if (trig !== null) {
+          tokens.push(trig)
+          continue
+        }
+        const unit = parseAngleUnit(word)
+        if (unit !== null) {
+          tokens.push({ type: 'ANGLE_UNIT', unit })
           continue
         }
         throw new Error(`Unexpected character: ${ch}`)
