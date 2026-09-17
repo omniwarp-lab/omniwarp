@@ -34,6 +34,7 @@
       "showInExplorer": "نمایش محل برنامه",
       "copyPath": "کپی مسیر برنامه",
       "copyResult": "کپی نتیجه",
+      "copyFullExpression": "کپی عبارت کامل",
       "noResults": "عملیاتی پیدا نشد"
     },
     "confirmation": {
@@ -65,7 +66,8 @@
   },
   "hud": {
     "copiedPath": "مسیر در کلیپ‌بورد کپی شد",
-    "copiedResult": "نتیجه در کلیپ‌بورد کپی شد"
+    "copiedResult": "نتیجه در کلیپ‌بورد کپی شد",
+    "copiedExpression": "عبارت در کلیپ‌بورد کپی شد"
   },
   "errors": {
     "generic": "خطای غیرمنتظره‌ای رخ داد",

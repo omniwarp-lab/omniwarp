@@ -23,6 +23,9 @@ import {
 } from '@/features/apps/commands'
 import { showCopyHud } from '@/features/hud/commands'
 import { showAppError } from '@/features/hud/errors'
+import { copyText } from '@/features/clipboard/commands'
+import { calculateFullExpression } from '@/features/calculator/calculate'
+import { useCommandStore } from '@/features/command-palette/store'
 
 interface ActionsPopupProps {
   item: PaletteItem
@@ -60,6 +63,22 @@ function ActionsPopup({ item, onClose, onSelect }: ActionsPopupProps) {
               await onSelect(item)
             } else {
               await handleSelect(item.id)
+            }
+          },
+        },
+        {
+          id: 'copy-full-expression',
+          label: t('commandPalette.actions.copyFullExpression'),
+          icon: Copy,
+          execute: async () => {
+            onClose()
+            const rawQuery = useCommandStore.getState().query
+            const textToCopy = calculateFullExpression(rawQuery) ?? item.label
+            try {
+              await copyText(textToCopy)
+              await showCopyHud(t('hud.copiedExpression'))
+            } catch (err) {
+              await showAppError(err)
             }
           },
         },

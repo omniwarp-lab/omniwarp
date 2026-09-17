@@ -4,6 +4,7 @@ import { parse } from './parse'
 import { evaluate } from './evaluate'
 import { render } from './render'
 import { toLatex } from './to-latex'
+import { toPlainText } from './to-plain-text'
 import type { ASTNode, CalculatorResult, Token } from './types'
 
 function hasOperator(node: ASTNode): boolean {
@@ -20,15 +21,15 @@ function hasOperator(node: ASTNode): boolean {
   return false
 }
 
-function calculate(input: string, locale = 'en-US'): CalculatorResult {
+function parseAndEvaluate(input: string, locale = 'en-US') {
   if (!input || !input.trim()) {
-    return { show: false }
+    return null
   }
 
   // Stage 1: Normalize
   const normalized = normalize(input)
   if (!normalized.trim()) {
-    return { show: false }
+    return null
   }
 
   // Stage 2: Tokenize
@@ -36,22 +37,22 @@ function calculate(input: string, locale = 'en-US'): CalculatorResult {
   try {
     tokens = tokenize(normalized)
   } catch {
-    return { show: false }
+    return null
   }
 
   if (tokens.length === 0) {
-    return { show: false }
+    return null
   }
 
   // Stage 3: Parse into an AST
   const ast = parse(tokens)
   if (!ast) {
-    return { show: false }
+    return null
   }
 
   // Expression must contain at least one operator
   if (!hasOperator(ast)) {
-    return { show: false }
+    return null
   }
 
   // Stage 4: Evaluate the AST
@@ -59,13 +60,33 @@ function calculate(input: string, locale = 'en-US'): CalculatorResult {
 
   // Stage 5: Render
   const rendered = render(evalResult, locale)
-  const latex = `${toLatex(ast)} =`
+
+  return { ast, rendered }
+}
+
+function calculate(input: string, locale = 'en-US'): CalculatorResult {
+  const evaluated = parseAndEvaluate(input, locale)
+  if (!evaluated) {
+    return { show: false }
+  }
 
   return {
     show: true,
-    result: rendered,
-    latex,
+    result: evaluated.rendered,
+    latex: `${toLatex(evaluated.ast)} =`,
   }
 }
 
-export { hasOperator, calculate }
+function calculateFullExpression(
+  input: string,
+  locale = 'en-US',
+): string | null {
+  const evaluated = parseAndEvaluate(input, locale)
+  if (!evaluated) {
+    return null
+  }
+
+  return `${toPlainText(evaluated.ast)} = ${evaluated.rendered}`
+}
+
+export { hasOperator, calculate, calculateFullExpression }

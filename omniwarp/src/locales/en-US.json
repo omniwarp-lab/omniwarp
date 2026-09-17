@@ -34,6 +34,7 @@
       "showInExplorer": "Show in File Explorer",
       "copyPath": "Copy Path",
       "copyResult": "Copy Result",
+      "copyFullExpression": "Copy Full Expression",
       "noResults": "No matching actions"
     },
     "confirmation": {
@@ -65,7 +66,8 @@
   },
   "hud": {
     "copiedPath": "Copied path to clipboard",
-    "copiedResult": "Copied result to clipboard"
+    "copiedResult": "Copied result to clipboard",
+    "copiedExpression": "Copied expression to clipboard"
   },
   "errors": {
     "generic": "An unexpected error occurred",
