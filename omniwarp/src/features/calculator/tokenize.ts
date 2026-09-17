@@ -63,6 +63,12 @@ class Scanner {
         continue
       }
 
+      if (ch === '^') {
+        this.advance()
+        tokens.push({ type: 'POWER' })
+        continue
+      }
+
       if (ch === '(') {
         this.advance()
         tokens.push({ type: 'LPAREN' })

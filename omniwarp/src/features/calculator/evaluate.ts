@@ -34,6 +34,9 @@ function evaluate(node: ASTNode): EvaluationResult {
         }
         result = left / right
         break
+      case '^':
+        result = Math.pow(left, right)
+        break
     }
 
     if (!Number.isFinite(result) || Number.isNaN(result)) {

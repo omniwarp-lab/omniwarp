@@ -67,12 +67,12 @@ function parse(rawTokens: readonly Token[]): ASTNode | null {
   }
 
   function parseTerm(): ASTNode {
-    let expr = parseFactor()
+    let expr = parsePower()
 
     while (true) {
       if (match('MULTIPLY', 'DIVIDE')) {
         const op: BinaryOperator = previous().type === 'MULTIPLY' ? '*' : '/'
-        const right = parseFactor()
+        const right = parsePower()
         expr = {
           type: 'BinaryOp',
           op,
@@ -81,7 +81,7 @@ function parse(rawTokens: readonly Token[]): ASTNode | null {
         }
       } else if (check('LPAREN')) {
         // Implicit multiplication before parenthesis: 2(3) or (2)(3)
-        const right = parseFactor()
+        const right = parsePower()
         expr = {
           type: 'BinaryOp',
           op: '*',
@@ -90,6 +90,22 @@ function parse(rawTokens: readonly Token[]): ASTNode | null {
         }
       } else {
         break
+      }
+    }
+
+    return expr
+  }
+
+  function parsePower(): ASTNode {
+    const expr = parseFactor()
+
+    if (match('POWER')) {
+      const right = parsePower()
+      return {
+        type: 'BinaryOp',
+        op: '^',
+        left: expr,
+        right,
       }
     }
 

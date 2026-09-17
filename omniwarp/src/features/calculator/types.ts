@@ -1,9 +1,9 @@
 type Token =
   | { type: 'NUMBER'; value: number }
-  | { type: 'PLUS' | 'MINUS' | 'MULTIPLY' | 'DIVIDE' }
+  | { type: 'PLUS' | 'MINUS' | 'MULTIPLY' | 'DIVIDE' | 'POWER' }
   | { type: 'LPAREN' | 'RPAREN' }
 
-type BinaryOperator = '+' | '-' | '*' | '/'
+type BinaryOperator = '+' | '-' | '*' | '/' | '^'
 
 type ASTNode =
   | { type: 'Number'; value: number }

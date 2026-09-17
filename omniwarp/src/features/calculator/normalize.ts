@@ -42,6 +42,10 @@ function normalize(input: string): string {
     } else if (code === 0xff09) {
       result += ')'
     }
+    // Fullwidth caret: ＾ (U+FF3E)
+    else if (code === 0xff3e) {
+      result += '^'
+    }
     // Thousands separators to strip:
     // , (ASCII comma), _ (underscore), ٬ (Arabic thousands separator U+066C),
     // ' (apostrophe), ’ (right single quote U+2019),   (narrow no-break space),   (no-break space)
