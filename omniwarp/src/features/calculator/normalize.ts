@@ -46,6 +46,10 @@ function normalize(input: string): string {
     else if (code === 0xff3e) {
       result += '^'
     }
+    // Percent signs: ٪ (Arabic U+066A), ％ (Fullwidth U+FF05)
+    else if (code === 0x066a || code === 0xff05) {
+      result += '%'
+    }
     // Thousands separators to strip:
     // , (ASCII comma), _ (underscore), ٬ (Arabic thousands separator U+066C),
     // ' (apostrophe), ’ (right single quote U+2019),   (narrow no-break space),   (no-break space)

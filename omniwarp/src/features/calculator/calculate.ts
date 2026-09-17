@@ -7,7 +7,11 @@ import { toLatex } from './to-latex'
 import type { ASTNode, CalculatorResult, Token } from './types'
 
 function hasOperator(node: ASTNode): boolean {
-  if (node.type === 'BinaryOp') {
+  if (
+    node.type === 'BinaryOp' ||
+    node.type === 'Percent' ||
+    node.type === 'PercentAddSub'
+  ) {
     return true
   }
   return false

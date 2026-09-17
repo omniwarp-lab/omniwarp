@@ -10,6 +10,37 @@ function evaluate(node: ASTNode): EvaluationResult {
     return node.value
   }
 
+  if (node.type === 'Percent') {
+    const val = evaluate(node.expr)
+    if (typeof val !== 'number') return UNDEFINED_RESULT
+    const result = val / 100
+    if (!Number.isFinite(result) || Number.isNaN(result)) {
+      return UNDEFINED_RESULT
+    }
+    if (Object.is(result, -0)) {
+      return 0
+    }
+    return result
+  }
+
+  if (node.type === 'PercentAddSub') {
+    const baseVal = evaluate(node.base)
+    if (typeof baseVal !== 'number') return UNDEFINED_RESULT
+
+    const percentVal = evaluate(node.percent)
+    if (typeof percentVal !== 'number') return UNDEFINED_RESULT
+
+    const delta = baseVal * (percentVal / 100)
+    const result = node.op === '+' ? baseVal + delta : baseVal - delta
+    if (!Number.isFinite(result) || Number.isNaN(result)) {
+      return UNDEFINED_RESULT
+    }
+    if (Object.is(result, -0)) {
+      return 0
+    }
+    return result
+  }
+
   if (node.type === 'BinaryOp') {
     const left = evaluate(node.left)
     if (typeof left !== 'number') return UNDEFINED_RESULT

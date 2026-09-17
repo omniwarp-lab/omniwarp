@@ -6,7 +6,8 @@ function parse(rawTokens: readonly Token[]): ASTNode | null {
   while (
     tokens.length > 0 &&
     tokens[tokens.length - 1].type !== 'NUMBER' &&
-    tokens[tokens.length - 1].type !== 'RPAREN'
+    tokens[tokens.length - 1].type !== 'RPAREN' &&
+    tokens[tokens.length - 1].type !== 'PERCENT'
   ) {
     tokens.pop()
   }
@@ -53,13 +54,23 @@ function parse(rawTokens: readonly Token[]): ASTNode | null {
     let expr = parseTerm()
 
     while (match('PLUS', 'MINUS')) {
-      const op: BinaryOperator = previous().type === 'PLUS' ? '+' : '-'
+      const op: '+' | '-' = previous().type === 'PLUS' ? '+' : '-'
       const right = parseTerm()
-      expr = {
-        type: 'BinaryOp',
-        op,
-        left: expr,
-        right,
+
+      if (right.type === 'Percent') {
+        expr = {
+          type: 'PercentAddSub',
+          op,
+          base: expr,
+          percent: right.expr,
+        }
+      } else {
+        expr = {
+          type: 'BinaryOp',
+          op,
+          left: expr,
+          right,
+        }
       }
     }
 
@@ -113,43 +124,50 @@ function parse(rawTokens: readonly Token[]): ASTNode | null {
   }
 
   function parseFactor(): ASTNode {
-    if (match('PLUS')) {
-      return parseFactor()
-    }
+    let expr: ASTNode
 
-    if (match('MINUS')) {
+    if (match('PLUS')) {
+      expr = parseFactor()
+    } else if (match('MINUS')) {
       const factor = parseFactor()
       if (factor.type === 'Number') {
-        return { type: 'Number', value: -factor.value }
+        expr = { type: 'Number', value: -factor.value }
+      } else {
+        expr = {
+          type: 'BinaryOp',
+          op: '-',
+          left: { type: 'Number', value: 0 },
+          right: factor,
+        }
       }
-      return {
-        type: 'BinaryOp',
-        op: '-',
-        left: { type: 'Number', value: 0 },
-        right: factor,
-      }
-    }
-
-    if (match('LPAREN')) {
-      const expr = parseExpression()
+    } else if (match('LPAREN')) {
+      expr = parseExpression()
       if (match('RPAREN')) {
-        return expr
+        // Closed
+      } else if (isAtEnd()) {
+        // Auto-close unclosed paren mid-typing
+      } else {
+        throw new Error('Expected )')
       }
-      // If at end of input mid-typing, allow auto-closing unclosed parentheses
-      if (isAtEnd()) {
-        return expr
-      }
-      throw new Error('Expected )')
-    }
-
-    if (match('NUMBER')) {
+    } else if (match('NUMBER')) {
       const prev = previous()
       if (prev.type === 'NUMBER') {
-        return { type: 'Number', value: prev.value }
+        expr = { type: 'Number', value: prev.value }
+      } else {
+        throw new Error(`Unexpected token at position ${current}`)
+      }
+    } else {
+      throw new Error(`Unexpected token at position ${current}`)
+    }
+
+    while (match('PERCENT')) {
+      expr = {
+        type: 'Percent',
+        expr,
       }
     }
 
-    throw new Error(`Unexpected token at position ${current}`)
+    return expr
   }
 
   try {

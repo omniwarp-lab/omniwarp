@@ -69,6 +69,12 @@ class Scanner {
         continue
       }
 
+      if (ch === '%') {
+        this.advance()
+        tokens.push({ type: 'PERCENT' })
+        continue
+      }
+
       if (ch === '(') {
         this.advance()
         tokens.push({ type: 'LPAREN' })

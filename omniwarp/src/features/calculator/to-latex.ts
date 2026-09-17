@@ -13,6 +13,18 @@ function toLatex(node: ASTNode, parentPrecedence = 0): string {
     return node.value < 0 ? `(${node.value})` : `${node.value}`
   }
 
+  if (node.type === 'Percent') {
+    const inner = toLatex(node.expr, 4)
+    return `${inner}\\%`
+  }
+
+  if (node.type === 'PercentAddSub') {
+    const baseStr = toLatex(node.base, 1)
+    const percentStr = toLatex(node.percent, 4)
+    const expr = `${baseStr} ${node.op} ${percentStr}\\%`
+    return parentPrecedence > 1 ? `(${expr})` : expr
+  }
+
   const myPrecedence = PRECEDENCE[node.op]
 
   if (node.op === '^') {
