@@ -28,6 +28,13 @@ class Scanner {
     return ch !== null && ch >= '0' && ch <= '9'
   }
 
+  private isAlpha(ch: string | null): boolean {
+    return (
+      ch !== null &&
+      ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z'))
+    )
+  }
+
   scanTokens(): Token[] {
     const tokens: Token[] = []
 
@@ -85,6 +92,18 @@ class Scanner {
         this.advance()
         tokens.push({ type: 'RPAREN' })
         continue
+      }
+
+      if (this.isAlpha(ch)) {
+        let word = ''
+        while (!this.isAtEnd() && this.isAlpha(this.peek())) {
+          word += this.advance().toLowerCase()
+        }
+        if (word === 'sqrt') {
+          tokens.push({ type: 'SQRT' })
+          continue
+        }
+        throw new Error(`Unexpected character: ${ch}`)
       }
 
       if (this.isDigit(ch) || (ch === '.' && this.isDigit(this.peekNext()))) {

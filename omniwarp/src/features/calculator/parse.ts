@@ -90,8 +90,8 @@ function parse(rawTokens: readonly Token[]): ASTNode | null {
           left: expr,
           right,
         }
-      } else if (check('LPAREN')) {
-        // Implicit multiplication before parenthesis: 2(3) or (2)(3)
+      } else if (check('LPAREN') || check('SQRT')) {
+        // Implicit multiplication before parenthesis or sqrt: 2(3) or 2 sqrt 9
         const right = parsePower()
         expr = {
           type: 'BinaryOp',
@@ -139,6 +139,11 @@ function parse(rawTokens: readonly Token[]): ASTNode | null {
           left: { type: 'Number', value: 0 },
           right: factor,
         }
+      }
+    } else if (match('SQRT')) {
+      expr = {
+        type: 'Sqrt',
+        expr: parseFactor(),
       }
     } else if (match('LPAREN')) {
       expr = parseExpression()

@@ -10,7 +10,8 @@ function hasOperator(node: ASTNode): boolean {
   if (
     node.type === 'BinaryOp' ||
     node.type === 'Percent' ||
-    node.type === 'PercentAddSub'
+    node.type === 'PercentAddSub' ||
+    node.type === 'Sqrt'
   ) {
     return true
   }

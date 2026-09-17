@@ -50,6 +50,10 @@ function normalize(input: string): string {
     else if (code === 0x066a || code === 0xff05) {
       result += '%'
     }
+    // Square root symbol: √ (U+221A)
+    else if (ch === '√') {
+      result += 'sqrt '
+    }
     // Thousands separators to strip:
     // , (ASCII comma), _ (underscore), ٬ (Arabic thousands separator U+066C),
     // ' (apostrophe), ’ (right single quote U+2019),   (narrow no-break space),   (no-break space)

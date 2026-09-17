@@ -41,6 +41,20 @@ function evaluate(node: ASTNode): EvaluationResult {
     return result
   }
 
+  if (node.type === 'Sqrt') {
+    const val = evaluate(node.expr)
+    if (typeof val !== 'number') return UNDEFINED_RESULT
+    if (val < 0) return UNDEFINED_RESULT
+    const result = Math.sqrt(val)
+    if (!Number.isFinite(result) || Number.isNaN(result)) {
+      return UNDEFINED_RESULT
+    }
+    if (Object.is(result, -0)) {
+      return 0
+    }
+    return result
+  }
+
   if (node.type === 'BinaryOp') {
     const left = evaluate(node.left)
     if (typeof left !== 'number') return UNDEFINED_RESULT

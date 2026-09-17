@@ -25,6 +25,11 @@ function toLatex(node: ASTNode, parentPrecedence = 0): string {
     return parentPrecedence > 1 ? `(${expr})` : expr
   }
 
+  if (node.type === 'Sqrt') {
+    const inner = toLatex(node.expr, 0)
+    return `\\sqrt{${inner}}`
+  }
+
   const myPrecedence = PRECEDENCE[node.op]
 
   if (node.op === '^') {
