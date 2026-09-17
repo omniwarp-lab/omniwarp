@@ -35,6 +35,7 @@
       "copyPath": "Copy Path",
       "copyResult": "Copy Result",
       "copyFullExpression": "Copy Full Expression",
+      "copyLatex": "Copy as LaTeX",
       "noResults": "No matching actions"
     },
     "confirmation": {
@@ -67,7 +68,8 @@
   "hud": {
     "copiedPath": "Copied path to clipboard",
     "copiedResult": "Copied result to clipboard",
-    "copiedExpression": "Copied expression to clipboard"
+    "copiedExpression": "Copied expression to clipboard",
+    "copiedLatex": "Copied LaTeX to clipboard"
   },
   "errors": {
     "generic": "An unexpected error occurred",

@@ -82,6 +82,23 @@ function ActionsPopup({ item, onClose, onSelect }: ActionsPopupProps) {
             }
           },
         },
+        {
+          id: 'copy-latex',
+          label: t('commandPalette.actions.copyLatex'),
+          icon: Copy,
+          execute: async () => {
+            onClose()
+            const textToCopy = item.expression
+              ? `${item.expression.trim()} ${item.label}`
+              : item.label
+            try {
+              await copyText(textToCopy)
+              await showCopyHud(t('hud.copiedLatex'))
+            } catch (err) {
+              await showAppError(err)
+            }
+          },
+        },
       ]
     }
 

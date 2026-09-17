@@ -35,6 +35,7 @@
       "copyPath": "کپی مسیر برنامه",
       "copyResult": "کپی نتیجه",
       "copyFullExpression": "کپی عبارت کامل",
+      "copyLatex": "کپی به عنوان LaTex",
       "noResults": "عملیاتی پیدا نشد"
     },
     "confirmation": {
@@ -67,7 +68,8 @@
   "hud": {
     "copiedPath": "مسیر در کلیپ‌بورد کپی شد",
     "copiedResult": "نتیجه در کلیپ‌بورد کپی شد",
-    "copiedExpression": "عبارت در کلیپ‌بورد کپی شد"
+    "copiedExpression": "عبارت در کلیپ‌بورد کپی شد",
+    "copiedLatex": "Latex در کلیپ‌بورد کپی شد"
   },
   "errors": {
     "generic": "خطای غیرمنتظره‌ای رخ داد",
