@@ -33,6 +33,7 @@
       "runAsAdmin": "Run as Administrator",
       "showInExplorer": "Show in File Explorer",
       "copyPath": "Copy Path",
+      "copyResult": "Copy Result",
       "noResults": "No matching actions"
     },
     "confirmation": {
@@ -63,11 +64,15 @@
     "autostartDescription": "Starts OmniWarp automatically when you log in"
   },
   "hud": {
-    "copiedPath": "Copied path to clipboard"
+    "copiedPath": "Copied path to clipboard",
+    "copiedResult": "Copied result to clipboard"
   },
   "errors": {
     "generic": "An unexpected error occurred",
     "checkLogs": "Check logs for details",
+    "clipboard": {
+      "copyText": "Failed to copy to clipboard"
+    },
     "apps": {
       "launch": "Failed to launch application",
       "discovery": "Failed to discover applications",

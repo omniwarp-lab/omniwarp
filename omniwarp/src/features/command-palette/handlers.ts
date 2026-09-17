@@ -1,4 +1,5 @@
 import { focusApp, launchApp } from '@/features/apps/commands.ts'
+import { copyText } from '@/features/clipboard/commands'
 import { openSettings } from '@/features/settings/commands.ts'
 import {
   lockScreen,
@@ -7,11 +8,13 @@ import {
   sleepSystem,
 } from '@/features/system/commands.ts'
 import { isAppRunning } from '@/features/command-palette/selectors.ts'
+import { showCopyHud } from '@/features/hud/commands'
 import { showAppError } from '@/features/hud/errors'
 import { searchWeb } from '@/features/search-providers/commands'
 import { SEARCH_URLS } from '@/features/search-providers/providers'
 import { SearchProviderId } from '@/features/search-providers/types'
 import { useCommandStore } from '@/features/command-palette/store'
+import i18n from '@/i18n'
 
 async function handleSelect(value: string) {
   const separator = value.indexOf(':')
@@ -21,6 +24,15 @@ async function handleSelect(value: string) {
   const id = value.slice(separator + 1)
 
   switch (kind) {
+    case 'calculator': {
+      try {
+        await copyText(id)
+        await showCopyHud(i18n.t('hud.copiedResult'))
+      } catch (err) {
+        await showAppError(err)
+      }
+      break
+    }
     case 'search-providers': {
       const query = useCommandStore.getState().query
       const base = SEARCH_URLS[id as SearchProviderId]

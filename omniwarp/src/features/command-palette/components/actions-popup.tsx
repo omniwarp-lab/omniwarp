@@ -13,6 +13,7 @@ import { PaletteItem } from '@/features/command-palette/types'
 import { Kbd } from '@/components/ui/kbd'
 import { handleSelect } from '@/features/command-palette/handlers'
 import { CommandIconRenderer } from '@/features/command-palette/components/icon-renderer'
+import { KatexRenderer } from '@/features/calculator/components/katex-renderer'
 import { cn } from '@/lib/utils'
 import {
   closeApp,
@@ -44,8 +45,27 @@ function ActionsPopup({ item, onClose, onSelect }: ActionsPopupProps) {
   const inputRef = useRef<HTMLInputElement>(null)
 
   const isAppItem = Boolean(item.id.startsWith('app:'))
+  const isCalculatorItem = Boolean(item.id.startsWith('calculator:'))
 
   const actions: ActionEntry[] = useMemo(() => {
+    if (isCalculatorItem) {
+      return [
+        {
+          id: 'copy-result',
+          label: t('commandPalette.actions.copyResult'),
+          icon: Copy,
+          execute: async () => {
+            onClose()
+            if (onSelect) {
+              await onSelect(item)
+            } else {
+              await handleSelect(item.id)
+            }
+          },
+        },
+      ]
+    }
+
     const list: ActionEntry[] = [
       {
         id: 'open',
@@ -133,7 +153,7 @@ function ActionsPopup({ item, onClose, onSelect }: ActionsPopupProps) {
     }
 
     return list
-  }, [item, isAppItem, t, onClose, onSelect])
+  }, [item, isAppItem, isCalculatorItem, t, onClose, onSelect])
 
   const filteredActions = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -228,11 +248,16 @@ function ActionsPopup({ item, onClose, onSelect }: ActionsPopupProps) {
             <span className='truncate text-xs font-semibold leading-tight text-foreground'>
               {item.label}
             </span>
-            {item.subgroup && (
+            {item.expression ? (
+              <KatexRenderer
+                expression={item.expression}
+                className='truncate text-[10px] text-muted-foreground leading-tight'
+              />
+            ) : item.subgroup ? (
               <span className='truncate text-[10px] text-muted-foreground leading-tight'>
                 {item.subgroup}
               </span>
-            )}
+            ) : null}
           </div>
           <span className='shrink-0 rounded-full border border-border/60 bg-muted/60 px-2 py-0.5 text-[10px] font-medium text-muted-foreground'>
             {t('commandPalette.actions.heading')}

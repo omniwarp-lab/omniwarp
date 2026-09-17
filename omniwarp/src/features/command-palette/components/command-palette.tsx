@@ -130,7 +130,7 @@ function CommandPalette() {
     } else {
       setIsShortcutsOpen(false)
       const target = resolveActiveItem()
-      if (target && !target.id.startsWith('calculator:')) {
+      if (target) {
         setActiveItem(target)
       }
     }
@@ -209,6 +209,9 @@ function CommandPalette() {
                       key={item.id}
                       item={item}
                       onSelect={handleItemSelect}
+                      onContextMenu={(_e, targetItem) =>
+                        setActiveItem(targetItem)
+                      }
                     />
                   ) : (
                     <CommandItem

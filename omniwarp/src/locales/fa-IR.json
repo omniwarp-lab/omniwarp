@@ -33,6 +33,7 @@
       "runAsAdmin": "اجرا به عنوان مدیر",
       "showInExplorer": "نمایش محل برنامه",
       "copyPath": "کپی مسیر برنامه",
+      "copyResult": "کپی نتیجه",
       "noResults": "عملیاتی پیدا نشد"
     },
     "confirmation": {
@@ -63,11 +64,15 @@
     "autostartDescription": "با ورود به سیستم، OmniWarp به‌صورت خودکار اجرا می‌شود"
   },
   "hud": {
-    "copiedPath": "مسیر در کلیپ‌بورد کپی شد"
+    "copiedPath": "مسیر در کلیپ‌بورد کپی شد",
+    "copiedResult": "نتیجه در کلیپ‌بورد کپی شد"
   },
   "errors": {
     "generic": "خطای غیرمنتظره‌ای رخ داد",
     "checkLogs": "لاگ‌ها را بررسی کنید",
+    "clipboard": {
+      "copyText": "هنگام کپی در کلیپ‌بورد خطایی رخ داد"
+    },
     "apps": {
       "launch": "هنگام اجرای برنامه خطایی رخ داد",
       "discovery": "هنگام یافتن برنامه‌ها خطایی رخ داد",

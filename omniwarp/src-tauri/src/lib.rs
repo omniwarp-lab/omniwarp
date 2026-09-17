@@ -9,6 +9,7 @@ use tauri_plugin_autostart::MacosLauncher;
 mod macros;
 
 mod apps;
+mod clipboard;
 mod commands;
 mod hud;
 mod logging;
@@ -42,6 +43,7 @@ use crate::tray::Tray;
 use commands::apps::{
     close_app, copy_app_target_path, discover_apps, focus_app, launch_app, open_app_in_explorer,
 };
+use commands::clipboard::copy_text;
 use commands::hud::show_hud;
 use commands::settings::open_settings_window;
 use commands::system::{lock_screen, restart_system, shutdown_system, sleep_system};
@@ -127,6 +129,7 @@ pub fn run() {
             close_app,
             open_app_in_explorer,
             copy_app_target_path,
+            copy_text,
             exit_app,
             open_settings_window,
             show_hud,
