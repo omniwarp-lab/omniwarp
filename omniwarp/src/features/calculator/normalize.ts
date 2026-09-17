@@ -36,6 +36,12 @@ function normalize(input: string): string {
     else if (code === 0xff0b) {
       result += '+'
     }
+    // Fullwidth parentheses: （ (U+FF08), ） (U+FF09)
+    else if (code === 0xff08) {
+      result += '('
+    } else if (code === 0xff09) {
+      result += ')'
+    }
     // Thousands separators to strip:
     // , (ASCII comma), _ (underscore), ٬ (Arabic thousands separator U+066C),
     // ' (apostrophe), ’ (right single quote U+2019),   (narrow no-break space),   (no-break space)

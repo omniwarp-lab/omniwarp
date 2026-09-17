@@ -63,6 +63,18 @@ class Scanner {
         continue
       }
 
+      if (ch === '(') {
+        this.advance()
+        tokens.push({ type: 'LPAREN' })
+        continue
+      }
+
+      if (ch === ')') {
+        this.advance()
+        tokens.push({ type: 'RPAREN' })
+        continue
+      }
+
       if (this.isDigit(ch) || (ch === '.' && this.isDigit(this.peekNext()))) {
         tokens.push(this.scanNumber())
         continue

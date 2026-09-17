@@ -1,6 +1,7 @@
 type Token =
   | { type: 'NUMBER'; value: number }
   | { type: 'PLUS' | 'MINUS' | 'MULTIPLY' | 'DIVIDE' }
+  | { type: 'LPAREN' | 'RPAREN' }
 
 type BinaryOperator = '+' | '-' | '*' | '/'
 

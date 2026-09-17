@@ -1,9 +1,13 @@
 import type { ASTNode, BinaryOperator, Token } from './types'
 
 function parse(rawTokens: readonly Token[]): ASTNode | null {
-  // Drop trailing operators from incomplete input mid-typing (e.g. "2 +", "2 + 3 *")
+  // Drop trailing operators from incomplete input mid-typing
   const tokens = [...rawTokens]
-  while (tokens.length > 0 && tokens[tokens.length - 1].type !== 'NUMBER') {
+  while (
+    tokens.length > 0 &&
+    tokens[tokens.length - 1].type !== 'NUMBER' &&
+    tokens[tokens.length - 1].type !== 'RPAREN'
+  ) {
     tokens.pop()
   }
 
@@ -65,14 +69,27 @@ function parse(rawTokens: readonly Token[]): ASTNode | null {
   function parseTerm(): ASTNode {
     let expr = parseFactor()
 
-    while (match('MULTIPLY', 'DIVIDE')) {
-      const op: BinaryOperator = previous().type === 'MULTIPLY' ? '*' : '/'
-      const right = parseFactor()
-      expr = {
-        type: 'BinaryOp',
-        op,
-        left: expr,
-        right,
+    while (true) {
+      if (match('MULTIPLY', 'DIVIDE')) {
+        const op: BinaryOperator = previous().type === 'MULTIPLY' ? '*' : '/'
+        const right = parseFactor()
+        expr = {
+          type: 'BinaryOp',
+          op,
+          left: expr,
+          right,
+        }
+      } else if (check('LPAREN')) {
+        // Implicit multiplication before parenthesis: 2(3) or (2)(3)
+        const right = parseFactor()
+        expr = {
+          type: 'BinaryOp',
+          op: '*',
+          left: expr,
+          right,
+        }
+      } else {
+        break
       }
     }
 
@@ -95,6 +112,18 @@ function parse(rawTokens: readonly Token[]): ASTNode | null {
         left: { type: 'Number', value: 0 },
         right: factor,
       }
+    }
+
+    if (match('LPAREN')) {
+      const expr = parseExpression()
+      if (match('RPAREN')) {
+        return expr
+      }
+      // If at end of input mid-typing, allow auto-closing unclosed parentheses
+      if (isAtEnd()) {
+        return expr
+      }
+      throw new Error('Expected )')
     }
 
     if (match('NUMBER')) {
