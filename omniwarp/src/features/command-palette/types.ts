@@ -46,6 +46,7 @@ interface CommandGroup {
 type PaletteItem = Omit<CommandItem, 'label' | 'labelKey'> & {
   label: string
   subgroupConfig?: SubgroupConfig
+  expression?: string
 }
 
 type CommandSection = {

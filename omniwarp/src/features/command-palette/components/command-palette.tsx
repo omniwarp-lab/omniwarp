@@ -15,6 +15,7 @@ import { useCommandPaletteSections } from '@/features/command-palette/hooks/useC
 import { useGroupNavigation } from '@/features/command-palette/hooks/useGroupNavigation.ts'
 import { useConfirmation } from '@/features/command-palette/hooks/useConfirmation.ts'
 import { PaletteItem } from '@/features/command-palette/types'
+import { CalculatorHeroItem } from '@/features/calculator/components'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { useTranslation } from 'react-i18next'
 
@@ -129,7 +130,7 @@ function CommandPalette() {
     } else {
       setIsShortcutsOpen(false)
       const target = resolveActiveItem()
-      if (target) {
+      if (target && !target.id.startsWith('calculator:')) {
         setActiveItem(target)
       }
     }
@@ -202,16 +203,24 @@ function CommandPalette() {
             <CommandEmpty>{t('commandPalette.noResults')}</CommandEmpty>
             {sections.map((section) => (
               <CommandGroup key={section.key} heading={section.heading}>
-                {section.items.map((item) => (
-                  <CommandItem
-                    key={item.id}
-                    item={item}
-                    onSelect={handleItemSelect}
-                    onContextMenu={(_e, targetItem) =>
-                      setActiveItem(targetItem)
-                    }
-                  />
-                ))}
+                {section.items.map((item) =>
+                  section.key === 'calculator' ? (
+                    <CalculatorHeroItem
+                      key={item.id}
+                      item={item}
+                      onSelect={handleItemSelect}
+                    />
+                  ) : (
+                    <CommandItem
+                      key={item.id}
+                      item={item}
+                      onSelect={handleItemSelect}
+                      onContextMenu={(_e, targetItem) =>
+                        setActiveItem(targetItem)
+                      }
+                    />
+                  ),
+                )}
               </CommandGroup>
             ))}
           </CommandList>

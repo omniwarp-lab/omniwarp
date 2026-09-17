@@ -3,6 +3,7 @@
     "placeholder": "Type a command or search…",
     "noResults": "No results found",
     "groups": {
+      "calculator": "Calculator",
       "apps": "Apps",
       "results": "Results",
       "commands": "Commands",

@@ -7,6 +7,8 @@ import { useMemo } from 'react'
 import { toPaletteItem } from '@/features/command-palette/adapters.ts'
 import { useTranslation } from 'react-i18next'
 import { SEARCH_PROVIDERS } from '@/features/search-providers/providers'
+import { calculate } from '@/features/calculator/calculate'
+import { Calculator } from 'lucide-react'
 
 const SEARCH_PROVIDERS_GROUP: CommandGroup = {
   key: 'search-providers',
@@ -43,6 +45,8 @@ function useCommandPaletteSections(
     return fuse.search(query).map((r) => r.item)
   }, [query, fuse])
 
+  const calcResult = useMemo(() => calculate(query), [query])
+
   return useMemo(() => {
     const trimmed = query.trim()
     const base: CommandSection[] = results
@@ -63,10 +67,30 @@ function useCommandPaletteSections(
           }))
           .filter((section) => section.items.length > 0)
 
-    if (!trimmed) return base
+    const calculatorSection: CommandSection | null = calcResult.show
+      ? {
+          key: 'calculator',
+          heading: t('commandPalette.groups.calculator'),
+          items: [
+            {
+              id: `calculator:${calcResult.result}`,
+              label: calcResult.result,
+              expression: trimmed.endsWith('=') ? trimmed : `${trimmed} =`,
+              subgroup: '',
+              icon: Calculator,
+            },
+          ],
+        }
+      : null
+
+    const baseWithCalculator = calculatorSection
+      ? [calculatorSection, ...base]
+      : base
+
+    if (!trimmed) return baseWithCalculator
 
     return [
-      ...base,
+      ...baseWithCalculator,
       {
         key: 'search-providers',
         heading: t('commandPalette.groups.searchProviders'),
@@ -75,7 +99,7 @@ function useCommandPaletteSections(
         ),
       },
     ]
-  }, [results, groups, t, query])
+  }, [results, groups, t, query, calcResult])
 }
 
 export { useCommandPaletteSections }
