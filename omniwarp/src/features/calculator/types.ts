@@ -12,7 +12,7 @@ type ASTNode =
 type EvaluationResult = number | 'Undefined'
 
 type CalculatorResult =
-  | { show: true; result: string }
+  | { show: true; result: string; latex: string }
   | { show: false }
 
 export type {

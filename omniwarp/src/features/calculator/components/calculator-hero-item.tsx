@@ -1,6 +1,7 @@
 import { CommandItem as CommandItemPrimitive } from 'cmdk'
 import type { PaletteItem } from '@/features/command-palette/types'
 import { CommandIconRenderer } from '@/features/command-palette/components/icon-renderer'
+import { KatexRenderer } from './katex-renderer'
 
 interface CalculatorHeroItemProps {
   item: PaletteItem
@@ -18,9 +19,10 @@ function CalculatorHeroItem({ item, onSelect }: CalculatorHeroItemProps) {
 
       <span className='flex min-w-0 flex-1 flex-col justify-center gap-0.5 antialiased'>
         {item.expression && (
-          <span className='truncate text-xs font-normal text-muted-foreground leading-none'>
-            {item.expression}
-          </span>
+          <KatexRenderer
+            expression={item.expression}
+            className='truncate text-xs font-normal text-muted-foreground leading-none'
+          />
         )}
         <span className='truncate text-lg font-semibold tracking-tight leading-tight'>
           {item.label}

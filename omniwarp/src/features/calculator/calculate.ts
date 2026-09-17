@@ -3,6 +3,7 @@ import { tokenize } from './tokenize'
 import { parse } from './parse'
 import { evaluate } from './evaluate'
 import { render } from './render'
+import { toLatex } from './to-latex'
 import type { ASTNode, CalculatorResult, Token } from './types'
 
 function hasOperator(node: ASTNode): boolean {
@@ -51,10 +52,12 @@ function calculate(input: string, locale = 'en-US'): CalculatorResult {
 
   // Stage 5: Render
   const rendered = render(evalResult, locale)
+  const latex = `${toLatex(ast)} =`
 
   return {
     show: true,
     result: rendered,
+    latex,
   }
 }
 

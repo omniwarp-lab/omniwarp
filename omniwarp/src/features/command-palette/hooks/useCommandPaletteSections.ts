@@ -75,7 +75,7 @@ function useCommandPaletteSections(
             {
               id: `calculator:${calcResult.result}`,
               label: calcResult.result,
-              expression: trimmed.endsWith('=') ? trimmed : `${trimmed} =`,
+              expression: calcResult.latex,
               subgroup: '',
               icon: Calculator,
             },
