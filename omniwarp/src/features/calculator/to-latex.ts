@@ -5,6 +5,7 @@ const PRECEDENCE: Record<BinaryOperator, number> = {
   '-': 1,
   '*': 2,
   '/': 2,
+  'mod': 2,
   '^': 3,
 }
 
@@ -46,7 +47,9 @@ function toLatex(node: ASTNode, parentPrecedence = 0): string {
 
   const leftStr = toLatex(node.left, myPrecedence)
   const rightPrecedence =
-    node.op === '-' || node.op === '/' ? myPrecedence + 0.1 : myPrecedence
+    node.op === '-' || node.op === '/' || node.op === 'mod'
+      ? myPrecedence + 0.1
+      : myPrecedence
   const rightStr = toLatex(node.right, rightPrecedence)
 
   let opLatex: string
@@ -62,6 +65,9 @@ function toLatex(node: ASTNode, parentPrecedence = 0): string {
       break
     case '/':
       opLatex = '\\div'
+      break
+    case 'mod':
+      opLatex = '\\bmod'
       break
   }
 

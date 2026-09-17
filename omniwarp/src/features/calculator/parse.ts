@@ -82,8 +82,10 @@ function parse(rawTokens: readonly Token[]): ASTNode | null {
     let expr = parsePower()
 
     while (true) {
-      if (match('MULTIPLY', 'DIVIDE')) {
-        const op: BinaryOperator = previous().type === 'MULTIPLY' ? '*' : '/'
+      if (match('MULTIPLY', 'DIVIDE', 'MOD')) {
+        const prevType = previous().type
+        const op: BinaryOperator =
+          prevType === 'MULTIPLY' ? '*' : prevType === 'DIVIDE' ? '/' : 'mod'
         const right = parsePower()
         expr = {
           type: 'BinaryOp',

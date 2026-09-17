@@ -103,6 +103,14 @@ function evaluate(node: ASTNode): EvaluationResult {
       case '^':
         result = Math.pow(left, right)
         break
+      case 'mod': {
+        if (right === 0) {
+          return UNDEFINED_RESULT
+        }
+        const rem = left % right
+        result = rem !== 0 && rem < 0 !== right < 0 ? rem + right : rem
+        break
+      }
     }
 
     if (!Number.isFinite(result) || Number.isNaN(result)) {

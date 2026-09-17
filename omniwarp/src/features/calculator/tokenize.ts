@@ -109,6 +109,10 @@ class Scanner {
           tokens.push({ type: 'SQRT' })
           continue
         }
+        if (word === 'mod') {
+          tokens.push({ type: 'MOD' })
+          continue
+        }
         throw new Error(`Unexpected character: ${ch}`)
       }
 
