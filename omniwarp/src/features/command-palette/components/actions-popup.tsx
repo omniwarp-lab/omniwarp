@@ -301,7 +301,7 @@ function ActionsPopup({ item, onClose, onSelect }: ActionsPopupProps) {
         </div>
 
         {/* Action Search Input */}
-        <div className='px-3 pt-2.5 pb-1.5'>
+        <div dir={dir} className='px-3 pt-2.5 pb-1.5'>
           <div className='flex items-center gap-2 rounded-lg border border-border/60 bg-muted/30 px-2.5 py-1.5 text-xs transition-colors focus-within:border-border focus-within:bg-muted/70'>
             <Search className='size-3.5 shrink-0 text-muted-foreground' />
             <input
@@ -317,7 +317,7 @@ function ActionsPopup({ item, onClose, onSelect }: ActionsPopupProps) {
         </div>
 
         {/* Actions List */}
-        <div className='flex max-h-60 flex-col gap-0.5 p-2 overflow-y-auto'>
+        <div dir={dir} className='flex max-h-60 flex-col gap-0.5 p-2 overflow-y-auto'>
           {filteredActions.length === 0 ? (
             <div className='py-6 text-center text-xs text-muted-foreground'>
               {t('commandPalette.actions.noResults')}
