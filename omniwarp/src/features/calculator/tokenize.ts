@@ -82,6 +82,12 @@ class Scanner {
         continue
       }
 
+      if (ch === '!') {
+        this.advance()
+        tokens.push({ type: 'FACTORIAL' })
+        continue
+      }
+
       if (ch === '(') {
         this.advance()
         tokens.push({ type: 'LPAREN' })

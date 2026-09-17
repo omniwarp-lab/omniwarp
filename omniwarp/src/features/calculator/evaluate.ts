@@ -55,6 +55,27 @@ function evaluate(node: ASTNode): EvaluationResult {
     return result
   }
 
+  if (node.type === 'Factorial') {
+    const val = evaluate(node.expr)
+    if (typeof val !== 'number') return UNDEFINED_RESULT
+    const rounded = Math.round(val)
+    const intVal = Math.abs(val - rounded) < 1e-10 ? rounded : val
+    if (intVal < 0 || !Number.isInteger(intVal) || intVal > 170) {
+      return UNDEFINED_RESULT
+    }
+    let result = 1
+    for (let i = 2; i <= intVal; i++) {
+      result *= i
+    }
+    if (!Number.isFinite(result) || Number.isNaN(result)) {
+      return UNDEFINED_RESULT
+    }
+    if (Object.is(result, -0)) {
+      return 0
+    }
+    return result
+  }
+
   if (node.type === 'BinaryOp') {
     const left = evaluate(node.left)
     if (typeof left !== 'number') return UNDEFINED_RESULT

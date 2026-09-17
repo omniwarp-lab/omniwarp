@@ -30,6 +30,11 @@ function toLatex(node: ASTNode, parentPrecedence = 0): string {
     return `\\sqrt{${inner}}`
   }
 
+  if (node.type === 'Factorial') {
+    const inner = toLatex(node.expr, 4)
+    return `${inner}!`
+  }
+
   const myPrecedence = PRECEDENCE[node.op]
 
   if (node.op === '^') {

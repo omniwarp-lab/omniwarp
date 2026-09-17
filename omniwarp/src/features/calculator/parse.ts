@@ -7,7 +7,8 @@ function parse(rawTokens: readonly Token[]): ASTNode | null {
     tokens.length > 0 &&
     tokens[tokens.length - 1].type !== 'NUMBER' &&
     tokens[tokens.length - 1].type !== 'RPAREN' &&
-    tokens[tokens.length - 1].type !== 'PERCENT'
+    tokens[tokens.length - 1].type !== 'PERCENT' &&
+    tokens[tokens.length - 1].type !== 'FACTORIAL'
   ) {
     tokens.pop()
   }
@@ -141,9 +142,22 @@ function parse(rawTokens: readonly Token[]): ASTNode | null {
         }
       }
     } else if (match('SQRT')) {
+      let inner: ASTNode
+      if (match('LPAREN')) {
+        inner = parseExpression()
+        if (match('RPAREN')) {
+          // Closed
+        } else if (isAtEnd()) {
+          // Auto-close unclosed paren mid-typing
+        } else {
+          throw new Error('Expected )')
+        }
+      } else {
+        inner = parseFactor()
+      }
       expr = {
         type: 'Sqrt',
-        expr: parseFactor(),
+        expr: inner,
       }
     } else if (match('LPAREN')) {
       expr = parseExpression()
@@ -165,10 +179,19 @@ function parse(rawTokens: readonly Token[]): ASTNode | null {
       throw new Error(`Unexpected token at position ${current}`)
     }
 
-    while (match('PERCENT')) {
-      expr = {
-        type: 'Percent',
-        expr,
+    while (true) {
+      if (match('FACTORIAL')) {
+        expr = {
+          type: 'Factorial',
+          expr,
+        }
+      } else if (match('PERCENT')) {
+        expr = {
+          type: 'Percent',
+          expr,
+        }
+      } else {
+        break
       }
     }
 
