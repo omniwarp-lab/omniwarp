@@ -92,7 +92,6 @@ function SettingsComponent() {
       type: 'select',
       value: activationMode,
       options: activationModes,
-      triggerClassName: 'w-44',
       onChange: (value) => {
         if (isActivationMode(value)) void setActivationMode(value)
       },

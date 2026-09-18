@@ -74,7 +74,7 @@ function SettingItem(props: SettingItemConfig) {
         }}
       >
         <SelectTrigger
-          className={cn('w-32 shrink-0', props.triggerClassName)}
+          className={cn('w-fit shrink-0', props.triggerClassName)}
           size='sm'
         >
           <SelectValue>
