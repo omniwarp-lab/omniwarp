@@ -13,6 +13,56 @@ const TRIG_FUNCTIONS: Record<TrigFunctionName, (x: number) => number> = {
   tan: Math.tan,
 }
 
+const HALF_LOG_2PI = 0.5 * Math.log(2 * Math.PI)
+
+const STIRLING_COEFFS = [
+  1 / 12,
+  -1 / 360,
+  1 / 1260,
+  -1 / 1680,
+  1 / 1188,
+  -691 / 360360,
+  1 / 156,
+]
+
+function stirlingSeries(w: number): number {
+  const invW = 1 / w
+  const invW2 = invW * invW
+  let term = invW
+  let sum = 0
+  for (let i = 0; i < STIRLING_COEFFS.length; i++) {
+    sum += STIRLING_COEFFS[i] * term
+    term *= invW2
+  }
+  return sum
+}
+
+function logGamma(w: number): number {
+  return HALF_LOG_2PI + (w - 0.5) * Math.log(w) - w + stirlingSeries(w)
+}
+
+function gamma(z: number): number {
+  if (Number.isInteger(z) && z <= 0) {
+    return Number.NaN
+  }
+
+  if (z < 0.5) {
+    // Reflection formula: Gamma(z) * Gamma(1 - z) = pi / sin(pi * z)
+    return Math.PI / (Math.sin(Math.PI * z) * gamma(1 - z))
+  }
+
+  // Shift z upward until w >= 10, then evaluate Stirling series
+  let w = z
+  let logDivisor = 0
+  while (w < 10) {
+    logDivisor += Math.log(w)
+    w += 1
+  }
+
+  const logResult = logGamma(w) - logDivisor
+  return Math.exp(logResult)
+}
+
 function makeComplex(re: number, im: number): Complex | 'Undefined' {
   if (
     !Number.isFinite(re) ||
@@ -102,15 +152,24 @@ function evaluate(node: ASTNode): EvaluationResult {
     const complex = typeof val === 'number' ? { re: val, im: 0 } : val
     if (complex.im !== 0) return UNDEFINED_RESULT
 
-    const realVal = complex.re
-    const rounded = Math.round(realVal)
-    const intVal = Math.abs(realVal - rounded) < 1e-10 ? rounded : realVal
-    if (intVal < 0 || !Number.isInteger(intVal) || intVal > 170) {
-      return UNDEFINED_RESULT
+    const x = complex.re
+
+    // Integers: use a plain multiplication loop up to 170. It's exact.
+    if (Number.isInteger(x)) {
+      if (x < 0 || x > 170) {
+        return UNDEFINED_RESULT
+      }
+      let result = 1
+      for (let i = 2; i <= x; i++) {
+        result *= i
+      }
+      return makeComplex(result, 0)
     }
-    let result = 1
-    for (let i = 2; i <= intVal; i++) {
-      result *= i
+
+    // Non-integers: use gamma with an integer check.
+    const result = gamma(x + 1)
+    if (!Number.isFinite(result) || Number.isNaN(result)) {
+      return UNDEFINED_RESULT
     }
     return makeComplex(result, 0)
   }
@@ -189,4 +248,4 @@ function evaluate(node: ASTNode): EvaluationResult {
   return UNDEFINED_RESULT
 }
 
-export { UNDEFINED_RESULT, TRIG_FUNCTIONS, evaluate }
+export { UNDEFINED_RESULT, TRIG_FUNCTIONS, gamma, evaluate }
