@@ -58,6 +58,7 @@
     "settings": "تنظیمات"
   },
   "settings": {
+    "general": "عمومی",
     "minimize": "کوچک کردن",
     "close": "بستن",
     "language": "زبان",

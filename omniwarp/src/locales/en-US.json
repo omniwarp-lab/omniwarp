@@ -58,6 +58,7 @@
     "settings": "Settings"
   },
   "settings": {
+    "general": "General",
     "minimize": "Minimize",
     "close": "Close",
     "language": "Language",
