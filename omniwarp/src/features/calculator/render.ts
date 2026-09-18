@@ -22,6 +22,9 @@ function render(
   if (value === 'Undefined') {
     return 'Undefined'
   }
+  if (value === 'Overflow') {
+    return ''
+  }
 
   const complex: Complex =
     typeof value === 'number' ? { re: value, im: 0 } : value

@@ -34,7 +34,7 @@ interface Complex {
   im: number
 }
 
-type EvaluationResult = number | Complex | 'Undefined'
+type EvaluationResult = number | Complex | 'Undefined' | 'Overflow'
 
 type CalculatorResult =
   | { show: true; result: string; latex: string }

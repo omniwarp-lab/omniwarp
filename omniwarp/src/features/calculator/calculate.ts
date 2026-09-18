@@ -68,6 +68,9 @@ function parseAndEvaluate(
 
   // Stage 4: Evaluate the AST
   const evalResult = evaluate(ast)
+  if (evalResult === 'Overflow') {
+    return null
+  }
 
   // Stage 5: Render
   const rendered = render(evalResult, locale, thousandSeparator)

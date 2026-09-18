@@ -6,6 +6,7 @@ import type {
 } from './types'
 
 const UNDEFINED_RESULT = 'Undefined' as const
+const OVERFLOW_RESULT = 'Overflow' as const
 
 const TRIG_FUNCTIONS: Record<TrigFunctionName, (x: number) => number> = {
   sin: Math.sin,
@@ -63,14 +64,15 @@ function gamma(z: number): number {
   return Math.exp(logResult)
 }
 
-function makeComplex(re: number, im: number): Complex | 'Undefined' {
-  if (
-    !Number.isFinite(re) ||
-    Number.isNaN(re) ||
-    !Number.isFinite(im) ||
-    Number.isNaN(im)
-  ) {
+function makeComplex(
+  re: number,
+  im: number,
+): Complex | 'Undefined' | 'Overflow' {
+  if (Number.isNaN(re) || Number.isNaN(im)) {
     return UNDEFINED_RESULT
+  }
+  if (!Number.isFinite(re) || !Number.isFinite(im)) {
+    return OVERFLOW_RESULT
   }
   const cleanRe = Math.abs(re) < 1e-12 || Object.is(re, -0) ? 0 : re
   const cleanIm = Math.abs(im) < 1e-12 || Object.is(im, -0) ? 0 : im
@@ -85,6 +87,7 @@ function evaluate(node: ASTNode): EvaluationResult {
   if (node.type === 'Percent') {
     const val = evaluate(node.expr)
     if (val === 'Undefined') return UNDEFINED_RESULT
+    if (val === 'Overflow') return OVERFLOW_RESULT
     const complex = typeof val === 'number' ? { re: val, im: 0 } : val
     return makeComplex(complex.re / 100, complex.im / 100)
   }
@@ -92,10 +95,12 @@ function evaluate(node: ASTNode): EvaluationResult {
   if (node.type === 'PercentAddSub') {
     const baseVal = evaluate(node.base)
     if (baseVal === 'Undefined') return UNDEFINED_RESULT
+    if (baseVal === 'Overflow') return OVERFLOW_RESULT
     const base = typeof baseVal === 'number' ? { re: baseVal, im: 0 } : baseVal
 
     const percentVal = evaluate(node.percent)
     if (percentVal === 'Undefined') return UNDEFINED_RESULT
+    if (percentVal === 'Overflow') return OVERFLOW_RESULT
     const percent =
       typeof percentVal === 'number' ? { re: percentVal, im: 0 } : percentVal
 
@@ -112,6 +117,7 @@ function evaluate(node: ASTNode): EvaluationResult {
   if (node.type === 'Sqrt') {
     const val = evaluate(node.expr)
     if (val === 'Undefined') return UNDEFINED_RESULT
+    if (val === 'Overflow') return OVERFLOW_RESULT
     const complex = typeof val === 'number' ? { re: val, im: 0 } : val
 
     if (complex.im === 0) {
@@ -131,6 +137,7 @@ function evaluate(node: ASTNode): EvaluationResult {
   if (node.type === 'Trig') {
     const val = evaluate(node.expr)
     if (val === 'Undefined') return UNDEFINED_RESULT
+    if (val === 'Overflow') return OVERFLOW_RESULT
     const complex = typeof val === 'number' ? { re: val, im: 0 } : val
     if (complex.im !== 0) return UNDEFINED_RESULT
 
@@ -149,6 +156,7 @@ function evaluate(node: ASTNode): EvaluationResult {
   if (node.type === 'Factorial') {
     const val = evaluate(node.expr)
     if (val === 'Undefined') return UNDEFINED_RESULT
+    if (val === 'Overflow') return OVERFLOW_RESULT
     const complex = typeof val === 'number' ? { re: val, im: 0 } : val
     if (complex.im !== 0) return UNDEFINED_RESULT
 
@@ -156,8 +164,11 @@ function evaluate(node: ASTNode): EvaluationResult {
 
     // Integers: use a plain multiplication loop up to 170. It's exact.
     if (Number.isInteger(x)) {
-      if (x < 0 || x > 170) {
+      if (x < 0) {
         return UNDEFINED_RESULT
+      }
+      if (x > 170) {
+        return OVERFLOW_RESULT
       }
       let result = 1
       for (let i = 2; i <= x; i++) {
@@ -168,8 +179,11 @@ function evaluate(node: ASTNode): EvaluationResult {
 
     // Non-integers: use gamma with an integer check.
     const result = gamma(x + 1)
-    if (!Number.isFinite(result) || Number.isNaN(result)) {
+    if (Number.isNaN(result)) {
       return UNDEFINED_RESULT
+    }
+    if (!Number.isFinite(result)) {
+      return OVERFLOW_RESULT
     }
     return makeComplex(result, 0)
   }
@@ -177,10 +191,12 @@ function evaluate(node: ASTNode): EvaluationResult {
   if (node.type === 'BinaryOp') {
     const leftVal = evaluate(node.left)
     if (leftVal === 'Undefined') return UNDEFINED_RESULT
+    if (leftVal === 'Overflow') return OVERFLOW_RESULT
     const left = typeof leftVal === 'number' ? { re: leftVal, im: 0 } : leftVal
 
     const rightVal = evaluate(node.right)
     if (rightVal === 'Undefined') return UNDEFINED_RESULT
+    if (rightVal === 'Overflow') return OVERFLOW_RESULT
     const right =
       typeof rightVal === 'number' ? { re: rightVal, im: 0 } : rightVal
 
@@ -248,4 +264,4 @@ function evaluate(node: ASTNode): EvaluationResult {
   return UNDEFINED_RESULT
 }
 
-export { UNDEFINED_RESULT, TRIG_FUNCTIONS, gamma, evaluate }
+export { UNDEFINED_RESULT, OVERFLOW_RESULT, TRIG_FUNCTIONS, gamma, evaluate }
