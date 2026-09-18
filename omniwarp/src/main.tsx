@@ -4,8 +4,10 @@ import { createRouter, RouterProvider } from '@tanstack/react-router'
 import { routeTree } from './routeTree.gen'
 import './App.css'
 import { initLanguageSync } from '@/features/settings/sync'
+import { initCalculatorSettingsSync } from '@/features/calculator/store'
 
 initLanguageSync()
+initCalculatorSettingsSync()
 
 const router = createRouter({
   routeTree,

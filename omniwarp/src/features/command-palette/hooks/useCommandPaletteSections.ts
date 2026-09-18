@@ -8,6 +8,7 @@ import { toPaletteItem } from '@/features/command-palette/adapters.ts'
 import { useTranslation } from 'react-i18next'
 import { SEARCH_PROVIDERS } from '@/features/search-providers/providers'
 import { calculate } from '@/features/calculator/calculate'
+import { useCalculatorSettingsStore } from '@/features/calculator/store'
 import { Calculator } from 'lucide-react'
 
 const SEARCH_PROVIDERS_GROUP: CommandGroup = {
@@ -45,7 +46,11 @@ function useCommandPaletteSections(
     return fuse.search(query).map((r) => r.item)
   }, [query, fuse])
 
-  const calcResult = useMemo(() => calculate(query), [query])
+  const activationMode = useCalculatorSettingsStore((s) => s.activationMode)
+  const calcResult = useMemo(
+    () => calculate(query, undefined, activationMode),
+    [query, activationMode],
+  )
 
   return useMemo(() => {
     const trimmed = query.trim()

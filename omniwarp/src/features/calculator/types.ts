@@ -35,6 +35,8 @@ type CalculatorResult =
   | { show: true; result: string; latex: string }
   | { show: false }
 
+type CalculatorActivationMode = 'auto' | 'requireEquals'
+
 export type {
   Token,
   BinaryOperator,
@@ -43,4 +45,5 @@ export type {
   ASTNode,
   EvaluationResult,
   CalculatorResult,
+  CalculatorActivationMode,
 }

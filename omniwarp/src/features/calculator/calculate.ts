@@ -5,7 +5,12 @@ import { evaluate } from './evaluate'
 import { render } from './render'
 import { toLatex } from './to-latex'
 import { toPlainText } from './to-plain-text'
-import type { ASTNode, CalculatorResult, Token } from './types'
+import type {
+  ASTNode,
+  CalculatorActivationMode,
+  CalculatorResult,
+  Token,
+} from './types'
 
 function hasOperator(node: ASTNode): boolean {
   if (
@@ -64,8 +69,20 @@ function parseAndEvaluate(input: string, locale = 'en-US') {
   return { ast, rendered }
 }
 
-function calculate(input: string, locale = 'en-US'): CalculatorResult {
-  const evaluated = parseAndEvaluate(input, locale)
+function calculate(
+  input: string,
+  locale = 'en-US',
+  activationMode: CalculatorActivationMode = 'auto',
+): CalculatorResult {
+  const trimmed = input.trimStart()
+  const hasEqualsPrefix = trimmed.startsWith('=')
+
+  if (activationMode === 'requireEquals' && !hasEqualsPrefix) {
+    return { show: false }
+  }
+
+  const cleanInput = hasEqualsPrefix ? trimmed.slice(1) : input
+  const evaluated = parseAndEvaluate(cleanInput, locale)
   if (!evaluated) {
     return { show: false }
   }
@@ -81,7 +98,9 @@ function calculateFullExpression(
   input: string,
   locale = 'en-US',
 ): string | null {
-  const evaluated = parseAndEvaluate(input, locale)
+  const trimmed = input.trimStart()
+  const cleanInput = trimmed.startsWith('=') ? trimmed.slice(1) : input
+  const evaluated = parseAndEvaluate(cleanInput, locale)
   if (!evaluated) {
     return null
   }

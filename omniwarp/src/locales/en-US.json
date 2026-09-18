@@ -59,12 +59,19 @@
   },
   "settings": {
     "general": "General",
+    "calculator": "Calculator",
     "minimize": "Minimize",
     "close": "Close",
     "language": "Language",
     "languageDescription": "Changes the language across OmniWarp",
     "autostart": "Run at Startup",
-    "autostartDescription": "Starts OmniWarp automatically when you log in"
+    "autostartDescription": "Starts OmniWarp automatically when you log in",
+    "activationMode": "Activation Mode",
+    "activationModeDescription": "Controls how math expressions trigger the calculator",
+    "activationModes": {
+      "auto": "Auto-Detect",
+      "requireEquals": "Require \"=\" Prefix"
+    }
   },
   "hud": {
     "copiedPath": "Copied path to clipboard",

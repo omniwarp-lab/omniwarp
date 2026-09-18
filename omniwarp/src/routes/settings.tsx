@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { useEffect, useState } from 'react'
 import {
+  CalculatorIcon,
   LanguagesIcon,
   MinusIcon,
   PowerIcon,
@@ -19,6 +20,10 @@ import {
 import { useSettingsStore } from '@/features/settings/store'
 import { isLanguageCode, LANGUAGES } from '@/features/settings/languages'
 import { useAutostart } from '@/features/settings/hooks/useAutostart'
+import {
+  isActivationMode,
+  useCalculatorSettingsStore,
+} from '@/features/calculator/store'
 
 function SettingsComponent() {
   const { t } = useTranslation()
@@ -28,12 +33,19 @@ function SettingsComponent() {
   const language = useSettingsStore((s) => s.language)
   const applyLanguage = useSettingsStore((s) => s.applyLanguage)
   const autostart = useAutostart()
+  const activationMode = useCalculatorSettingsStore((s) => s.activationMode)
+  const setActivationMode = useCalculatorSettingsStore((s) => s.setActivationMode)
 
   const tabs: readonly SettingsTab[] = [
     {
       id: 'general',
       label: t('settings.general'),
       icon: SlidersHorizontalIcon,
+    },
+    {
+      id: 'calculator',
+      label: t('settings.calculator'),
+      icon: CalculatorIcon,
     },
   ]
 
@@ -59,6 +71,30 @@ function SettingsComponent() {
       checked: autostart.enabled,
       disabled: autostart.loading,
       onChange: autostart.toggle,
+    },
+  ]
+
+  const activationModes = [
+    { value: 'auto', label: t('settings.activationModes.auto') },
+    {
+      value: 'requireEquals',
+      label: t('settings.activationModes.requireEquals'),
+    },
+  ] as const
+
+  const calculatorSettings: SettingItemConfig[] = [
+    {
+      id: 'activationMode',
+      icon: CalculatorIcon,
+      title: t('settings.activationMode'),
+      description: t('settings.activationModeDescription'),
+      type: 'select',
+      value: activationMode,
+      options: activationModes,
+      triggerClassName: 'w-44',
+      onChange: (value) => {
+        if (isActivationMode(value)) void setActivationMode(value)
+      },
     },
   ]
 
@@ -147,6 +183,9 @@ function SettingsComponent() {
 
         <div className='flex-1 overflow-y-auto p-3'>
           {activeTab === 'general' && <SettingsList items={generalSettings} />}
+          {activeTab === 'calculator' && (
+            <SettingsList items={calculatorSettings} />
+          )}
         </div>
       </div>
 

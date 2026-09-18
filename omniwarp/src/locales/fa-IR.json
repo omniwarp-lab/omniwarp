@@ -59,12 +59,19 @@
   },
   "settings": {
     "general": "عمومی",
+    "calculator": "ماشین‌حساب",
     "minimize": "کوچک کردن",
     "close": "بستن",
     "language": "زبان",
     "languageDescription": "زبان مورد استفاده در سراسر OmniWarp را تغییر می‌دهد",
     "autostart": "اجرا هنگام راه‌اندازی",
-    "autostartDescription": "با ورود به سیستم، OmniWarp به‌صورت خودکار اجرا می‌شود"
+    "autostartDescription": "با ورود به سیستم، OmniWarp به‌صورت خودکار اجرا می‌شود",
+    "activationMode": "حالت فعال‌سازی",
+    "activationModeDescription": "نحوهٔ فعال شدن ماشین‌حساب با عبارت‌های ریاضی را تعیین می‌کند",
+    "activationModes": {
+      "auto": "تشخیص خودکار",
+      "requireEquals": "نیاز به پیشوند «=»"
+    }
   },
   "hud": {
     "copiedPath": "مسیر در کلیپ‌بورد کپی شد",
