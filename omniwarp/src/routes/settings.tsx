@@ -2,15 +2,20 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { useEffect, useState } from 'react'
-import { MinusIcon, XIcon } from 'lucide-react'
+import { LanguagesIcon, MinusIcon, PowerIcon, XIcon } from 'lucide-react'
 import { getVersion } from '@tauri-apps/api/app'
-import { LanguageSetting } from '@/features/settings/components/language-setting'
-import { AutostartSetting } from '@/features/settings/components/autostart-setting'
+import { SettingsList } from '@/features/settings/components'
+import { useSettingsStore } from '@/features/settings/store'
+import { isLanguageCode, LANGUAGES } from '@/features/settings/languages'
+import { useAutostart } from '@/features/settings/hooks/useAutostart'
 
 function SettingsComponent() {
   const { t } = useTranslation()
   const appWindow = getCurrentWindow()
   const [version, setVersion] = useState<string | null>(null)
+  const language = useSettingsStore((s) => s.language)
+  const applyLanguage = useSettingsStore((s) => s.applyLanguage)
+  const autostart = useAutostart()
 
   useEffect(() => {
     let active = true
@@ -89,10 +94,32 @@ function SettingsComponent() {
       </header>
 
       <div className='flex-1 p-3'>
-        <div className='divide-y divide-border overflow-hidden rounded-xl border border-border bg-card'>
-          <LanguageSetting />
-          <AutostartSetting />
-        </div>
+        <SettingsList
+          items={[
+            {
+              id: 'language',
+              icon: LanguagesIcon,
+              title: t('settings.language'),
+              description: t('settings.languageDescription'),
+              type: 'select',
+              value: language,
+              options: LANGUAGES,
+              onChange: (value) => {
+                if (isLanguageCode(value)) void applyLanguage(value)
+              },
+            },
+            {
+              id: 'autostart',
+              icon: PowerIcon,
+              title: t('settings.autostart'),
+              description: t('settings.autostartDescription'),
+              type: 'switch',
+              checked: autostart.enabled,
+              disabled: autostart.loading,
+              onChange: autostart.toggle,
+            },
+          ]}
+        />
       </div>
 
       <footer className='flex h-8 shrink-0 items-center justify-between border-t border-border bg-muted/40 px-4 text-xs text-muted-foreground'>
