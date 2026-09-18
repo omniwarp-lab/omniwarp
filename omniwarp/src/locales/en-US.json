@@ -60,12 +60,16 @@
   "settings": {
     "general": "General",
     "calculator": "Calculator",
+    "logs": "Logs",
     "minimize": "Minimize",
     "close": "Close",
+    "open": "Open",
     "language": "Language",
     "languageDescription": "Changes the language across OmniWarp",
     "autostart": "Run at Startup",
     "autostartDescription": "Starts OmniWarp automatically when you log in",
+    "openDir": "Logs Directory",
+    "openDirDescription": "Opens the folder containing OmniWarp log files in File Explorer",
     "enableCalculator": "Enable Calculator",
     "enableCalculatorDescription": "Enables mathematical calculations",
     "activationMode": "Activation Mode",
@@ -112,7 +116,8 @@
       "shutdown": "Failed to shut down computer"
     },
     "settings": {
-      "open": "Failed to open settings window"
+      "open": "Failed to open settings window",
+      "openDir": "Failed to open logs directory"
     },
     "webSearch": {
       "open": "Failed to open URL"

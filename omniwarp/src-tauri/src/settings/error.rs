@@ -8,6 +8,8 @@ pub type SettingsResult<T> = Result<T, SettingsError>;
 pub enum SettingsError {
     #[error("[open] {0}")]
     Open(#[from] tauri::Error),
+    #[error("[openDir] {0}")]
+    OpenDir(#[from] tauri_plugin_opener::Error),
 }
 
 impl_error_serialize!(SettingsError);

@@ -6,10 +6,13 @@ import {
   CalculatorIcon,
   DraftingCompassIcon,
   EqualIcon,
+  FolderIcon,
+  FolderOpenIcon,
   HashIcon,
   LanguagesIcon,
   MinusIcon,
   PowerIcon,
+  ScrollTextIcon,
   SlidersHorizontalIcon,
   XIcon,
 } from 'lucide-react'
@@ -23,6 +26,8 @@ import {
 import { useSettingsStore } from '@/features/settings/store'
 import { isLanguageCode, LANGUAGES } from '@/features/settings/languages'
 import { useAutostart } from '@/features/settings/hooks/useAutostart'
+import { openLogsDir } from '@/features/settings/commands'
+import { showAppError } from '@/features/hud/errors'
 import {
   isActivationMode,
   isAngleUnit,
@@ -41,7 +46,9 @@ function SettingsComponent() {
   const enabled = useCalculatorSettingsStore((s) => s.enabled)
   const setEnabled = useCalculatorSettingsStore((s) => s.setEnabled)
   const activationMode = useCalculatorSettingsStore((s) => s.activationMode)
-  const setActivationMode = useCalculatorSettingsStore((s) => s.setActivationMode)
+  const setActivationMode = useCalculatorSettingsStore(
+    (s) => s.setActivationMode,
+  )
   const thousandSeparator = useCalculatorSettingsStore(
     (s) => s.thousandSeparator,
   )
@@ -61,6 +68,11 @@ function SettingsComponent() {
       id: 'calculator',
       label: t('settings.calculator'),
       icon: CalculatorIcon,
+    },
+    {
+      id: 'logs',
+      label: t('settings.logs'),
+      icon: ScrollTextIcon,
     },
   ]
 
@@ -146,6 +158,23 @@ function SettingsComponent() {
       disabled: !enabled,
       onChange: (value) => {
         if (isAngleUnit(value)) void setAngleUnit(value)
+      },
+    },
+  ]
+
+  const logsSettings: SettingItemConfig[] = [
+    {
+      id: 'openDir',
+      icon: FolderIcon,
+      title: t('settings.openDir'),
+      description: t('settings.openDirDescription'),
+      type: 'button',
+      buttonIcon: FolderOpenIcon,
+      ariaLabel: t('settings.open'),
+      onClick: () => {
+        openLogsDir().catch((err) => {
+          void showAppError(err)
+        })
       },
     },
   ]
@@ -238,14 +267,13 @@ function SettingsComponent() {
           {activeTab === 'calculator' && (
             <SettingsList items={calculatorSettings} />
           )}
+          {activeTab === 'logs' && <SettingsList items={logsSettings} />}
         </div>
       </div>
 
       <footer className='flex h-8 shrink-0 items-center justify-between border-t border-border bg-muted/40 px-4 text-xs text-muted-foreground'>
         <span className='font-medium'>OmniWarp</span>
-        {version !== null && (
-          <span className='tabular-nums'>v{version}</span>
-        )}
+        {version !== null && <span className='tabular-nums'>v{version}</span>}
       </footer>
     </main>
   )

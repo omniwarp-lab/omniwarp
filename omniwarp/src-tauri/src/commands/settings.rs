@@ -1,5 +1,7 @@
+use crate::logging::Logging;
 use crate::settings::SettingsResult;
 use tauri::{AppHandle, Manager, WebviewUrl, WebviewWindowBuilder};
+use tauri_plugin_opener::OpenerExt;
 
 const SETTINGS_WINDOW_LABEL: &str = "settings";
 const SETTINGS_WINDOW_URL: &str = "/settings";
@@ -35,5 +37,14 @@ pub async fn open_settings_window(
 
     builder.build()?;
 
+    Ok(())
+}
+
+#[tauri::command]
+#[tracing::instrument(skip_all, err)]
+pub async fn open_logs_dir(app: AppHandle) -> SettingsResult<()> {
+    let log_dir = Logging::dir(&app);
+    let _ = std::fs::create_dir_all(&log_dir);
+    app.opener().open_path(log_dir.to_string_lossy(), None::<&str>)?;
     Ok(())
 }

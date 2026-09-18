@@ -9,13 +9,17 @@ use tracing_subscriber::Layer;
 pub struct Logging;
 
 impl Logging {
-    pub fn setup(app: &App) -> Result<(), Box<dyn std::error::Error>> {
-        let log_dir = app.path().app_log_dir().unwrap_or_else(|_| {
+    pub fn dir(app: &tauri::AppHandle) -> std::path::PathBuf {
+        app.path().app_log_dir().unwrap_or_else(|_| {
             app.path()
                 .app_data_dir()
                 .unwrap_or_else(|_| std::path::PathBuf::from("."))
                 .join("logs")
-        });
+        })
+    }
+
+    pub fn setup(app: &App) -> Result<(), Box<dyn std::error::Error>> {
+        let log_dir = Self::dir(app.handle());
 
         fs::create_dir_all(&log_dir)?;
 

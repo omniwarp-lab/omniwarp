@@ -1,4 +1,5 @@
 import type { ComponentType, ReactNode } from 'react'
+import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import {
   Select,
@@ -39,6 +40,16 @@ interface SelectSettingConfig<T extends string = string>
   onChange?: (value: T) => void
 }
 
+interface ButtonSettingConfig extends BaseSettingConfig {
+  type: 'button'
+  buttonText?: string
+  buttonIcon?: ComponentType<{ className?: string }>
+  buttonSize?: 'default' | 'sm' | 'lg' | 'icon' | 'icon-sm' | 'icon-lg'
+  ariaLabel?: string
+  disabled?: boolean
+  onClick?: () => void
+}
+
 interface CustomSettingConfig extends BaseSettingConfig {
   type?: 'custom'
   control?: ReactNode
@@ -47,6 +58,7 @@ interface CustomSettingConfig extends BaseSettingConfig {
 type SettingItemConfig =
   | SwitchSettingConfig
   | SelectSettingConfig<any>
+  | ButtonSettingConfig
   | CustomSettingConfig
 
 function SettingItem(props: SettingItemConfig) {
@@ -91,6 +103,24 @@ function SettingItem(props: SettingItemConfig) {
           ))}
         </SelectContent>
       </Select>
+    )
+  } else if (props.type === 'button') {
+    const ButtonIcon = props.buttonIcon
+    control = (
+      <Button
+        type='button'
+        variant='outline'
+        size={
+          props.buttonSize ?? (ButtonIcon && !props.buttonText ? 'icon' : 'sm')
+        }
+        disabled={props.disabled}
+        onClick={props.onClick}
+        aria-label={props.ariaLabel ?? props.buttonText}
+        title={props.ariaLabel ?? props.buttonText}
+      >
+        {ButtonIcon && <ButtonIcon className='size-4.5' />}
+        {props.buttonText}
+      </Button>
     )
   } else {
     control = props.control
@@ -142,6 +172,7 @@ export type {
   SettingItemConfig,
   SwitchSettingConfig,
   SelectSettingConfig,
+  ButtonSettingConfig,
   CustomSettingConfig,
   SelectOption,
   SettingsListProps,

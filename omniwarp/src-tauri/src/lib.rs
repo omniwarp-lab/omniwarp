@@ -45,7 +45,7 @@ use commands::apps::{
 };
 use commands::clipboard::copy_text;
 use commands::hud::show_hud;
-use commands::settings::open_settings_window;
+use commands::settings::{open_logs_dir, open_settings_window};
 use commands::system::{lock_screen, restart_system, shutdown_system, sleep_system};
 use commands::tray::exit_app;
 use commands::web_search::search_web;
@@ -132,6 +132,7 @@ pub fn run() {
             copy_text,
             exit_app,
             open_settings_window,
+            open_logs_dir,
             show_hud,
             lock_screen,
             sleep_system,

@@ -4,4 +4,8 @@ async function openSettings(): Promise<void> {
   await invoke('open_settings_window')
 }
 
-export { openSettings }
+async function openLogsDir(): Promise<void> {
+  await invoke('open_logs_dir')
+}
+
+export { openSettings, openLogsDir }

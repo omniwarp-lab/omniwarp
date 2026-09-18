@@ -60,12 +60,16 @@
   "settings": {
     "general": "عمومی",
     "calculator": "ماشین‌حساب",
+    "logs": "لاگ‌ها",
     "minimize": "کوچک کردن",
     "close": "بستن",
+    "open": "باز کردن",
     "language": "زبان",
     "languageDescription": "زبان مورد استفاده در سراسر OmniWarp را تغییر می‌دهد",
     "autostart": "اجرا هنگام راه‌اندازی",
     "autostartDescription": "با ورود به سیستم، OmniWarp به‌صورت خودکار اجرا می‌شود",
+    "openDir": "پوشهٔ لاگ‌ها",
+    "openDirDescription": "پوشهٔ حاوی فایل‌های لاگ OmniWarp را باز می‌کند",
     "enableCalculator": "فعال‌سازی ماشین‌حساب",
     "enableCalculatorDescription": "محاسبات ریاضی را فعال می‌کند",
     "activationMode": "حالت فعال‌سازی",
@@ -112,7 +116,8 @@
       "shutdown": "هنگام خاموش کردن رایانه خطایی رخ داد"
     },
     "settings": {
-      "open": "هنگام باز کردن پنجرهٔ تنظیمات خطایی رخ داد"
+      "open": "هنگام باز کردن پنجرهٔ تنظیمات خطایی رخ داد",
+      "openDir": "هنگام باز کردن پوشهٔ لاگ‌ها خطایی رخ داد"
     },
     "webSearch": {
       "open": "هنگام باز کردن نشانی وب خطایی رخ داد"
