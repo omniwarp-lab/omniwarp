@@ -104,7 +104,10 @@ function SettingItem(props: SettingItemConfig) {
 
       <div className='min-w-0 flex-1'>
         <p className='text-[13px] font-medium leading-snug'>{title}</p>
-        <bdi className='mt-0.5 text-xs leading-snug text-muted-foreground'>
+        <bdi
+          title={description}
+          className='mt-0.5 block truncate text-xs leading-snug text-muted-foreground'
+        >
           {description}
         </bdi>
       </div>
