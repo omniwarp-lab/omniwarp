@@ -74,10 +74,15 @@ function ActionsPopup({ item, onClose, onSelect }: ActionsPopupProps) {
           execute: async () => {
             onClose()
             const rawQuery = useCommandStore.getState().query
-            const angleUnit = useCalculatorSettingsStore.getState().angleUnit
+            const { angleUnit, thousandSeparator } =
+              useCalculatorSettingsStore.getState()
             const textToCopy =
-              calculateFullExpression(rawQuery, undefined, angleUnit) ??
-              item.label
+              calculateFullExpression(
+                rawQuery,
+                undefined,
+                angleUnit,
+                thousandSeparator,
+              ) ?? item.label
             try {
               await copyText(textToCopy)
               await showCopyHud(t('hud.copiedExpression'))

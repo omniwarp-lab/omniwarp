@@ -5,6 +5,9 @@ import type { AngleUnit, CalculatorActivationMode } from './types'
 const ACTIVATION_MODE_KEY = 'calculator.activationMode'
 const DEFAULT_ACTIVATION_MODE: CalculatorActivationMode = 'auto'
 
+const THOUSAND_SEPARATOR_KEY = 'calculator.thousandSeparator'
+const DEFAULT_THOUSAND_SEPARATOR = true
+
 const ANGLE_UNIT_KEY = 'calculator.angleUnit'
 const DEFAULT_ANGLE_UNIT: AngleUnit = 'rad'
 
@@ -19,6 +22,8 @@ function isAngleUnit(value: unknown): value is AngleUnit {
 interface CalculatorSettingsStore {
   activationMode: CalculatorActivationMode
   setActivationMode: (mode: CalculatorActivationMode) => Promise<void>
+  thousandSeparator: boolean
+  setThousandSeparator: (enabled: boolean) => Promise<void>
   angleUnit: AngleUnit
   setAngleUnit: (unit: AngleUnit) => Promise<void>
 }
@@ -34,6 +39,17 @@ const useCalculatorSettingsStore = create<CalculatorSettingsStore>(
         await settingsStore.set(ACTIVATION_MODE_KEY, mode)
       } catch {
         set({ activationMode: prev })
+      }
+    },
+    thousandSeparator: DEFAULT_THOUSAND_SEPARATOR,
+    setThousandSeparator: async (enabled) => {
+      if (get().thousandSeparator === enabled) return
+      const prev = get().thousandSeparator
+      set({ thousandSeparator: enabled })
+      try {
+        await settingsStore.set(THOUSAND_SEPARATOR_KEY, enabled)
+      } catch {
+        set({ thousandSeparator: prev })
       }
     },
     angleUnit: DEFAULT_ANGLE_UNIT,
@@ -67,6 +83,16 @@ async function initCalculatorSettingsSync(): Promise<() => void> {
   } catch {}
 
   try {
+    const storedThousandSep =
+      await settingsStore.get<boolean>(THOUSAND_SEPARATOR_KEY)
+    if (typeof storedThousandSep === 'boolean') {
+      useCalculatorSettingsStore.setState({
+        thousandSeparator: storedThousandSep,
+      })
+    }
+  } catch {}
+
+  try {
     const storedAngle = await settingsStore.get<string>(ANGLE_UNIT_KEY)
     if (isAngleUnit(storedAngle)) {
       useCalculatorSettingsStore.setState({ angleUnit: storedAngle })
@@ -82,6 +108,15 @@ async function initCalculatorSettingsSync(): Promise<() => void> {
     },
   )
 
+  const unlistenThousandSep = await settingsStore.onKeyChange<boolean>(
+    THOUSAND_SEPARATOR_KEY,
+    (value) => {
+      if (typeof value === 'boolean') {
+        useCalculatorSettingsStore.setState({ thousandSeparator: value })
+      }
+    },
+  )
+
   const unlistenAngle = await settingsStore.onKeyChange<string>(
     ANGLE_UNIT_KEY,
     (value) => {
@@ -93,6 +128,7 @@ async function initCalculatorSettingsSync(): Promise<() => void> {
 
   return () => {
     unlistenActivation()
+    unlistenThousandSep()
     unlistenAngle()
     syncActive = false
   }
@@ -104,4 +140,5 @@ export {
   isActivationMode,
   isAngleUnit,
   DEFAULT_ANGLE_UNIT,
+  DEFAULT_THOUSAND_SEPARATOR,
 }

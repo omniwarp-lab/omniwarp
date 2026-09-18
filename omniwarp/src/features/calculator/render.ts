@@ -1,6 +1,10 @@
 import type { EvaluationResult } from './types'
 
-function render(value: EvaluationResult, locale = 'en-US'): string {
+function render(
+  value: EvaluationResult,
+  locale = 'en-US',
+  thousandSeparator = true,
+): string {
   if (value === 'Undefined') {
     return 'Undefined'
   }
@@ -11,7 +15,7 @@ function render(value: EvaluationResult, locale = 'en-US'): string {
 
   return new Intl.NumberFormat(locale, {
     maximumFractionDigits: 10,
-    useGrouping: true,
+    useGrouping: thousandSeparator,
   }).format(safeValue)
 }
 

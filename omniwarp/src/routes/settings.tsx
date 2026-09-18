@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import {
   CalculatorIcon,
   DraftingCompassIcon,
+  HashIcon,
   LanguagesIcon,
   MinusIcon,
   PowerIcon,
@@ -38,6 +39,12 @@ function SettingsComponent() {
   const autostart = useAutostart()
   const activationMode = useCalculatorSettingsStore((s) => s.activationMode)
   const setActivationMode = useCalculatorSettingsStore((s) => s.setActivationMode)
+  const thousandSeparator = useCalculatorSettingsStore(
+    (s) => s.thousandSeparator,
+  )
+  const setThousandSeparator = useCalculatorSettingsStore(
+    (s) => s.setThousandSeparator,
+  )
   const angleUnit = useCalculatorSettingsStore((s) => s.angleUnit)
   const setAngleUnit = useCalculatorSettingsStore((s) => s.setAngleUnit)
 
@@ -104,6 +111,15 @@ function SettingsComponent() {
       onChange: (value) => {
         if (isActivationMode(value)) void setActivationMode(value)
       },
+    },
+    {
+      id: 'thousandsSeparator',
+      icon: HashIcon,
+      title: t('settings.thousandsSeparator'),
+      description: t('settings.thousandsSeparatorDescription'),
+      type: 'switch',
+      checked: thousandSeparator,
+      onChange: (checked) => void setThousandSeparator(checked),
     },
     {
       id: 'angleUnit',

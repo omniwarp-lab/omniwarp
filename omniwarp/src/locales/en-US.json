@@ -72,6 +72,8 @@
       "auto": "Auto-Detect",
       "requireEquals": "Require \"=\" Prefix"
     },
+    "thousandsSeparator": "Thousands Separator",
+    "thousandsSeparatorDescription": "Formats large numbers with thousands separators  (e.g. 1,000,000)",
     "angleUnit": "Default Angle Unit",
     "angleUnitDescription": "Sets the default unit for trigonometric calculations",
     "angleUnits": {

@@ -31,6 +31,7 @@ function parseAndEvaluate(
   input: string,
   locale = 'en-US',
   angleUnit: AngleUnit = 'rad',
+  thousandSeparator = true,
 ) {
   if (!input || !input.trim()) {
     return null
@@ -69,7 +70,7 @@ function parseAndEvaluate(
   const evalResult = evaluate(ast)
 
   // Stage 5: Render
-  const rendered = render(evalResult, locale)
+  const rendered = render(evalResult, locale, thousandSeparator)
 
   return { ast, rendered }
 }
@@ -79,6 +80,7 @@ function calculate(
   locale = 'en-US',
   activationMode: CalculatorActivationMode = 'auto',
   angleUnit: AngleUnit = 'rad',
+  thousandSeparator = true,
 ): CalculatorResult {
   const trimmed = input.trimStart()
   const hasEqualsPrefix = trimmed.startsWith('=')
@@ -88,7 +90,12 @@ function calculate(
   }
 
   const cleanInput = hasEqualsPrefix ? trimmed.slice(1) : input
-  const evaluated = parseAndEvaluate(cleanInput, locale, angleUnit)
+  const evaluated = parseAndEvaluate(
+    cleanInput,
+    locale,
+    angleUnit,
+    thousandSeparator,
+  )
   if (!evaluated) {
     return { show: false }
   }
@@ -104,10 +111,16 @@ function calculateFullExpression(
   input: string,
   locale = 'en-US',
   angleUnit: AngleUnit = 'rad',
+  thousandSeparator = true,
 ): string | null {
   const trimmed = input.trimStart()
   const cleanInput = trimmed.startsWith('=') ? trimmed.slice(1) : input
-  const evaluated = parseAndEvaluate(cleanInput, locale, angleUnit)
+  const evaluated = parseAndEvaluate(
+    cleanInput,
+    locale,
+    angleUnit,
+    thousandSeparator,
+  )
   if (!evaluated) {
     return null
   }

@@ -72,6 +72,8 @@
       "auto": "تشخیص خودکار",
       "requireEquals": "نیاز به پیشوند «=»"
     },
+    "thousandsSeparator": "جداکنندهٔ هزارگان",
+    "thousandsSeparatorDescription": "اعداد بزرگ را با جداکنندهٔ هزارگان نمایش می‌دهد (مثلاً ۱,۰۰۰,۰۰۰)",
     "angleUnit": "واحد پیش‌فرض زاویه",
     "angleUnitDescription": "واحد پیش‌فرض برای محاسبات مثلثاتی را تعیین می‌کند",
     "angleUnits": {
