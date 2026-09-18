@@ -1,6 +1,9 @@
 import type { AngleUnit, ASTNode, BinaryOperator, Token } from './types'
 
-function parse(rawTokens: readonly Token[]): ASTNode | null {
+function parse(
+  rawTokens: readonly Token[],
+  defaultAngleUnit: AngleUnit = 'rad',
+): ASTNode | null {
   // Drop trailing operators from incomplete input mid-typing
   const tokens = [...rawTokens]
   while (
@@ -207,7 +210,7 @@ function parse(rawTokens: readonly Token[]): ASTNode | null {
       expr = {
         type: 'Trig',
         fn,
-        unit: explicitUnit ?? fnUnit ?? 'rad',
+        unit: explicitUnit ?? fnUnit ?? defaultAngleUnit,
         expr: inner,
       }
     } else if (match('LPAREN')) {

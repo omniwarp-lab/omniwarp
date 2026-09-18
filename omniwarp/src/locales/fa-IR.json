@@ -71,6 +71,12 @@
     "activationModes": {
       "auto": "تشخیص خودکار",
       "requireEquals": "نیاز به پیشوند «=»"
+    },
+    "angleUnit": "واحد پیش‌فرض زاویه",
+    "angleUnitDescription": "واحد پیش‌فرض برای محاسبات مثلثاتی را تعیین می‌کند",
+    "angleUnits": {
+      "rad": "رادیان",
+      "deg": "درجه"
     }
   },
   "hud": {

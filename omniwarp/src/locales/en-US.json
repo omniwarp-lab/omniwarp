@@ -71,6 +71,12 @@
     "activationModes": {
       "auto": "Auto-Detect",
       "requireEquals": "Require \"=\" Prefix"
+    },
+    "angleUnit": "Default Angle Unit",
+    "angleUnitDescription": "Sets the default unit for trigonometric calculations",
+    "angleUnits": {
+      "rad": "Radian",
+      "deg": "Degree"
     }
   },
   "hud": {

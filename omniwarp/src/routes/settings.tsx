@@ -4,6 +4,7 @@ import { getCurrentWindow } from '@tauri-apps/api/window'
 import { useEffect, useState } from 'react'
 import {
   CalculatorIcon,
+  DraftingCompassIcon,
   LanguagesIcon,
   MinusIcon,
   PowerIcon,
@@ -22,6 +23,7 @@ import { isLanguageCode, LANGUAGES } from '@/features/settings/languages'
 import { useAutostart } from '@/features/settings/hooks/useAutostart'
 import {
   isActivationMode,
+  isAngleUnit,
   useCalculatorSettingsStore,
 } from '@/features/calculator/store'
 
@@ -36,6 +38,8 @@ function SettingsComponent() {
   const autostart = useAutostart()
   const activationMode = useCalculatorSettingsStore((s) => s.activationMode)
   const setActivationMode = useCalculatorSettingsStore((s) => s.setActivationMode)
+  const angleUnit = useCalculatorSettingsStore((s) => s.angleUnit)
+  const setAngleUnit = useCalculatorSettingsStore((s) => s.setAngleUnit)
 
   const tabs: readonly SettingsTab[] = [
     {
@@ -83,6 +87,11 @@ function SettingsComponent() {
     },
   ] as const
 
+  const angleUnits = [
+    { value: 'rad', label: t('settings.angleUnits.rad') },
+    { value: 'deg', label: t('settings.angleUnits.deg') },
+  ] as const
+
   const calculatorSettings: SettingItemConfig[] = [
     {
       id: 'activationMode',
@@ -94,6 +103,18 @@ function SettingsComponent() {
       options: activationModes,
       onChange: (value) => {
         if (isActivationMode(value)) void setActivationMode(value)
+      },
+    },
+    {
+      id: 'angleUnit',
+      icon: DraftingCompassIcon,
+      title: t('settings.angleUnit'),
+      description: t('settings.angleUnitDescription'),
+      type: 'select',
+      value: angleUnit,
+      options: angleUnits,
+      onChange: (value) => {
+        if (isAngleUnit(value)) void setAngleUnit(value)
       },
     },
   ]

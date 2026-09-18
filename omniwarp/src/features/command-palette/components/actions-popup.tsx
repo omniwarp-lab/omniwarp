@@ -25,6 +25,7 @@ import { showCopyHud } from '@/features/hud/commands'
 import { showAppError } from '@/features/hud/errors'
 import { copyText } from '@/features/clipboard/commands'
 import { calculateFullExpression } from '@/features/calculator/calculate'
+import { useCalculatorSettingsStore } from '@/features/calculator/store'
 import { useCommandStore } from '@/features/command-palette/store'
 
 interface ActionsPopupProps {
@@ -73,7 +74,10 @@ function ActionsPopup({ item, onClose, onSelect }: ActionsPopupProps) {
           execute: async () => {
             onClose()
             const rawQuery = useCommandStore.getState().query
-            const textToCopy = calculateFullExpression(rawQuery) ?? item.label
+            const angleUnit = useCalculatorSettingsStore.getState().angleUnit
+            const textToCopy =
+              calculateFullExpression(rawQuery, undefined, angleUnit) ??
+              item.label
             try {
               await copyText(textToCopy)
               await showCopyHud(t('hud.copiedExpression'))

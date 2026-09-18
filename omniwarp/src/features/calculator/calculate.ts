@@ -6,6 +6,7 @@ import { render } from './render'
 import { toLatex } from './to-latex'
 import { toPlainText } from './to-plain-text'
 import type {
+  AngleUnit,
   ASTNode,
   CalculatorActivationMode,
   CalculatorResult,
@@ -26,7 +27,11 @@ function hasOperator(node: ASTNode): boolean {
   return false
 }
 
-function parseAndEvaluate(input: string, locale = 'en-US') {
+function parseAndEvaluate(
+  input: string,
+  locale = 'en-US',
+  angleUnit: AngleUnit = 'rad',
+) {
   if (!input || !input.trim()) {
     return null
   }
@@ -50,7 +55,7 @@ function parseAndEvaluate(input: string, locale = 'en-US') {
   }
 
   // Stage 3: Parse into an AST
-  const ast = parse(tokens)
+  const ast = parse(tokens, angleUnit)
   if (!ast) {
     return null
   }
@@ -73,6 +78,7 @@ function calculate(
   input: string,
   locale = 'en-US',
   activationMode: CalculatorActivationMode = 'auto',
+  angleUnit: AngleUnit = 'rad',
 ): CalculatorResult {
   const trimmed = input.trimStart()
   const hasEqualsPrefix = trimmed.startsWith('=')
@@ -82,7 +88,7 @@ function calculate(
   }
 
   const cleanInput = hasEqualsPrefix ? trimmed.slice(1) : input
-  const evaluated = parseAndEvaluate(cleanInput, locale)
+  const evaluated = parseAndEvaluate(cleanInput, locale, angleUnit)
   if (!evaluated) {
     return { show: false }
   }
@@ -97,10 +103,11 @@ function calculate(
 function calculateFullExpression(
   input: string,
   locale = 'en-US',
+  angleUnit: AngleUnit = 'rad',
 ): string | null {
   const trimmed = input.trimStart()
   const cleanInput = trimmed.startsWith('=') ? trimmed.slice(1) : input
-  const evaluated = parseAndEvaluate(cleanInput, locale)
+  const evaluated = parseAndEvaluate(cleanInput, locale, angleUnit)
   if (!evaluated) {
     return null
   }

@@ -47,9 +47,10 @@ function useCommandPaletteSections(
   }, [query, fuse])
 
   const activationMode = useCalculatorSettingsStore((s) => s.activationMode)
+  const angleUnit = useCalculatorSettingsStore((s) => s.angleUnit)
   const calcResult = useMemo(
-    () => calculate(query, undefined, activationMode),
-    [query, activationMode],
+    () => calculate(query, undefined, activationMode, angleUnit),
+    [query, activationMode, angleUnit],
   )
 
   return useMemo(() => {
