@@ -1,6 +1,11 @@
-import type { ASTNode, EvaluationResult, TrigFunctionName } from './types'
+import type {
+  ASTNode,
+  Complex,
+  EvaluationResult,
+  TrigFunctionName,
+} from './types'
 
-const UNDEFINED_RESULT: EvaluationResult = 'Undefined'
+const UNDEFINED_RESULT = 'Undefined' as const
 
 const TRIG_FUNCTIONS: Record<TrigFunctionName, (x: number) => number> = {
   sin: Math.sin,
@@ -8,63 +13,79 @@ const TRIG_FUNCTIONS: Record<TrigFunctionName, (x: number) => number> = {
   tan: Math.tan,
 }
 
+function makeComplex(re: number, im: number): Complex | 'Undefined' {
+  if (
+    !Number.isFinite(re) ||
+    Number.isNaN(re) ||
+    !Number.isFinite(im) ||
+    Number.isNaN(im)
+  ) {
+    return UNDEFINED_RESULT
+  }
+  const cleanRe = Math.abs(re) < 1e-12 || Object.is(re, -0) ? 0 : re
+  const cleanIm = Math.abs(im) < 1e-12 || Object.is(im, -0) ? 0 : im
+  return { re: cleanRe, im: cleanIm }
+}
+
 function evaluate(node: ASTNode): EvaluationResult {
   if (node.type === 'Number') {
-    if (!Number.isFinite(node.value) || Number.isNaN(node.value)) {
-      return UNDEFINED_RESULT
-    }
-    return node.value
+    return makeComplex(node.value, 0)
   }
 
   if (node.type === 'Percent') {
     const val = evaluate(node.expr)
-    if (typeof val !== 'number') return UNDEFINED_RESULT
-    const result = val / 100
-    if (!Number.isFinite(result) || Number.isNaN(result)) {
-      return UNDEFINED_RESULT
-    }
-    if (Object.is(result, -0)) {
-      return 0
-    }
-    return result
+    if (val === 'Undefined') return UNDEFINED_RESULT
+    const complex = typeof val === 'number' ? { re: val, im: 0 } : val
+    return makeComplex(complex.re / 100, complex.im / 100)
   }
 
   if (node.type === 'PercentAddSub') {
     const baseVal = evaluate(node.base)
-    if (typeof baseVal !== 'number') return UNDEFINED_RESULT
+    if (baseVal === 'Undefined') return UNDEFINED_RESULT
+    const base = typeof baseVal === 'number' ? { re: baseVal, im: 0 } : baseVal
 
     const percentVal = evaluate(node.percent)
-    if (typeof percentVal !== 'number') return UNDEFINED_RESULT
+    if (percentVal === 'Undefined') return UNDEFINED_RESULT
+    const percent =
+      typeof percentVal === 'number' ? { re: percentVal, im: 0 } : percentVal
 
-    const delta = baseVal * (percentVal / 100)
-    const result = node.op === '+' ? baseVal + delta : baseVal - delta
-    if (!Number.isFinite(result) || Number.isNaN(result)) {
-      return UNDEFINED_RESULT
-    }
-    if (Object.is(result, -0)) {
-      return 0
-    }
-    return result
+    const pctRe = percent.re / 100
+    const pctIm = percent.im / 100
+    const deltaRe = base.re * pctRe - base.im * pctIm
+    const deltaIm = base.re * pctIm + base.im * pctRe
+
+    return node.op === '+'
+      ? makeComplex(base.re + deltaRe, base.im + deltaIm)
+      : makeComplex(base.re - deltaRe, base.im - deltaIm)
   }
 
   if (node.type === 'Sqrt') {
     const val = evaluate(node.expr)
-    if (typeof val !== 'number') return UNDEFINED_RESULT
-    if (val < 0) return UNDEFINED_RESULT
-    const result = Math.sqrt(val)
-    if (!Number.isFinite(result) || Number.isNaN(result)) {
-      return UNDEFINED_RESULT
+    if (val === 'Undefined') return UNDEFINED_RESULT
+    const complex = typeof val === 'number' ? { re: val, im: 0 } : val
+
+    if (complex.im === 0) {
+      if (complex.re >= 0) {
+        return makeComplex(Math.sqrt(complex.re), 0)
+      }
+      return makeComplex(0, Math.sqrt(-complex.re))
     }
-    if (Object.is(result, -0)) {
-      return 0
-    }
-    return result
+
+    const r = Math.hypot(complex.re, complex.im)
+    const re = Math.sqrt((r + complex.re) / 2)
+    const sgn = complex.im >= 0 ? 1 : -1
+    const im = sgn * Math.sqrt((r - complex.re) / 2)
+    return makeComplex(re, im)
   }
 
   if (node.type === 'Trig') {
     const val = evaluate(node.expr)
-    if (typeof val !== 'number') return UNDEFINED_RESULT
-    const radians = node.unit === 'deg' ? val * (Math.PI / 180) : val
+    if (val === 'Undefined') return UNDEFINED_RESULT
+    const complex = typeof val === 'number' ? { re: val, im: 0 } : val
+    if (complex.im !== 0) return UNDEFINED_RESULT
+
+    const radians =
+      node.unit === 'deg' ? complex.re * (Math.PI / 180) : complex.re
     if (!Number.isFinite(radians) || Number.isNaN(radians)) {
       return UNDEFINED_RESULT
     }
@@ -72,20 +93,18 @@ function evaluate(node: ASTNode): EvaluationResult {
       return UNDEFINED_RESULT
     }
     const result = TRIG_FUNCTIONS[node.fn](radians)
-    if (!Number.isFinite(result) || Number.isNaN(result)) {
-      return UNDEFINED_RESULT
-    }
-    if (Object.is(result, -0)) {
-      return 0
-    }
-    return result
+    return makeComplex(result, 0)
   }
 
   if (node.type === 'Factorial') {
     const val = evaluate(node.expr)
-    if (typeof val !== 'number') return UNDEFINED_RESULT
-    const rounded = Math.round(val)
-    const intVal = Math.abs(val - rounded) < 1e-10 ? rounded : val
+    if (val === 'Undefined') return UNDEFINED_RESULT
+    const complex = typeof val === 'number' ? { re: val, im: 0 } : val
+    if (complex.im !== 0) return UNDEFINED_RESULT
+
+    const realVal = complex.re
+    const rounded = Math.round(realVal)
+    const intVal = Math.abs(realVal - rounded) < 1e-10 ? rounded : realVal
     if (intVal < 0 || !Number.isInteger(intVal) || intVal > 170) {
       return UNDEFINED_RESULT
     }
@@ -93,61 +112,78 @@ function evaluate(node: ASTNode): EvaluationResult {
     for (let i = 2; i <= intVal; i++) {
       result *= i
     }
-    if (!Number.isFinite(result) || Number.isNaN(result)) {
-      return UNDEFINED_RESULT
-    }
-    if (Object.is(result, -0)) {
-      return 0
-    }
-    return result
+    return makeComplex(result, 0)
   }
 
   if (node.type === 'BinaryOp') {
-    const left = evaluate(node.left)
-    if (typeof left !== 'number') return UNDEFINED_RESULT
+    const leftVal = evaluate(node.left)
+    if (leftVal === 'Undefined') return UNDEFINED_RESULT
+    const left = typeof leftVal === 'number' ? { re: leftVal, im: 0 } : leftVal
 
-    const right = evaluate(node.right)
-    if (typeof right !== 'number') return UNDEFINED_RESULT
+    const rightVal = evaluate(node.right)
+    if (rightVal === 'Undefined') return UNDEFINED_RESULT
+    const right =
+      typeof rightVal === 'number' ? { re: rightVal, im: 0 } : rightVal
 
-    let result: number
     switch (node.op) {
       case '+':
-        result = left + right
-        break
+        return makeComplex(left.re + right.re, left.im + right.im)
       case '-':
-        result = left - right
-        break
-      case '*':
-        result = left * right
-        break
-      case '/':
-        if (right === 0) {
+        return makeComplex(left.re - right.re, left.im - right.im)
+      case '*': {
+        const re = left.re * right.re - left.im * right.im
+        const im = left.re * right.im + left.im * right.re
+        return makeComplex(re, im)
+      }
+      case '/': {
+        const denom = right.re * right.re + right.im * right.im
+        if (denom === 0) {
           return UNDEFINED_RESULT
         }
-        result = left / right
-        break
-      case '^':
-        result = Math.pow(left, right)
-        break
+        const re = (left.re * right.re + left.im * right.im) / denom
+        const im = (left.im * right.re - left.re * right.im) / denom
+        return makeComplex(re, im)
+      }
+      case '^': {
+        if (right.im === 0) {
+          if (left.im === 0) {
+            if (left.re >= 0) {
+              return makeComplex(Math.pow(left.re, right.re), 0)
+            }
+            if (Number.isInteger(right.re)) {
+              return makeComplex(Math.pow(left.re, right.re), 0)
+            }
+            const r = -left.re
+            const p = right.re
+            const mag = Math.pow(r, p)
+            const theta = Math.PI * p
+            return makeComplex(mag * Math.cos(theta), mag * Math.sin(theta))
+          }
+        }
+        if (left.re === 0 && left.im === 0) {
+          if (right.re > 0 && right.im === 0) {
+            return makeComplex(0, 0)
+          }
+          return UNDEFINED_RESULT
+        }
+        const r = Math.hypot(left.re, left.im)
+        const theta = Math.atan2(left.im, left.re)
+        const logR = Math.log(r)
+        const newR = right.re * logR - right.im * theta
+        const newTheta = right.im * logR + right.re * theta
+        const mag = Math.exp(newR)
+        return makeComplex(mag * Math.cos(newTheta), mag * Math.sin(newTheta))
+      }
       case 'mod': {
-        if (right === 0) {
+        if (left.im !== 0 || right.im !== 0 || right.re === 0) {
           return UNDEFINED_RESULT
         }
-        const rem = left % right
-        result = rem !== 0 && rem < 0 !== right < 0 ? rem + right : rem
-        break
+        const rem = left.re % right.re
+        const result =
+          rem !== 0 && rem < 0 !== right.re < 0 ? rem + right.re : rem
+        return makeComplex(result, 0)
       }
     }
-
-    if (!Number.isFinite(result) || Number.isNaN(result)) {
-      return UNDEFINED_RESULT
-    }
-
-    if (Object.is(result, -0)) {
-      return 0
-    }
-
-    return result
   }
 
   return UNDEFINED_RESULT

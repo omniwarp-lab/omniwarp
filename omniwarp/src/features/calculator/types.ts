@@ -29,7 +29,12 @@ type ASTNode =
   | { type: 'Trig'; fn: TrigFunctionName; unit: AngleUnit; expr: ASTNode }
   | { type: 'Factorial'; expr: ASTNode }
 
-type EvaluationResult = number | 'Undefined'
+interface Complex {
+  re: number
+  im: number
+}
+
+type EvaluationResult = number | Complex | 'Undefined'
 
 type CalculatorResult =
   | { show: true; result: string; latex: string }
@@ -43,6 +48,7 @@ export type {
   TrigFunctionName,
   AngleUnit,
   ASTNode,
+  Complex,
   EvaluationResult,
   CalculatorResult,
   CalculatorActivationMode,

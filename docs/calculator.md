@@ -13,10 +13,10 @@
 
 ## Advanced math
 
-| Capability  | Syntax / Supported Symbols | Example Input                       | Normalized / Interpreted As | Result Output | Notes & Edge Cases                                                                                        |
-|:------------|:---------------------------|:------------------------------------|:----------------------------|:--------------|:----------------------------------------------------------------------------------------------------------|
-| Square Root | `sqrt`, `√` (U+221A)       | `sqrt(144)` or `√144` or `sqrt 144` | `sqrt(144)`                 | `12`          | Works with or without parentheses; negative inputs return `Undefined`                                     |
-| Factorial   | `!`, `！` (Fullwidth)      | `5!`                                | `5!`                        | `120`         | Supports non-negative integers up to `170!`; non-integers, negative numbers, or `>170` return `Undefined` |
+| Capability  | Syntax / Supported Symbols | Example Input                       | Normalized / Interpreted As | Result Output | Notes & Edge Cases                                                                                                              |
+|:------------|:---------------------------|:------------------------------------|:----------------------------|:--------------|:--------------------------------------------------------------------------------------------------------------------------------|
+| Square Root | `sqrt`, `√` (U+221A)       | `sqrt(144)` or `√144` or `sqrt(-4)` | `sqrt(-4)`                  | `2i`          | Works with or without parentheses; negative inputs return imaginary numbers with `i` (e.g. `sqrt(-1)` = `i`, `sqrt(-4)` = `2i`) |
+| Factorial   | `!`, `！` (Fullwidth)      | `5!`                                | `5!`                        | `120`         | Supports non-negative integers up to `170!`; non-integers, negative numbers, or `>170` return `Undefined`                       |
 
 ## Percentages
 
