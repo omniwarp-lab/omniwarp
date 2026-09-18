@@ -66,6 +66,8 @@
     "languageDescription": "زبان مورد استفاده در سراسر OmniWarp را تغییر می‌دهد",
     "autostart": "اجرا هنگام راه‌اندازی",
     "autostartDescription": "با ورود به سیستم، OmniWarp به‌صورت خودکار اجرا می‌شود",
+    "enableCalculator": "فعال‌سازی ماشین‌حساب",
+    "enableCalculatorDescription": "محاسبات ریاضی را فعال می‌کند",
     "activationMode": "حالت فعال‌سازی",
     "activationModeDescription": "نحوهٔ فعال شدن ماشین‌حساب با عبارت‌های ریاضی را تعیین می‌کند",
     "activationModes": {

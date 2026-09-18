@@ -66,6 +66,8 @@
     "languageDescription": "Changes the language across OmniWarp",
     "autostart": "Run at Startup",
     "autostartDescription": "Starts OmniWarp automatically when you log in",
+    "enableCalculator": "Enable Calculator",
+    "enableCalculatorDescription": "Enables mathematical calculations",
     "activationMode": "Activation Mode",
     "activationModeDescription": "Controls how math expressions trigger the calculator",
     "activationModes": {

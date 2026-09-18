@@ -2,6 +2,9 @@ import { create } from 'zustand/react'
 import { settingsStore } from '@/features/settings/storage'
 import type { AngleUnit, CalculatorActivationMode } from './types'
 
+const ENABLED_KEY = 'calculator.enabled'
+const DEFAULT_ENABLED = true
+
 const ACTIVATION_MODE_KEY = 'calculator.activationMode'
 const DEFAULT_ACTIVATION_MODE: CalculatorActivationMode = 'auto'
 
@@ -20,6 +23,8 @@ function isAngleUnit(value: unknown): value is AngleUnit {
 }
 
 interface CalculatorSettingsStore {
+  enabled: boolean
+  setEnabled: (enabled: boolean) => Promise<void>
   activationMode: CalculatorActivationMode
   setActivationMode: (mode: CalculatorActivationMode) => Promise<void>
   thousandSeparator: boolean
@@ -30,6 +35,17 @@ interface CalculatorSettingsStore {
 
 const useCalculatorSettingsStore = create<CalculatorSettingsStore>(
   (set, get) => ({
+    enabled: DEFAULT_ENABLED,
+    setEnabled: async (enabled) => {
+      if (get().enabled === enabled) return
+      const prev = get().enabled
+      set({ enabled })
+      try {
+        await settingsStore.set(ENABLED_KEY, enabled)
+      } catch {
+        set({ enabled: prev })
+      }
+    },
     activationMode: DEFAULT_ACTIVATION_MODE,
     setActivationMode: async (mode) => {
       if (get().activationMode === mode) return
@@ -73,6 +89,13 @@ async function initCalculatorSettingsSync(): Promise<() => void> {
   syncActive = true
 
   try {
+    const storedEnabled = await settingsStore.get<boolean>(ENABLED_KEY)
+    if (typeof storedEnabled === 'boolean') {
+      useCalculatorSettingsStore.setState({ enabled: storedEnabled })
+    }
+  } catch {}
+
+  try {
     const storedActivation =
       await settingsStore.get<string>(ACTIVATION_MODE_KEY)
     if (isActivationMode(storedActivation)) {
@@ -98,6 +121,15 @@ async function initCalculatorSettingsSync(): Promise<() => void> {
       useCalculatorSettingsStore.setState({ angleUnit: storedAngle })
     }
   } catch {}
+
+  const unlistenEnabled = await settingsStore.onKeyChange<boolean>(
+    ENABLED_KEY,
+    (value) => {
+      if (typeof value === 'boolean') {
+        useCalculatorSettingsStore.setState({ enabled: value })
+      }
+    },
+  )
 
   const unlistenActivation = await settingsStore.onKeyChange<string>(
     ACTIVATION_MODE_KEY,
@@ -127,6 +159,7 @@ async function initCalculatorSettingsSync(): Promise<() => void> {
   )
 
   return () => {
+    unlistenEnabled()
     unlistenActivation()
     unlistenThousandSep()
     unlistenAngle()
@@ -139,6 +172,7 @@ export {
   initCalculatorSettingsSync,
   isActivationMode,
   isAngleUnit,
+  DEFAULT_ENABLED,
   DEFAULT_ANGLE_UNIT,
   DEFAULT_THOUSAND_SEPARATOR,
 }

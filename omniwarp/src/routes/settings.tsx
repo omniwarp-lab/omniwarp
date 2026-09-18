@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import {
   CalculatorIcon,
   DraftingCompassIcon,
+  EqualIcon,
   HashIcon,
   LanguagesIcon,
   MinusIcon,
@@ -37,6 +38,8 @@ function SettingsComponent() {
   const language = useSettingsStore((s) => s.language)
   const applyLanguage = useSettingsStore((s) => s.applyLanguage)
   const autostart = useAutostart()
+  const enabled = useCalculatorSettingsStore((s) => s.enabled)
+  const setEnabled = useCalculatorSettingsStore((s) => s.setEnabled)
   const activationMode = useCalculatorSettingsStore((s) => s.activationMode)
   const setActivationMode = useCalculatorSettingsStore((s) => s.setActivationMode)
   const thousandSeparator = useCalculatorSettingsStore(
@@ -101,13 +104,23 @@ function SettingsComponent() {
 
   const calculatorSettings: SettingItemConfig[] = [
     {
-      id: 'activationMode',
+      id: 'enabled',
       icon: CalculatorIcon,
+      title: t('settings.enableCalculator'),
+      description: t('settings.enableCalculatorDescription'),
+      type: 'switch',
+      checked: enabled,
+      onChange: (checked) => void setEnabled(checked),
+    },
+    {
+      id: 'activationMode',
+      icon: EqualIcon,
       title: t('settings.activationMode'),
       description: t('settings.activationModeDescription'),
       type: 'select',
       value: activationMode,
       options: activationModes,
+      disabled: !enabled,
       onChange: (value) => {
         if (isActivationMode(value)) void setActivationMode(value)
       },
@@ -119,6 +132,7 @@ function SettingsComponent() {
       description: t('settings.thousandsSeparatorDescription'),
       type: 'switch',
       checked: thousandSeparator,
+      disabled: !enabled,
       onChange: (checked) => void setThousandSeparator(checked),
     },
     {
@@ -129,6 +143,7 @@ function SettingsComponent() {
       type: 'select',
       value: angleUnit,
       options: angleUnits,
+      disabled: !enabled,
       onChange: (value) => {
         if (isAngleUnit(value)) void setAngleUnit(value)
       },

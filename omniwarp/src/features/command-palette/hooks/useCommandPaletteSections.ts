@@ -46,6 +46,7 @@ function useCommandPaletteSections(
     return fuse.search(query).map((r) => r.item)
   }, [query, fuse])
 
+  const enabled = useCalculatorSettingsStore((s) => s.enabled)
   const activationMode = useCalculatorSettingsStore((s) => s.activationMode)
   const thousandSeparator = useCalculatorSettingsStore(
     (s) => s.thousandSeparator,
@@ -53,14 +54,16 @@ function useCommandPaletteSections(
   const angleUnit = useCalculatorSettingsStore((s) => s.angleUnit)
   const calcResult = useMemo(
     () =>
-      calculate(
-        query,
-        undefined,
-        activationMode,
-        angleUnit,
-        thousandSeparator,
-      ),
-    [query, activationMode, angleUnit, thousandSeparator],
+      enabled
+        ? calculate(
+            query,
+            undefined,
+            activationMode,
+            angleUnit,
+            thousandSeparator,
+          )
+        : ({ show: false } as const),
+    [enabled, query, activationMode, angleUnit, thousandSeparator],
   )
 
   return useMemo(() => {
