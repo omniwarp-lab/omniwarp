@@ -23,7 +23,7 @@ function SettingsSidebar({
   return (
     <aside
       className={cn(
-        'flex w-[180px] shrink-0 flex-col gap-1 border-r border-border bg-muted/20 p-2',
+        'flex w-[180px] shrink-0 flex-col gap-1 border-e border-border bg-muted/20 p-2',
         className,
       )}
     >

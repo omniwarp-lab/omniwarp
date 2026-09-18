@@ -26,7 +26,8 @@ import {
 } from '@/features/calculator/store'
 
 function SettingsComponent() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const dir = i18n.dir()
   const appWindow = getCurrentWindow()
   const [version, setVersion] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState('general')
@@ -174,7 +175,7 @@ function SettingsComponent() {
         </div>
       </header>
 
-      <div className='flex flex-1 overflow-hidden'>
+      <div dir={dir} className='flex flex-1 overflow-hidden'>
         <SettingsSidebar
           tabs={tabs}
           activeTab={activeTab}
