@@ -2,7 +2,9 @@ import i18n from '@/i18n'
 import { LanguageCode } from '@/features/settings/types'
 import {
   getStoredLanguage,
+  getStoredLogCleanup,
   onStoredLanguageChange,
+  onStoredLogCleanupChange,
 } from '@/features/settings/storage'
 import { useSettingsStore } from '@/features/settings/store'
 
@@ -23,12 +25,20 @@ async function initLanguageSync(): Promise<() => void> {
   const initialLanguage = await getStoredLanguage()
   applyRemoteLanguage(initialLanguage)
 
-  const unlisten = await onStoredLanguageChange((language) => {
+  const initialLogCleanup = await getStoredLogCleanup()
+  useSettingsStore.setState({ logCleanup: initialLogCleanup })
+
+  const unlistenLanguage = await onStoredLanguageChange((language) => {
     applyRemoteLanguage(language)
   })
 
+  const unlistenLogCleanup = await onStoredLogCleanupChange((option) => {
+    useSettingsStore.setState({ logCleanup: option })
+  })
+
   return () => {
-    unlisten()
+    unlistenLanguage()
+    unlistenLogCleanup()
     syncActive = false
   }
 }

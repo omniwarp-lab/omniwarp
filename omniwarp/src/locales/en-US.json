@@ -70,6 +70,13 @@
     "autostartDescription": "Starts OmniWarp automatically when you log in",
     "openDir": "Logs Directory",
     "openDirDescription": "Opens the folder containing OmniWarp log files in File Explorer",
+    "cleanup": "Auto Cleanup",
+    "cleanupDescription": "Automatically removes old log files when OmniWarp starts",
+    "cleanupOptions": {
+      "7days": "7 Days",
+      "30days": "30 Days",
+      "never": "Never"
+    },
     "enableCalculator": "Enable Calculator",
     "enableCalculatorDescription": "Enables mathematical calculations",
     "activationMode": "Activation Mode",

@@ -70,6 +70,13 @@
     "autostartDescription": "با ورود به سیستم، OmniWarp به‌صورت خودکار اجرا می‌شود",
     "openDir": "پوشهٔ لاگ‌ها",
     "openDirDescription": "پوشهٔ حاوی فایل‌های لاگ OmniWarp را باز می‌کند",
+    "cleanup": "پاک‌سازی خودکار",
+    "cleanupDescription": "فایل‌های لاگ قدیمی را هنگام اجرای OmniWarp به‌صورت خودکار حذف می‌کند",
+    "cleanupOptions": {
+      "7days": "۷ روز",
+      "30days": "۳۰ روز",
+      "never": "هرگز"
+    },
     "enableCalculator": "فعال‌سازی ماشین‌حساب",
     "enableCalculatorDescription": "محاسبات ریاضی را فعال می‌کند",
     "activationMode": "حالت فعال‌سازی",

@@ -14,6 +14,7 @@ import {
   PowerIcon,
   ScrollTextIcon,
   SlidersHorizontalIcon,
+  Trash2Icon,
   XIcon,
 } from 'lucide-react'
 import { getVersion } from '@tauri-apps/api/app'
@@ -25,6 +26,7 @@ import {
 } from '@/features/settings/components'
 import { useSettingsStore } from '@/features/settings/store'
 import { isLanguageCode, LANGUAGES } from '@/features/settings/languages'
+import { isLogCleanupOption } from '@/features/settings/storage'
 import { useAutostart } from '@/features/settings/hooks/useAutostart'
 import { openLogsDir } from '@/features/settings/commands'
 import { showAppError } from '@/features/hud/errors'
@@ -42,6 +44,8 @@ function SettingsComponent() {
   const [activeTab, setActiveTab] = useState('general')
   const language = useSettingsStore((s) => s.language)
   const applyLanguage = useSettingsStore((s) => s.applyLanguage)
+  const logCleanup = useSettingsStore((s) => s.logCleanup)
+  const setLogCleanup = useSettingsStore((s) => s.setLogCleanup)
   const autostart = useAutostart()
   const enabled = useCalculatorSettingsStore((s) => s.enabled)
   const setEnabled = useCalculatorSettingsStore((s) => s.setEnabled)
@@ -162,6 +166,12 @@ function SettingsComponent() {
     },
   ]
 
+  const cleanupOptions = [
+    { value: '7days', label: t('settings.cleanupOptions.7days') },
+    { value: '30days', label: t('settings.cleanupOptions.30days') },
+    { value: 'never', label: t('settings.cleanupOptions.never') },
+  ] as const
+
   const logsSettings: SettingItemConfig[] = [
     {
       id: 'openDir',
@@ -175,6 +185,18 @@ function SettingsComponent() {
         openLogsDir().catch((err) => {
           void showAppError(err)
         })
+      },
+    },
+    {
+      id: 'cleanup',
+      icon: Trash2Icon,
+      title: t('settings.cleanup'),
+      description: t('settings.cleanupDescription'),
+      type: 'select',
+      value: logCleanup,
+      options: cleanupOptions,
+      onChange: (value) => {
+        if (isLogCleanupOption(value)) void setLogCleanup(value)
       },
     },
   ]
