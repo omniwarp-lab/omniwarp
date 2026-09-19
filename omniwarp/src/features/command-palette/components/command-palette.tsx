@@ -25,6 +25,9 @@ function CommandPalette() {
   const setQuery = useCommandStore((s) => s.setQuery)
   const [activeItem, setActiveItem] = useState<PaletteItem | null>(null)
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false)
+  const [shortcutsIsCalculator, setShortcutsIsCalculator] = useState<
+    boolean | null
+  >(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const viewportRef = useRef<HTMLDivElement>(null)
@@ -108,6 +111,47 @@ function CommandPalette() {
     }
   }, [query, resetSelection])
 
+  useEffect(() => {
+    if (!isShortcutsOpen) {
+      setShortcutsIsCalculator(null)
+      return
+    }
+
+    const container = containerRef.current
+    if (!container) return
+
+    const sync = () => {
+      const el = container.querySelector<HTMLElement>(
+        '[cmdk-item][aria-selected="true"]',
+      )
+      const id = el?.getAttribute('data-value') ?? flatItems[0]?.id
+      const isCalc = Boolean(id?.startsWith('calculator:'))
+      setShortcutsIsCalculator((prev) => (prev !== isCalc ? isCalc : prev))
+    }
+
+    sync()
+
+    const observer = new MutationObserver((mutations) => {
+      for (const m of mutations) {
+        if (
+          m.type === 'attributes' &&
+          (m.target as HTMLElement).getAttribute('aria-selected') === 'true'
+        ) {
+          sync()
+          return
+        }
+      }
+    })
+
+    observer.observe(container, {
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['aria-selected'],
+    })
+
+    return () => observer.disconnect()
+  }, [isShortcutsOpen, flatItems])
+
   const resolveActiveItem = (): PaletteItem | null => {
     const selectedValue = getSelectedValue()
     if (selectedValue) {
@@ -116,6 +160,14 @@ function CommandPalette() {
     }
     return flatItems[0] ?? null
   }
+
+  const isCalculatorActive =
+    (isShortcutsOpen ? shortcutsIsCalculator : null) ??
+    Boolean(resolveActiveItem()?.id.startsWith('calculator:'))
+
+  const primaryActionLabel = isCalculatorActive
+    ? t('commandPalette.actions.copyResult')
+    : t('commandPalette.actions.open')
 
   const handleCloseActions = () => {
     setActiveItem(null)
@@ -231,6 +283,7 @@ function CommandPalette() {
         <CommandFooter
           open={isShortcutsOpen}
           onOpenChange={setIsShortcutsOpen}
+          primaryActionLabel={primaryActionLabel}
         />
       </Command>
 

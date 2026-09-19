@@ -17,6 +17,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
     - Actions to copy the result, the full expression, or the expression as LaTeX, available from the context menu.
 - **Calculator settings**: enable or disable the calculator, choose the activation mode, set the default angle unit
   (degrees or radians), and toggle thousands separators.
+- Contextual primary action hint in the command palette footer.
 - Documentation for calculator syntax and supported functions.
 - Tabbed sidebar navigation in the settings window.
 - Logs tab in settings with a button to open the logs directory.

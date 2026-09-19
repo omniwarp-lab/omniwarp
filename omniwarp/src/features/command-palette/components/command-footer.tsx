@@ -6,9 +6,14 @@ import { Popover } from '@base-ui/react/popover'
 interface CommandFooterProps {
   open?: boolean
   onOpenChange?: (open: boolean) => void
+  primaryActionLabel: string
 }
 
-function CommandFooter({ open, onOpenChange }: CommandFooterProps) {
+function CommandFooter({
+  open,
+  onOpenChange,
+  primaryActionLabel,
+}: CommandFooterProps) {
   const { t, i18n } = useTranslation()
   const dir = i18n.dir()
 
@@ -46,9 +51,9 @@ function CommandFooter({ open, onOpenChange }: CommandFooterProps) {
                 </div>
                 <div className='flex flex-col gap-2 pt-0.5'>
                   <div className='flex items-center justify-between gap-4'>
-                    <span className='text-xs text-muted-foreground'>
-                      {t('commandPalette.hints.open')}
-                    </span>
+                    <bdi className='text-xs text-muted-foreground'>
+                      {primaryActionLabel}
+                    </bdi>
                     <bdi>
                       <Kbd>
                         <CornerDownLeft className='size-3.5' />
