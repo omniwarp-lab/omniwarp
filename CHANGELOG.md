@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-09-19
+
 ### Added
 
 - **Inline calculator** in the command palette, with results rendered using KaTeX.
@@ -33,4 +35,5 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   dropdowns.
 - Long setting descriptions are now truncated with a tooltip instead of overflowing the layout.
 
-[Unreleased]: https://github.com/omniwarp-lab/omniwarp/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/omniwarp-lab/omniwarp/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/omniwarp-lab/omniwarp/compare/v0.1.0...v.2.0
