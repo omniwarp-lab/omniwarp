@@ -40,6 +40,25 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Extract changelog notes
+        id: changelog
+        shell: bash
+        run: |
+          VERSION=$(node -p "require('./omniwarp/src-tauri/tauri.conf.json').version")
+          NOTES=$(awk -v v="$VERSION" '
+            /^## \[/ { if (found) exit; if (index($0, "[" v "]")) { found=1 }; next }
+            found && /^\[[^]]+\]:/ { next }
+            found { print }
+          ' CHANGELOG.md)
+          if [ -z "$NOTES" ]; then
+            NOTES="See the assets to download this version and install."
+          fi
+          {
+            echo "body<<CHANGELOG_EOF"
+            echo "$NOTES"
+            echo "CHANGELOG_EOF"
+          } >> "$GITHUB_OUTPUT"
+
       - name: Build and publish release
         uses: tauri-apps/tauri-action@v0
         env:
@@ -48,6 +67,6 @@ jobs:
           projectPath: omniwarp
           tagName: v__VERSION__
           releaseName: 'OmniWarp v__VERSION__'
-          releaseBody: 'See the assets to download this version and install.'
+          releaseBody: ${{ steps.changelog.outputs.body }}
           releaseDraft: true
           prerelease: false
