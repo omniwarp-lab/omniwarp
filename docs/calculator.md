@@ -1,5 +1,7 @@
 # Calculator
 
+![Demo](https://github.com/user-attachments/assets/4f3ee647-b92e-4be4-ba9d-a55db3404577)
+
 ## Basic arithmetic
 
 | Capability         | Syntax / Supported Symbols                      | Example Input | Normalized / Interpreted As | Result Output | Notes & Edge Cases                                         |
@@ -13,9 +15,9 @@
 
 ## Advanced math
 
-| Capability  | Syntax / Supported Symbols | Example Input                       | Normalized / Interpreted As | Result Output | Notes & Edge Cases                                                                                                              |
-|:------------|:---------------------------|:------------------------------------|:----------------------------|:--------------|:--------------------------------------------------------------------------------------------------------------------------------|
-| Square Root | `sqrt`, `√` (U+221A)       | `sqrt(144)` or `√144` or `sqrt(-4)` | `sqrt(-4)`                  | `2i`          | Works with or without parentheses; negative inputs return imaginary numbers with `i` (e.g. `sqrt(-1)` = `i`, `sqrt(-4)` = `2i`) |
+| Capability  | Syntax / Supported Symbols | Example Input                       | Normalized / Interpreted As | Result Output  | Notes & Edge Cases                                                                                                                                                                                                                              |
+|:------------|:---------------------------|:------------------------------------|:----------------------------|:---------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Square Root | `sqrt`, `√` (U+221A)       | `sqrt(144)` or `√144` or `sqrt(-4)` | `sqrt(-4)`                  | `2i`           | Works with or without parentheses; negative inputs return imaginary numbers with `i` (e.g. `sqrt(-1)` = `i`, `sqrt(-4)` = `2i`)                                                                                                                 |
 | Factorial   | `!`, `！` (Fullwidth)      | `5!` or `2.5!`                      | `2.5!`                      | `3.3233509705` | Exact integer factorials up to `170!`; non-integer floating-point factorials evaluated via Euler's Gamma function $x! = \Gamma(x + 1)$; negative integers return `Undefined`; overflow values (>170! or float overflow) do not display a result |
 
 ## Percentages
