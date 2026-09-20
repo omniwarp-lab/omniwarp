@@ -36,4 +36,4 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Long setting descriptions are now truncated with a tooltip instead of overflowing the layout.
 
 [Unreleased]: https://github.com/omniwarp-lab/omniwarp/compare/v0.2.0...HEAD
-[0.2.0]: https://github.com/omniwarp-lab/omniwarp/compare/v0.1.0...v.2.0
+[0.2.0]: https://github.com/omniwarp-lab/omniwarp/compare/v0.1.0...v0.2.0
