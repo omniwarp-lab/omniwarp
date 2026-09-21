@@ -11,9 +11,7 @@ import { isAppRunning } from '@/features/command-palette/selectors.ts'
 import { showCopyHud } from '@/features/hud/commands'
 import { showAppError } from '@/features/hud/errors'
 import { searchWeb } from '@/features/search-providers/commands'
-import { SEARCH_URLS } from '@/features/search-providers/providers'
 import { useSearchProvidersStore } from '@/features/search-providers/store'
-import { SearchProviderId } from '@/features/search-providers/types'
 import { useCommandStore } from '@/features/command-palette/store'
 import i18n from '@/i18n'
 
@@ -35,13 +33,13 @@ async function handleSelect(value: string) {
       break
     }
     case 'search-providers': {
-      const providerId = id as SearchProviderId
-      if (!useSearchProvidersStore.getState().providers[providerId]) return
+      const template = useSearchProvidersStore.getState().getProviderUrl(id)
+      if (!template) return
 
       const query = useCommandStore.getState().query
       try {
         await searchWeb(
-          SEARCH_URLS[providerId].replace(
+          template.replace(
             '{query}',
             encodeURIComponent(query.trim()),
           ),

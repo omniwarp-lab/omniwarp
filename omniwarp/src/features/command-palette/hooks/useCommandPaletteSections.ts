@@ -6,20 +6,16 @@ import {
 import { useMemo } from 'react'
 import { toPaletteItem } from '@/features/command-palette/adapters.ts'
 import { useTranslation } from 'react-i18next'
-import {
-  SEARCH_PROVIDERS,
-  getSearchProviderId,
-} from '@/features/search-providers/providers'
 import { useSearchProvidersStore } from '@/features/search-providers/store'
 import { calculate } from '@/features/calculator/calculate'
 import { useCalculatorSettingsStore } from '@/features/calculator/store'
-import { Calculator } from 'lucide-react'
+import { Calculator, Globe } from 'lucide-react'
 
 const SEARCH_PROVIDERS_GROUP: CommandGroup = {
   key: 'search-providers',
   order: 2,
   subgroupConfigs: {},
-  items: [...SEARCH_PROVIDERS],
+  items: [],
 }
 
 function useCommandPaletteSections(
@@ -70,7 +66,7 @@ function useCommandPaletteSections(
     [enabled, query, activationMode, angleUnit, thousandSeparator],
   )
 
-  const searchProviders = useSearchProvidersStore((s) => s.providers)
+  const providers = useSearchProvidersStore((s) => s.providers)
 
   return useMemo(() => {
     const trimmed = query.trim()
@@ -112,9 +108,7 @@ function useCommandPaletteSections(
       ? [calculatorSection, ...base]
       : base
 
-    const activeProviders = SEARCH_PROVIDERS.filter(
-      (item) => searchProviders[getSearchProviderId(item.id)],
-    )
+    const activeProviders = providers.filter((p) => p.enabled)
     if (!trimmed || activeProviders.length === 0) return baseWithCalculator
 
     return [
@@ -122,12 +116,21 @@ function useCommandPaletteSections(
       {
         key: 'search-providers',
         heading: t('commandPalette.groups.searchProviders'),
-        items: activeProviders.map((item) =>
-          toPaletteItem(item, SEARCH_PROVIDERS_GROUP, t),
+        items: activeProviders.map((p) =>
+          toPaletteItem(
+            {
+              id: `search-providers:${p.id}`,
+              label: p.name,
+              icon: p.icon ? { kind: 'image', src: p.icon } : Globe,
+              subgroup: 'webSearch',
+            },
+            SEARCH_PROVIDERS_GROUP,
+            t,
+          ),
         ),
       },
     ]
-  }, [results, groups, t, query, calcResult, searchProviders])
+  }, [results, groups, t, query, calcResult, providers])
 }
 
 export { useCommandPaletteSections }

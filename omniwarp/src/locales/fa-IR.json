@@ -97,7 +97,14 @@
       "name": "نام",
       "urlTemplate": "الگوی نشانی",
       "showInSearch": "نمایش در جستجو",
-      "hideFromSearch": "پنهان کردن از جستجو"
+      "hideFromSearch": "پنهان کردن از جستجو",
+      "addProvider": "افزودن ارائه‌دهنده جستجو",
+      "addProviderDescription": "نام ارائه‌دهنده و الگوی نشانی را با جایگزین {query} وارد کنید.",
+      "providerNamePlaceholder": "مثلاً Github",
+      "urlTemplateHint": "از {query} به عنوان جایگزین متن جستجو استفاده کنید",
+      "deleteProvider": "حذف ارائه‌دهنده",
+      "cancel": "انصراف",
+      "add": "افزودن"
     }
   },
   "hud": {

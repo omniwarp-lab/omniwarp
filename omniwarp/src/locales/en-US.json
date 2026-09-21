@@ -97,7 +97,14 @@
       "name": "Name",
       "urlTemplate": "URL Template",
       "showInSearch": "Show in search",
-      "hideFromSearch": "Hide from search"
+      "hideFromSearch": "Hide from search",
+      "addProvider": "Add Search Provider",
+      "addProviderDescription": "Enter provider name and URL template with {query} placeholder.",
+      "providerNamePlaceholder": "e.g. GitHub",
+      "urlTemplateHint": "Use {query} as placeholder for search text",
+      "deleteProvider": "Delete provider",
+      "cancel": "Cancel",
+      "add": "Add"
     }
   },
   "hud": {
