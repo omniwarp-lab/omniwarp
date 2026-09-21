@@ -1,6 +1,12 @@
 import { create } from 'zustand/react'
-import { invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
+import {
+  addSearchProvider,
+  deleteSearchProvider,
+  listSearchProviders,
+  setSearchProviderEnabled,
+} from './commands'
+import { SEARCH_PROVIDERS_UPDATED_EVENT } from './events'
 import { BUILT_IN_ICONS } from './providers'
 import type { SearchProvider } from './types'
 
@@ -32,16 +38,13 @@ const useSearchProvidersStore = create<SearchProvidersStore>((set, get) => ({
       providers: s.providers.map((p) => (p.id === id ? { ...p, enabled } : p)),
     }))
     try {
-      await invoke('set_search_provider_enabled', { id, enabled })
+      await setSearchProviderEnabled(id, enabled)
     } catch {
       set({ providers: prev })
     }
   },
   addProvider: async (name, url) => {
-    const provider = await invoke<SearchProvider>('add_search_provider', {
-      name,
-      url,
-    })
+    const provider = await addSearchProvider(name, url)
     set((s) => ({ providers: [...s.providers, provider] }))
     return provider
   },
@@ -51,7 +54,7 @@ const useSearchProvidersStore = create<SearchProvidersStore>((set, get) => ({
     const prev = get().providers
     set((s) => ({ providers: s.providers.filter((p) => p.id !== id) }))
     try {
-      await invoke('delete_search_provider', { id })
+      await deleteSearchProvider(id)
     } catch {
       set({ providers: prev })
     }
@@ -66,7 +69,7 @@ async function initSearchProvidersSettingsSync(): Promise<void> {
 
   const loadProviders = async () => {
     try {
-      const providers = await invoke<SearchProvider[]>('list_search_providers')
+      const providers = await listSearchProviders()
       useSearchProvidersStore.setState({ providers: hydrateIcons(providers) })
     } catch (err) {
       // TODO
@@ -74,7 +77,7 @@ async function initSearchProvidersSettingsSync(): Promise<void> {
   }
 
   await loadProviders()
-  await listen('omniwarp://search-providers-updated', loadProviders)
+  await listen(SEARCH_PROVIDERS_UPDATED_EVENT, loadProviders)
 }
 
 export { useSearchProvidersStore, initSearchProvidersSettingsSync }

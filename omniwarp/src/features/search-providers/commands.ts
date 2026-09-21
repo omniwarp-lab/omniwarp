@@ -1,4 +1,5 @@
 import { invoke } from '@tauri-apps/api/core'
+import type { SearchProvider } from './types'
 
 function searchWeb(url: string): Promise<void> {
   return invoke('search_web', { url })
@@ -8,5 +9,27 @@ function fetchWebsiteTitle(url: string): Promise<string | null> {
   return invoke<string | null>('fetch_website_title', { url })
 }
 
-export { searchWeb, fetchWebsiteTitle }
+function listSearchProviders(): Promise<SearchProvider[]> {
+  return invoke<SearchProvider[]>('list_search_providers')
+}
 
+function setSearchProviderEnabled(id: string, enabled: boolean): Promise<void> {
+  return invoke('set_search_provider_enabled', { id, enabled })
+}
+
+function addSearchProvider(name: string, url: string): Promise<SearchProvider> {
+  return invoke<SearchProvider>('add_search_provider', { name, url })
+}
+
+function deleteSearchProvider(id: string): Promise<void> {
+  return invoke('delete_search_provider', { id })
+}
+
+export {
+  searchWeb,
+  fetchWebsiteTitle,
+  listSearchProviders,
+  setSearchProviderEnabled,
+  addSearchProvider,
+  deleteSearchProvider,
+}
