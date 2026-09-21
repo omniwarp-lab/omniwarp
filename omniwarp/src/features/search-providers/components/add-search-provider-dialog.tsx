@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -9,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { fetchWebsiteTitle } from '@/features/search-providers/commands'
 import { useSearchProvidersStore } from '@/features/search-providers/store'
 
 interface AddSearchProviderDialogProps {
@@ -26,18 +28,42 @@ function AddSearchProviderDialog({
 
   const [name, setName] = useState('')
   const [url, setUrl] = useState('')
+  const [isNameManuallyEdited, setIsNameManuallyEdited] = useState(false)
+  const [isLoadingTitle, setIsLoadingTitle] = useState(false)
 
   useEffect(() => {
     if (open) {
       setName('')
       setUrl('')
+      setIsNameManuallyEdited(false)
+      setIsLoadingTitle(false)
     }
   }, [open])
 
   const handleClose = () => {
-    setName('')
-    setUrl('')
     onOpenChange(false)
+  }
+
+  const resolveWebsiteName = async (inputUrl: string) => {
+    const trimmed = inputUrl.trim()
+    if (!trimmed || isNameManuallyEdited) return
+
+    setIsLoadingTitle(true)
+    try {
+      const title = await fetchWebsiteTitle(trimmed)
+      if (title && !isNameManuallyEdited) {
+        setName(title)
+      }
+    } finally {
+      setIsLoadingTitle(false)
+    }
+  }
+
+  const handleUrlPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const pasted = e.clipboardData.getData('text')
+    if (pasted && !isNameManuallyEdited) {
+      void resolveWebsiteName(pasted)
+    }
   }
 
   const canSubmit = Boolean(
@@ -75,19 +101,29 @@ function AddSearchProviderDialog({
               >
                 {t('settings.searchProvidersTable.name')}
               </label>
-              <input
-                id='provider-name'
-                type='text'
-                autoFocus
-                autoComplete='off'
-                spellCheck={false}
-                placeholder={t(
-                  'settings.searchProvidersTable.providerNamePlaceholder',
+              <div className='relative'>
+                <input
+                  id='provider-name'
+                  type='text'
+                  autoFocus
+                  autoComplete='off'
+                  spellCheck={false}
+                  placeholder={t(
+                    'settings.searchProvidersTable.providerNamePlaceholder',
+                  )}
+                  value={name}
+                  onChange={(e) => {
+                    setName(e.target.value)
+                    setIsNameManuallyEdited(e.target.value.trim().length > 0)
+                  }}
+                  className='h-9 w-full rounded-lg border border-border bg-background px-3 pe-8 text-xs text-foreground placeholder:text-muted-foreground outline-none transition-all focus:border-ring focus:ring-2 focus:ring-ring/20'
+                />
+                {isLoadingTitle && (
+                  <div className='pointer-events-none absolute end-2.5 top-1/2 -translate-y-1/2'>
+                    <Loader2 className='size-3.5 animate-spin text-muted-foreground' />
+                  </div>
                 )}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className='h-9 w-full rounded-lg border border-border bg-background px-3 text-xs text-foreground placeholder:text-muted-foreground outline-none transition-all focus:border-ring focus:ring-2 focus:ring-ring/20'
-              />
+              </div>
             </div>
 
             <div className='flex flex-col gap-1.5 text-start'>
@@ -106,6 +142,7 @@ function AddSearchProviderDialog({
                 placeholder='https://github.com/search?q={query}'
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
+                onPaste={handleUrlPaste}
                 className='h-9 w-full rounded-lg border border-border bg-background px-3 font-mono text-xs text-foreground placeholder:text-muted-foreground outline-none transition-all focus:border-ring focus:ring-2 focus:ring-ring/20'
               />
               <span className='text-[11px] text-muted-foreground'>

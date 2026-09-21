@@ -48,7 +48,7 @@ use commands::hud::show_hud;
 use commands::settings::{open_logs_dir, open_settings_window};
 use commands::system::{lock_screen, restart_system, shutdown_system, sleep_system};
 use commands::tray::exit_app;
-use commands::web_search::search_web;
+use commands::web_search::{fetch_website_title, search_web};
 
 pub fn show_main_window(app: &tauri::AppHandle) {
     if let Some(window) = app.get_webview_window("main") {
@@ -138,7 +138,8 @@ pub fn run() {
             sleep_system,
             restart_system,
             shutdown_system,
-            search_web
+            search_web,
+            fetch_website_title
         ])
         .build(tauri::generate_context!())
         .expect("Error while running OmniWarp")
