@@ -8,6 +8,7 @@ import {
   EqualIcon,
   FolderIcon,
   FolderOpenIcon,
+  GlobeIcon,
   HashIcon,
   LanguagesIcon,
   MinusIcon,
@@ -35,6 +36,7 @@ import {
   isAngleUnit,
   useCalculatorSettingsStore,
 } from '@/features/calculator/store'
+import { SearchProvidersTable } from '@/features/search-providers/components/search-providers-table'
 
 function SettingsComponent() {
   const { t, i18n } = useTranslation()
@@ -72,6 +74,11 @@ function SettingsComponent() {
       id: 'calculator',
       label: t('settings.calculator'),
       icon: CalculatorIcon,
+    },
+    {
+      id: 'searchProviders',
+      label: t('settings.searchProviders'),
+      icon: GlobeIcon,
     },
     {
       id: 'logs',
@@ -289,6 +296,7 @@ function SettingsComponent() {
           {activeTab === 'calculator' && (
             <SettingsList items={calculatorSettings} />
           )}
+          {activeTab === 'searchProviders' && <SearchProvidersTable />}
           {activeTab === 'logs' && <SettingsList items={logsSettings} />}
         </div>
       </div>

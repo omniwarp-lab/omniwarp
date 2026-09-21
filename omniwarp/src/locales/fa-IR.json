@@ -59,6 +59,7 @@
   "settings": {
     "general": "عمومی",
     "calculator": "ماشین‌حساب",
+    "searchProviders": "ارائه‌دهندگان جستجو",
     "logs": "لاگ‌ها",
     "minimize": "کوچک کردن",
     "close": "بستن",
@@ -91,6 +92,12 @@
     "angleUnits": {
       "rad": "رادیان",
       "deg": "درجه"
+    },
+    "searchProvidersTable": {
+      "name": "نام",
+      "urlTemplate": "الگوی نشانی",
+      "showInSearch": "نمایش در جستجو",
+      "hideFromSearch": "پنهان کردن از جستجو"
     }
   },
   "hud": {

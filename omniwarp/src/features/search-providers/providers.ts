@@ -19,8 +19,11 @@ const SEARCH_PROVIDERS: readonly CommandItem[] = [
 ]
 
 const SEARCH_URLS: Record<SearchProviderId, string> = {
-  google: 'https://www.google.com/search?q=',
-  duckduckgo: 'https://duckduckgo.com/?q=',
+  google: 'https://www.google.com/search?q={query}',
+  duckduckgo: 'https://duckduckgo.com/?q={query}',
 }
 
-export { SEARCH_PROVIDERS, SEARCH_URLS }
+const getSearchProviderId = (id: string) =>
+  id.slice('search-providers:'.length) as SearchProviderId
+
+export { SEARCH_PROVIDERS, SEARCH_URLS, getSearchProviderId }

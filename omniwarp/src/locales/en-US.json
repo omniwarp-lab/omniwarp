@@ -59,6 +59,7 @@
   "settings": {
     "general": "General",
     "calculator": "Calculator",
+    "searchProviders": "Search Providers",
     "logs": "Logs",
     "minimize": "Minimize",
     "close": "Close",
@@ -91,6 +92,12 @@
     "angleUnits": {
       "rad": "Radian",
       "deg": "Degree"
+    },
+    "searchProvidersTable": {
+      "name": "Name",
+      "urlTemplate": "URL Template",
+      "showInSearch": "Show in search",
+      "hideFromSearch": "Hide from search"
     }
   },
   "hud": {

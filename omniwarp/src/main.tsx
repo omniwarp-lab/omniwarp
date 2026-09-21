@@ -5,9 +5,11 @@ import { routeTree } from './routeTree.gen'
 import './App.css'
 import { initLanguageSync } from '@/features/settings/sync'
 import { initCalculatorSettingsSync } from '@/features/calculator/store'
+import { initSearchProvidersSettingsSync } from '@/features/search-providers/store'
 
 initLanguageSync()
 initCalculatorSettingsSync()
+initSearchProvidersSettingsSync()
 
 const router = createRouter({
   routeTree,
