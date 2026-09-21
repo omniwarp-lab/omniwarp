@@ -1,5 +1,3 @@
-type SearchProviderId = 'google' | 'duckduckgo'
-
 interface SearchProvider {
   id: string
   name: string
@@ -9,4 +7,4 @@ interface SearchProvider {
   enabled: boolean
 }
 
-export type { SearchProviderId, SearchProvider }
+export type { SearchProvider }

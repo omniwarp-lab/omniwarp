@@ -11,6 +11,7 @@ mod macros;
 mod apps;
 mod clipboard;
 mod commands;
+mod db;
 mod hud;
 mod logging;
 mod settings;
@@ -45,10 +46,15 @@ use commands::apps::{
 };
 use commands::clipboard::copy_text;
 use commands::hud::show_hud;
+use commands::search_providers::{
+    add_search_provider, delete_search_provider, list_search_providers,
+    set_search_provider_enabled,
+};
 use commands::settings::{open_logs_dir, open_settings_window};
 use commands::system::{lock_screen, restart_system, shutdown_system, sleep_system};
 use commands::tray::exit_app;
 use commands::web_search::{fetch_website_title, search_web};
+use db::Db;
 
 pub fn show_main_window(app: &tauri::AppHandle) {
     if let Some(window) = app.get_webview_window("main") {
@@ -93,6 +99,7 @@ pub fn run() {
         .setup(|app| {
             Logging::setup(app)
                 .inspect_err(|err| eprintln!("Failed to initialize logging: {err}"))?;
+            app.manage(Db::init(app.handle()).log_err()?);
             Tray::setup(app).log_err()?;
             Shortcuts::setup(app).log_err()?;
             Hud::setup(app).log_err()?;
@@ -139,7 +146,11 @@ pub fn run() {
             restart_system,
             shutdown_system,
             search_web,
-            fetch_website_title
+            fetch_website_title,
+            list_search_providers,
+            set_search_provider_enabled,
+            add_search_provider,
+            delete_search_provider
         ])
         .build(tauri::generate_context!())
         .expect("Error while running OmniWarp")

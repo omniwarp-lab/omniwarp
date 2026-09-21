@@ -1,10 +1,15 @@
 import { create } from 'zustand/react'
-import { settingsStore } from '@/features/settings/storage'
-import { BUILT_IN_PROVIDERS, PROVIDER_IDS } from './providers'
-import type { SearchProvider, SearchProviderId } from './types'
+import { invoke } from '@tauri-apps/api/core'
+import { listen } from '@tauri-apps/api/event'
+import { BUILT_IN_ICONS } from './providers'
+import type { SearchProvider } from './types'
 
-const CUSTOM_PROVIDERS_KEY = 'searchProviders.custom'
-const storageKey = (id: string) => `searchProviders.${id}`
+function hydrateIcons(providers: SearchProvider[]): SearchProvider[] {
+  return providers.map((p) => ({
+    ...p,
+    icon: p.icon || BUILT_IN_ICONS[p.id],
+  }))
+}
 
 interface SearchProvidersStore {
   providers: SearchProvider[]
@@ -15,7 +20,7 @@ interface SearchProvidersStore {
 }
 
 const useSearchProvidersStore = create<SearchProvidersStore>((set, get) => ({
-  providers: [...BUILT_IN_PROVIDERS],
+  providers: [],
   getProviderUrl: (id: string) => {
     return get().providers.find((p) => p.id === id && p.enabled)?.url
   },
@@ -27,45 +32,29 @@ const useSearchProvidersStore = create<SearchProvidersStore>((set, get) => ({
       providers: s.providers.map((p) => (p.id === id ? { ...p, enabled } : p)),
     }))
     try {
-      if (PROVIDER_IDS.includes(id as SearchProviderId)) {
-        await settingsStore.set(storageKey(id), enabled)
-      } else {
-        await settingsStore.set(
-          CUSTOM_PROVIDERS_KEY,
-          get().providers.filter((p) => p.isCustom),
-        )
-      }
+      await invoke('set_search_provider_enabled', { id, enabled })
     } catch {
       set({ providers: prev })
     }
   },
   addProvider: async (name, url) => {
-    const newProvider: SearchProvider = {
-      id: `custom_${Date.now()}`,
-      name: name.trim(),
-      url: url.trim(),
-      enabled: true,
-      isCustom: true,
-    }
-    const next = [...get().providers, newProvider]
-    set({ providers: next })
-    try {
-      await settingsStore.set(
-        CUSTOM_PROVIDERS_KEY,
-        next.filter((p) => p.isCustom),
-      )
-    } catch {}
-    return newProvider
+    const provider = await invoke<SearchProvider>('add_search_provider', {
+      name,
+      url,
+    })
+    set((s) => ({ providers: [...s.providers, provider] }))
+    return provider
   },
   removeProvider: async (id) => {
-    const next = get().providers.filter((p) => p.id !== id)
-    set({ providers: next })
+    const target = get().providers.find((p) => p.id === id)
+    if (!target || !target.isCustom) return
+    const prev = get().providers
+    set((s) => ({ providers: s.providers.filter((p) => p.id !== id) }))
     try {
-      await settingsStore.set(
-        CUSTOM_PROVIDERS_KEY,
-        next.filter((p) => p.isCustom),
-      )
-    } catch {}
+      await invoke('delete_search_provider', { id })
+    } catch {
+      set({ providers: prev })
+    }
   },
 }))
 
@@ -75,49 +64,17 @@ async function initSearchProvidersSettingsSync(): Promise<void> {
   if (syncActive) return
   syncActive = true
 
-  for (const id of PROVIDER_IDS) {
+  const loadProviders = async () => {
     try {
-      const stored = await settingsStore.get<boolean>(storageKey(id))
-      if (typeof stored === 'boolean') {
-        useSearchProvidersStore.setState((s) => ({
-          providers: s.providers.map((p) =>
-            p.id === id ? { ...p, enabled: stored } : p,
-          ),
-        }))
-      }
-    } catch {}
-    void settingsStore.onKeyChange<boolean>(storageKey(id), (val) => {
-      if (typeof val === 'boolean') {
-        useSearchProvidersStore.setState((s) => ({
-          providers: s.providers.map((p) =>
-            p.id === id ? { ...p, enabled: val } : p,
-          ),
-        }))
-      }
-    })
+      const providers = await invoke<SearchProvider[]>('list_search_providers')
+      useSearchProvidersStore.setState({ providers: hydrateIcons(providers) })
+    } catch (err) {
+      // TODO
+    }
   }
 
-  const syncCustom = (list: SearchProvider[]) => {
-    useSearchProvidersStore.setState((s) => {
-      const builtIns = s.providers.filter((p) => !p.isCustom)
-      const customs = list.map((p) => ({ ...p, isCustom: true }))
-      return { providers: [...builtIns, ...customs] }
-    })
-  }
-
-  try {
-    const stored = await settingsStore.get<SearchProvider[]>(
-      CUSTOM_PROVIDERS_KEY,
-    )
-    if (Array.isArray(stored)) syncCustom(stored)
-  } catch {}
-
-  void settingsStore.onKeyChange<SearchProvider[]>(
-    CUSTOM_PROVIDERS_KEY,
-    (val) => {
-      if (Array.isArray(val)) syncCustom(val)
-    },
-  )
+  await loadProviders()
+  await listen('omniwarp://search-providers-updated', loadProviders)
 }
 
 export { useSearchProvidersStore, initSearchProvidersSettingsSync }

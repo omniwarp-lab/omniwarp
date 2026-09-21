@@ -5,3 +5,4 @@ pub mod settings;
 pub mod system;
 pub mod tray;
 pub mod web_search;
+pub mod search_providers;
