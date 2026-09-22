@@ -5,6 +5,7 @@ import {
   deleteSearchProvider,
   listSearchProviders,
   setSearchProviderEnabled,
+  updateSearchProvider,
 } from './commands'
 import { SEARCH_PROVIDERS_UPDATED_EVENT } from './events'
 import { BUILT_IN_ICONS, providerIconUrl } from './providers'
@@ -25,6 +26,7 @@ interface SearchProvidersStore {
   providers: SearchProvider[]
   setProviderEnabled: (id: string, enabled: boolean) => Promise<void>
   addProvider: (name: string, url: string) => Promise<SearchProvider>
+  updateProvider: (id: string, name: string, url: string) => Promise<SearchProvider>
   removeProvider: (id: string) => Promise<void>
   getProviderUrl: (id: string) => string | undefined
 }
@@ -51,6 +53,14 @@ const useSearchProvidersStore = create<SearchProvidersStore>((set, get) => ({
     const provider = await addSearchProvider(name, url)
     const hydrated = hydrateIcons([provider])[0]
     set((s) => ({ providers: [...s.providers, hydrated] }))
+    return hydrated
+  },
+  updateProvider: async (id, name, url) => {
+    const updated = await updateSearchProvider(id, name, url)
+    const hydrated = hydrateIcons([updated])[0]
+    set((s) => ({
+      providers: s.providers.map((p) => (p.id === id ? hydrated : p)),
+    }))
     return hydrated
   },
   removeProvider: async (id) => {

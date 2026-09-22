@@ -5,7 +5,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { Eye, EyeOff, Globe, Plus, Trash2 } from 'lucide-react'
+import { Eye, EyeOff, Globe, Pencil, Plus, Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useSearchProvidersStore } from '@/features/search-providers/store'
 import { AddSearchProviderDialog } from '@/features/search-providers/components/add-search-provider-dialog'
@@ -16,7 +16,7 @@ const COLUMN_STYLES: Record<string, string> = {
   icon: 'w-10 pl-3.5 pr-1',
   name: 'w-32 px-3',
   url: 'px-3 truncate',
-  actions: 'w-24 pr-3.5 pl-1 text-right',
+  actions: 'w-28 pr-3.5 pl-1 text-right',
 }
 
 function ProviderTableIcon({ src }: { src?: string }) {
@@ -39,6 +39,7 @@ function ProviderTableIcon({ src }: { src?: string }) {
 function SearchProvidersTable() {
   const { t } = useTranslation()
   const [isAddOpen, setIsAddOpen] = useState(false)
+  const [editingProvider, setEditingProvider] = useState<SearchProvider | null>(null)
 
   const providers = useSearchProvidersStore((s) => s.providers)
   const setProviderEnabled = useSearchProvidersStore(
@@ -115,15 +116,26 @@ function SearchProvidersTable() {
                 )}
               </button>
               {row.original.isCustom && (
-                <button
-                  type='button'
-                  onClick={() => void removeProvider(row.original.id)}
-                  title={t('settings.searchProvidersTable.deleteProvider')}
-                  aria-label={t('settings.searchProvidersTable.deleteProvider')}
-                  className='group flex size-7 shrink-0 items-center justify-center rounded-lg text-muted-foreground/70 transition-all outline-none hover:bg-destructive/10 hover:text-destructive focus-visible:ring-2 focus-visible:ring-ring/50 active:scale-95'
-                >
-                  <Trash2 className='size-3.5 transition-colors' />
-                </button>
+                <>
+                  <button
+                    type='button'
+                    onClick={() => setEditingProvider(row.original)}
+                    title={t('settings.searchProvidersTable.editProvider')}
+                    aria-label={t('settings.searchProvidersTable.editProvider')}
+                    className='group flex size-7 shrink-0 items-center justify-center rounded-lg text-muted-foreground/70 transition-all outline-none hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50 active:scale-95'
+                  >
+                    <Pencil className='size-3.5 transition-colors' />
+                  </button>
+                  <button
+                    type='button'
+                    onClick={() => void removeProvider(row.original.id)}
+                    title={t('settings.searchProvidersTable.deleteProvider')}
+                    aria-label={t('settings.searchProvidersTable.deleteProvider')}
+                    className='group flex size-7 shrink-0 items-center justify-center rounded-lg text-muted-foreground/70 transition-all outline-none hover:bg-destructive/10 hover:text-destructive focus-visible:ring-2 focus-visible:ring-ring/50 active:scale-95'
+                  >
+                    <Trash2 className='size-3.5 transition-colors' />
+                  </button>
+                </>
               )}
             </div>
           )
@@ -198,8 +210,14 @@ function SearchProvidersTable() {
       </div>
 
       <AddSearchProviderDialog
-        open={isAddOpen}
-        onOpenChange={setIsAddOpen}
+        open={isAddOpen || Boolean(editingProvider)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setIsAddOpen(false)
+            setEditingProvider(null)
+          }
+        }}
+        provider={editingProvider}
       />
     </>
   )

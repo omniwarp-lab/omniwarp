@@ -21,6 +21,14 @@ function addSearchProvider(name: string, url: string): Promise<SearchProvider> {
   return invoke<SearchProvider>('add_search_provider', { name, url })
 }
 
+function updateSearchProvider(
+  id: string,
+  name: string,
+  url: string,
+): Promise<SearchProvider> {
+  return invoke<SearchProvider>('update_search_provider', { id, name, url })
+}
+
 function deleteSearchProvider(id: string): Promise<void> {
   return invoke('delete_search_provider', { id })
 }
@@ -36,5 +44,6 @@ export {
   listSearchProviders,
   setSearchProviderEnabled,
   addSearchProvider,
+  updateSearchProvider,
   deleteSearchProvider,
 }

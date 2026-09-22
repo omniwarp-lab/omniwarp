@@ -17,43 +17,49 @@ import {
 } from '@/features/search-providers/commands'
 import { previewIconUrl } from '@/features/search-providers/providers'
 import { useSearchProvidersStore } from '@/features/search-providers/store'
+import type { SearchProvider } from '@/features/search-providers/types'
 
 interface AddSearchProviderDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
+  provider?: SearchProvider | null
 }
 
 function AddSearchProviderDialog({
   open,
   onOpenChange,
+  provider,
 }: AddSearchProviderDialogProps) {
   const { t, i18n } = useTranslation()
   const dir = i18n.dir()
   const addProvider = useSearchProvidersStore((s) => s.addProvider)
+  const updateProvider = useSearchProvidersStore((s) => s.updateProvider)
 
+  const isEdit = Boolean(provider)
   const [name, setName] = useState('')
   const [url, setUrl] = useState('')
   const [isLoadingTitle, setIsLoadingTitle] = useState(false)
   const [isLoadingIcon, setIsLoadingIcon] = useState(false)
   const [previewKey, setPreviewKey] = useState<string | null>(null)
   const isNameManuallyEditedRef = useRef(false)
+  const initialUrlRef = useRef('')
   const reqIdRef = useRef(0)
 
   useEffect(() => {
-    if (open) {
-      setName('')
-      setUrl('')
-      isNameManuallyEditedRef.current = false
-      setIsLoadingTitle(false)
-      setIsLoadingIcon(false)
-      setPreviewKey(null)
-      reqIdRef.current = 0
-    }
-  }, [open])
+    if (!open) return
+    setName(provider?.name ?? '')
+    setUrl(provider?.url ?? '')
+    initialUrlRef.current = provider?.url.trim() ?? ''
+    isNameManuallyEditedRef.current = Boolean(provider)
+    setIsLoadingTitle(false)
+    setIsLoadingIcon(false)
+    setPreviewKey(null)
+    reqIdRef.current = 0
+  }, [open, provider])
 
   useEffect(() => {
     const trimmed = url.trim()
-    if (!trimmed) {
+    if (!trimmed || (isEdit && trimmed === initialUrlRef.current)) {
       setIsLoadingIcon(false)
       setPreviewKey(null)
       setIsLoadingTitle(false)
@@ -92,7 +98,7 @@ function AddSearchProviderDialog({
     }, 400)
 
     return () => clearTimeout(timer)
-  }, [url])
+  }, [url, isEdit])
 
   const handleClose = () => {
     onOpenChange(false)
@@ -108,7 +114,11 @@ function AddSearchProviderDialog({
     e.preventDefault()
     if (!canSubmit) return
 
-    await addProvider(name, url)
+    if (provider) {
+      await updateProvider(provider.id, name, url)
+    } else {
+      await addProvider(name, url)
+    }
     handleClose()
   }
 
@@ -118,10 +128,14 @@ function AddSearchProviderDialog({
         <form onSubmit={handleSubmit} autoComplete='off'>
           <DialogHeader className='p-5 pb-3 gap-1.5 text-start'>
             <DialogTitle className='text-base font-semibold text-foreground tracking-tight'>
-              {t('settings.searchProvidersTable.addProvider')}
+              {isEdit
+                ? t('settings.searchProvidersTable.editProvider')
+                : t('settings.searchProvidersTable.addProvider')}
             </DialogTitle>
             <DialogDescription className='text-xs text-muted-foreground leading-relaxed'>
-              {t('settings.searchProvidersTable.addProviderDescription')}
+              {isEdit
+                ? t('settings.searchProvidersTable.editProviderDescription')
+                : t('settings.searchProvidersTable.addProviderDescription')}
             </DialogDescription>
           </DialogHeader>
 
@@ -137,6 +151,12 @@ function AddSearchProviderDialog({
                 ) : previewKey ? (
                   <img
                     src={previewIconUrl(previewKey)}
+                    alt=''
+                    className='size-5 object-contain'
+                  />
+                ) : isEdit && provider?.icon ? (
+                  <img
+                    src={provider.icon}
                     alt=''
                     className='size-5 object-contain'
                   />
@@ -223,7 +243,9 @@ function AddSearchProviderDialog({
               {t('settings.searchProvidersTable.cancel')}
             </Button>
             <Button type='submit' size='sm' disabled={!canSubmit}>
-              {t('settings.searchProvidersTable.add')}
+              {isEdit
+                ? t('settings.searchProvidersTable.save')
+                : t('settings.searchProvidersTable.add')}
             </Button>
           </DialogFooter>
         </form>

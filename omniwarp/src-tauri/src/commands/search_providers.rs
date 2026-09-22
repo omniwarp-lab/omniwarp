@@ -147,6 +147,49 @@ pub fn set_search_provider_enabled(
     Ok(())
 }
 
+fn resolve_icon(
+    icon_cache: &Mutex<IconCache>,
+    url: &str,
+) -> (Option<Vec<u8>>, Option<i64>, bool) {
+    let origin = crate::web_search::icon::extract_origin_and_base(url).map(|(_, o)| o);
+    let cached_icon = origin.as_ref().and_then(|orig| {
+        let guard = icon_cache.lock();
+        if let Some(OriginEntry::Hit(key)) = guard.origins.get(orig) {
+            guard.keys.get(key).cloned()
+        } else {
+            None
+        }
+    });
+
+    match cached_icon {
+        Some(hit) => {
+            let now_secs = std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap_or_default()
+                .as_secs() as i64;
+            (Some(hit), Some(now_secs), true)
+        }
+        None => (None, None, false),
+    }
+}
+
+fn fetch_and_save_icon_background(app: AppHandle, id: String, url: String) {
+    tauri::async_runtime::spawn(async move {
+        if let Some(bytes) = crate::web_search::icon::fetch_icon_for_url(&url).await {
+            let db = app.state::<Db>();
+            let now = std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap_or_default()
+                .as_secs() as i64;
+            let _ = db.execute(
+                "UPDATE search_providers SET icon_data = ?1, icon_updated_at = ?2 WHERE id = ?3",
+                params![bytes, now, id],
+            );
+            let _ = app.emit(SEARCH_PROVIDERS_UPDATED, ());
+        }
+    });
+}
+
 #[tauri::command]
 #[tracing::instrument(skip_all, err)]
 pub async fn add_search_provider(
@@ -164,25 +207,7 @@ pub async fn add_search_provider(
     let name = name.trim().to_string();
     let url = url.trim().to_string();
 
-    let origin = crate::web_search::icon::extract_origin_and_base(&url).map(|(_, o)| o);
-    let cached_icon = origin.as_ref().and_then(|orig| {
-        let guard = icon_cache.lock();
-        if let Some(OriginEntry::Hit(key)) = guard.origins.get(orig) {
-            guard.keys.get(key).cloned()
-        } else {
-            None
-        }
-    });
-
-    let now_secs = std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .unwrap_or_default()
-        .as_secs() as i64;
-
-    let (icon_data, icon_updated_at, has_icon) = match cached_icon {
-        Some(hit) => (Some(hit), Some(now_secs), true),
-        None => (None, None, false),
-    };
+    let (icon_data, icon_updated_at, has_icon) = resolve_icon(&icon_cache, &url);
 
     db.execute(
         "INSERT INTO search_providers (id, name, url, icon_data, icon_updated_at, is_custom) VALUES (?1, ?2, ?3, ?4, ?5, 1)",
@@ -191,23 +216,7 @@ pub async fn add_search_provider(
     let _ = app.emit(SEARCH_PROVIDERS_UPDATED, ());
 
     if !has_icon {
-        let fetch_id = id.clone();
-        let fetch_url = url.clone();
-        let app_handle = app.clone();
-        tauri::async_runtime::spawn(async move {
-            if let Some(bytes) = crate::web_search::icon::fetch_icon_for_url(&fetch_url).await {
-                let db = app_handle.state::<Db>();
-                let now = std::time::SystemTime::now()
-                    .duration_since(std::time::UNIX_EPOCH)
-                    .unwrap_or_default()
-                    .as_secs() as i64;
-                let _ = db.execute(
-                    "UPDATE search_providers SET icon_data = ?1, icon_updated_at = ?2 WHERE id = ?3",
-                    params![bytes, now, fetch_id],
-                );
-                let _ = app_handle.emit(SEARCH_PROVIDERS_UPDATED, ());
-            }
-        });
+        fetch_and_save_icon_background(app, id.clone(), url.clone());
     }
 
     Ok(SearchProvider {
@@ -218,6 +227,65 @@ pub async fn add_search_provider(
         icon_updated_at,
         is_custom: true,
         enabled: true,
+    })
+}
+
+#[tauri::command]
+#[tracing::instrument(skip_all, err)]
+pub async fn update_search_provider(
+    app: AppHandle,
+    db: State<'_, Db>,
+    icon_cache: State<'_, Mutex<IconCache>>,
+    id: String,
+    name: String,
+    url: String,
+) -> DbResult<SearchProvider> {
+    let name = name.trim().to_string();
+    let url = url.trim().to_string();
+
+    let conn = db.conn();
+    let (old_url, is_custom, enabled, mut has_icon, mut icon_updated_at): (
+        String,
+        bool,
+        bool,
+        bool,
+        Option<i64>,
+    ) = conn.query_row(
+        "SELECT url, is_custom, enabled, icon_data IS NOT NULL, icon_updated_at FROM search_providers WHERE id = ?1",
+        params![id],
+        |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?, row.get(4)?)),
+    )?;
+
+    if old_url == url || !is_custom {
+        db.execute(
+            "UPDATE search_providers SET name = ?1, url = ?2 WHERE id = ?3",
+            params![name, url, id],
+        )?;
+    } else {
+        let (icon_data, updated_at, cached) = resolve_icon(&icon_cache, &url);
+        has_icon = cached;
+        icon_updated_at = updated_at;
+
+        db.execute(
+            "UPDATE search_providers SET name = ?1, url = ?2, icon_data = ?3, icon_updated_at = ?4 WHERE id = ?5",
+            params![name, url, icon_data, icon_updated_at, id],
+        )?;
+
+        if !has_icon {
+            fetch_and_save_icon_background(app.clone(), id.clone(), url.clone());
+        }
+    }
+
+    let _ = app.emit(SEARCH_PROVIDERS_UPDATED, ());
+
+    Ok(SearchProvider {
+        id,
+        name,
+        url,
+        has_icon,
+        icon_updated_at,
+        is_custom,
+        enabled,
     })
 }
 

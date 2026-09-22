@@ -103,8 +103,11 @@
       "providerNamePlaceholder": "e.g. GitHub",
       "urlTemplateHint": "Use {query} as placeholder for search text",
       "deleteProvider": "Delete provider",
+      "editProvider": "Edit Search Provider",
+      "editProviderDescription": "Update provider name and URL template with {query} placeholder.",
       "cancel": "Cancel",
-      "add": "Add"
+      "add": "Add",
+      "save": "Save"
     }
   },
   "hud": {

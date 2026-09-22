@@ -103,8 +103,11 @@
       "providerNamePlaceholder": "مثلاً Github",
       "urlTemplateHint": "از {query} به عنوان جایگزین متن جستجو استفاده کنید",
       "deleteProvider": "حذف ارائه‌دهنده",
+      "editProvider": "ویرایش ارائه‌دهنده جستجو",
+      "editProviderDescription": "نام ارائه‌دهنده و الگوی نشانی را با جایگزین {query} ویرایش کنید.",
       "cancel": "انصراف",
-      "add": "افزودن"
+      "add": "افزودن",
+      "save": "ذخیره"
     }
   },
   "hud": {
