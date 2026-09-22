@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Loader2 } from 'lucide-react'
+import { Globe, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 import {
   Dialog,
   DialogContent,
@@ -10,7 +11,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { fetchWebsiteTitle } from '@/features/search-providers/commands'
+import {
+  fetchWebsiteTitle,
+  previewSearchProviderIcon,
+} from '@/features/search-providers/commands'
+import { previewIconUrl } from '@/features/search-providers/providers'
 import { useSearchProvidersStore } from '@/features/search-providers/store'
 
 interface AddSearchProviderDialogProps {
@@ -28,42 +33,69 @@ function AddSearchProviderDialog({
 
   const [name, setName] = useState('')
   const [url, setUrl] = useState('')
-  const [isNameManuallyEdited, setIsNameManuallyEdited] = useState(false)
   const [isLoadingTitle, setIsLoadingTitle] = useState(false)
+  const [isLoadingIcon, setIsLoadingIcon] = useState(false)
+  const [previewKey, setPreviewKey] = useState<string | null>(null)
+  const isNameManuallyEditedRef = useRef(false)
+  const reqIdRef = useRef(0)
 
   useEffect(() => {
     if (open) {
       setName('')
       setUrl('')
-      setIsNameManuallyEdited(false)
+      isNameManuallyEditedRef.current = false
       setIsLoadingTitle(false)
+      setIsLoadingIcon(false)
+      setPreviewKey(null)
+      reqIdRef.current = 0
     }
   }, [open])
 
+  useEffect(() => {
+    const trimmed = url.trim()
+    if (!trimmed) {
+      setIsLoadingIcon(false)
+      setPreviewKey(null)
+      setIsLoadingTitle(false)
+      return
+    }
+
+    const currentReqId = ++reqIdRef.current
+    setIsLoadingIcon(true)
+    if (!isNameManuallyEditedRef.current) {
+      setIsLoadingTitle(true)
+    }
+
+    const timer = setTimeout(async () => {
+      const [titleResult, iconResult] = await Promise.allSettled([
+        !isNameManuallyEditedRef.current ? fetchWebsiteTitle(trimmed) : Promise.resolve(null),
+        previewSearchProviderIcon(trimmed),
+      ])
+
+      if (reqIdRef.current !== currentReqId) return
+
+      setIsLoadingTitle(false)
+      setIsLoadingIcon(false)
+      if (
+        titleResult.status === 'fulfilled' &&
+        titleResult.value &&
+        !isNameManuallyEditedRef.current
+      ) {
+        setName(titleResult.value)
+      }
+
+      setPreviewKey(
+        iconResult.status === 'fulfilled' && iconResult.value
+          ? iconResult.value.key
+          : null,
+      )
+    }, 400)
+
+    return () => clearTimeout(timer)
+  }, [url])
+
   const handleClose = () => {
     onOpenChange(false)
-  }
-
-  const resolveWebsiteName = async (inputUrl: string) => {
-    const trimmed = inputUrl.trim()
-    if (!trimmed || isNameManuallyEdited) return
-
-    setIsLoadingTitle(true)
-    try {
-      const title = await fetchWebsiteTitle(trimmed)
-      if (title && !isNameManuallyEdited) {
-        setName(title)
-      }
-    } finally {
-      setIsLoadingTitle(false)
-    }
-  }
-
-  const handleUrlPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
-    const pasted = e.clipboardData.getData('text')
-    if (pasted && !isNameManuallyEdited) {
-      void resolveWebsiteName(pasted)
-    }
   }
 
   const canSubmit = Boolean(
@@ -94,6 +126,36 @@ function AddSearchProviderDialog({
           </DialogHeader>
 
           <div className='flex flex-col gap-3.5 px-5 py-3'>
+            {/* Read-only automatic icon preview */}
+            <div
+              dir='ltr'
+              className='flex items-center gap-2.5 rounded-lg border border-border/60 bg-muted/20 px-3 py-2'
+            >
+              <div className='flex size-5 shrink-0 items-center justify-center'>
+                {isLoadingIcon ? (
+                  <Loader2 className='size-4 animate-spin text-muted-foreground' />
+                ) : previewKey ? (
+                  <img
+                    src={previewIconUrl(previewKey)}
+                    alt=''
+                    className='size-5 object-contain'
+                  />
+                ) : (
+                  <Globe className='size-4 text-muted-foreground' />
+                )}
+              </div>
+              <span
+                dir='ltr'
+                className={cn(
+                  'text-xs font-medium truncate text-left',
+                  name.trim() ? 'text-foreground' : 'text-muted-foreground/60',
+                )}
+              >
+                {name.trim() ||
+                  t('settings.searchProvidersTable.providerNamePlaceholder')}
+              </span>
+            </div>
+
             <div className='flex flex-col gap-1.5 text-start'>
               <label
                 htmlFor='provider-name'
@@ -114,7 +176,8 @@ function AddSearchProviderDialog({
                   value={name}
                   onChange={(e) => {
                     setName(e.target.value)
-                    setIsNameManuallyEdited(e.target.value.trim().length > 0)
+                    isNameManuallyEditedRef.current =
+                      e.target.value.trim().length > 0
                   }}
                   className='h-9 w-full rounded-lg border border-border bg-background px-3 pe-8 text-xs text-foreground placeholder:text-muted-foreground outline-none transition-all focus:border-ring focus:ring-2 focus:ring-ring/20'
                 />
@@ -142,7 +205,6 @@ function AddSearchProviderDialog({
                 placeholder='https://github.com/search?q={query}'
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                onPaste={handleUrlPaste}
                 className='h-9 w-full rounded-lg border border-border bg-background px-3 font-mono text-xs text-foreground placeholder:text-muted-foreground outline-none transition-all focus:border-ring focus:ring-2 focus:ring-ring/20'
               />
               <span className='text-[11px] text-muted-foreground'>

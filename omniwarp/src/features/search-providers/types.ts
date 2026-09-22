@@ -3,8 +3,14 @@ interface SearchProvider {
   name: string
   url: string
   icon?: string
+  hasIcon?: boolean
+  iconUpdatedAt?: number | null
   isCustom?: boolean
   enabled: boolean
 }
 
-export type { SearchProvider }
+interface IconPreview {
+  key: string
+}
+
+export type { SearchProvider, IconPreview }

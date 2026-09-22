@@ -7,13 +7,17 @@ import {
   setSearchProviderEnabled,
 } from './commands'
 import { SEARCH_PROVIDERS_UPDATED_EVENT } from './events'
-import { BUILT_IN_ICONS } from './providers'
+import { BUILT_IN_ICONS, providerIconUrl } from './providers'
 import type { SearchProvider } from './types'
 
 function hydrateIcons(providers: SearchProvider[]): SearchProvider[] {
   return providers.map((p) => ({
     ...p,
-    icon: p.icon || BUILT_IN_ICONS[p.id],
+    icon: !p.isCustom
+      ? BUILT_IN_ICONS[p.id]
+      : p.hasIcon
+        ? providerIconUrl(p)
+        : undefined,
   }))
 }
 
@@ -45,8 +49,9 @@ const useSearchProvidersStore = create<SearchProvidersStore>((set, get) => ({
   },
   addProvider: async (name, url) => {
     const provider = await addSearchProvider(name, url)
-    set((s) => ({ providers: [...s.providers, provider] }))
-    return provider
+    const hydrated = hydrateIcons([provider])[0]
+    set((s) => ({ providers: [...s.providers, hydrated] }))
+    return hydrated
   },
   removeProvider: async (id) => {
     const target = get().providers.find((p) => p.id === id)

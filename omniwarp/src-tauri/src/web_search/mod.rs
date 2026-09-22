@@ -3,6 +3,7 @@ use std::sync::LazyLock;
 use tauri_plugin_opener::OpenerExt;
 
 pub mod error;
+pub mod icon;
 pub use error::WebSearchResult;
 
 pub struct WebSearch;
@@ -14,7 +15,7 @@ impl WebSearch {
     }
 }
 
-static CLIENT: LazyLock<reqwest::Client> = LazyLock::new(|| {
+pub static CLIENT: LazyLock<reqwest::Client> = LazyLock::new(|| {
     reqwest::Client::builder()
         .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
         .timeout(std::time::Duration::from_secs(3))

@@ -5,7 +5,7 @@ import {
   SubgroupConfig,
 } from '@/features/command-palette/types.ts'
 import { Avatar, AvatarBadge } from '@/components/ui/avatar'
-import type { LucideIcon } from 'lucide-react'
+import { Globe, type LucideIcon } from 'lucide-react'
 import { useState } from 'react'
 
 function IconRenderer({
@@ -36,7 +36,7 @@ function IconRenderer({
 
 function ImageIconRenderer({
   src,
-  fallback: FallbackIcon,
+  fallback: FallbackIcon = Globe,
 }: {
   src: string
   fallback?: LucideIcon
@@ -45,11 +45,11 @@ function ImageIconRenderer({
   const [hasError, setHasError] = useState(false)
 
   if (hasError || !src) {
-    if (!FallbackIcon) return null
     return <FallbackIcon className='size-6' />
   }
 
-  const resolvedSrc = src.startsWith('/') ? src : convertFileSrc(src)
+  const resolvedSrc =
+    src.startsWith('/') || src.includes('://') ? src : convertFileSrc(src)
 
   return (
     <img

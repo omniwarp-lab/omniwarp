@@ -1,5 +1,5 @@
 import { invoke } from '@tauri-apps/api/core'
-import type { SearchProvider } from './types'
+import type { SearchProvider, IconPreview } from './types'
 
 function searchWeb(url: string): Promise<void> {
   return invoke('search_web', { url })
@@ -25,9 +25,14 @@ function deleteSearchProvider(id: string): Promise<void> {
   return invoke('delete_search_provider', { id })
 }
 
+function previewSearchProviderIcon(url: string): Promise<IconPreview | null> {
+  return invoke<IconPreview | null>('preview_search_provider_icon', { url })
+}
+
 export {
   searchWeb,
   fetchWebsiteTitle,
+  previewSearchProviderIcon,
   listSearchProviders,
   setSearchProviderEnabled,
   addSearchProvider,

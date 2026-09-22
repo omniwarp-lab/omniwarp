@@ -25,7 +25,7 @@
       }
     ],
     "security": {
-      "csp": null,
+      "csp": "default-src 'self'; img-src 'self' asset: https://asset.localhost provider-icon: http://provider-icon.localhost https://provider-icon.localhost data:; style-src 'self' 'unsafe-inline'; font-src 'self' data:;",
       "assetProtocol": { "enable": true, "scope": ["$APPCACHE/**/*"] }
     }
   },

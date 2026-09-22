@@ -19,6 +19,23 @@ const COLUMN_STYLES: Record<string, string> = {
   actions: 'w-24 pr-3.5 pl-1 text-right',
 }
 
+function ProviderTableIcon({ src }: { src?: string }) {
+  const [hasError, setHasError] = useState(false)
+
+  if (!src || hasError) {
+    return <Globe className='size-4 text-muted-foreground shrink-0' />
+  }
+
+  return (
+    <img
+      src={src}
+      alt=''
+      className='size-5 shrink-0 object-contain'
+      onError={() => setHasError(true)}
+    />
+  )
+}
+
 function SearchProvidersTable() {
   const { t } = useTranslation()
   const [isAddOpen, setIsAddOpen] = useState(false)
@@ -33,16 +50,7 @@ function SearchProvidersTable() {
     () => [
       {
         id: 'icon',
-        cell: ({ row }) =>
-          row.original.icon ? (
-            <img
-              src={row.original.icon}
-              alt=''
-              className='size-5 shrink-0 object-contain'
-            />
-          ) : (
-            <Globe className='size-4 text-muted-foreground shrink-0' />
-          ),
+        cell: ({ row }) => <ProviderTableIcon src={row.original.icon} />,
       },
       {
         id: 'name',

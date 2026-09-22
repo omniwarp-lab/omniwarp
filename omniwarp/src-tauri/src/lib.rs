@@ -48,13 +48,14 @@ use commands::clipboard::copy_text;
 use commands::hud::show_hud;
 use commands::search_providers::{
     add_search_provider, delete_search_provider, list_search_providers,
-    set_search_provider_enabled,
+    preview_search_provider_icon, set_search_provider_enabled, IconCache,
 };
 use commands::settings::{open_logs_dir, open_settings_window};
 use commands::system::{lock_screen, restart_system, shutdown_system, sleep_system};
 use commands::tray::exit_app;
 use commands::web_search::{fetch_website_title, search_web};
 use db::Db;
+use tauri::http::{header, Response, StatusCode};
 
 pub fn show_main_window(app: &tauri::AppHandle) {
     if let Some(window) = app.get_webview_window("main") {
@@ -74,6 +75,7 @@ pub fn show_main_window(app: &tauri::AppHandle) {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let mut builder = tauri::Builder::default();
+
     #[cfg(desktop)]
     {
         builder = builder.plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
@@ -82,6 +84,70 @@ pub fn run() {
     }
 
     builder
+        .register_asynchronous_uri_scheme_protocol("provider-icon", |ctx, request, responder| {
+            let app = ctx.app_handle().clone();
+            let uri = request.uri().clone();
+            tauri::async_runtime::spawn(async move {
+                let query = uri.query().unwrap_or("");
+                let mut id_param = None;
+                let mut preview_param = None;
+                for (k, v) in url::form_urlencoded::parse(query.as_bytes()) {
+                    if k == "id" {
+                        id_param = Some(v.into_owned());
+                    } else if k == "preview" {
+                        preview_param = Some(v.into_owned());
+                    }
+                }
+
+                let icon: Option<Vec<u8>> = if let Some(id) = id_param {
+                    let db = app.state::<Db>();
+                    let row = db
+                        .conn()
+                        .query_row(
+                            "SELECT icon_data FROM search_providers WHERE id = ?1",
+                            rusqlite::params![id],
+                            |r| r.get::<_, Option<Vec<u8>>>(0),
+                        )
+                        .ok();
+                    row.flatten()
+                } else if let Some(preview_key) = preview_param {
+                    app.state::<parking_lot::Mutex<IconCache>>()
+                        .lock()
+                        .keys
+                        .get(&preview_key)
+                        .cloned()
+                } else {
+                    None
+                };
+
+                let response = match icon {
+                    Some(bytes) => {
+                        let mime = if bytes.starts_with(b"\x89PNG") {
+                            "image/png"
+                        } else {
+                            "image/svg+xml"
+                        };
+                        Response::builder()
+                            .status(StatusCode::OK)
+                            .header(header::CONTENT_TYPE, mime)
+                            .header("X-Content-Type-Options", "nosniff")
+                            .header(header::CACHE_CONTROL, "public, max-age=31536000, immutable")
+                            .header(
+                                "Content-Security-Policy",
+                                "default-src 'none'; style-src 'unsafe-inline'",
+                            )
+                            .body(bytes)
+                            .unwrap()
+                    }
+                    None => Response::builder()
+                        .status(StatusCode::NOT_FOUND)
+                        .body(Vec::new())
+                        .unwrap(),
+                };
+
+                responder.respond(response);
+            });
+        })
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_opener::init())
@@ -100,6 +166,7 @@ pub fn run() {
             Logging::setup(app)
                 .inspect_err(|err| eprintln!("Failed to initialize logging: {err}"))?;
             app.manage(Db::init(app.handle()).log_err()?);
+            app.manage(parking_lot::Mutex::new(IconCache::default()));
             Tray::setup(app).log_err()?;
             Shortcuts::setup(app).log_err()?;
             Hud::setup(app).log_err()?;
@@ -147,6 +214,7 @@ pub fn run() {
             shutdown_system,
             search_web,
             fetch_website_title,
+            preview_search_provider_icon,
             list_search_providers,
             set_search_provider_enabled,
             add_search_provider,

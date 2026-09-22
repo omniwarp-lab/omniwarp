@@ -2,7 +2,8 @@ CREATE TABLE IF NOT EXISTS search_providers (
     id TEXT PRIMARY KEY NOT NULL,
     name TEXT NOT NULL,
     url TEXT NOT NULL,
-    icon TEXT,
+    icon_data BLOB,
+    icon_updated_at INTEGER,
     is_custom INTEGER NOT NULL DEFAULT 0,
     enabled INTEGER NOT NULL DEFAULT 1
 );
