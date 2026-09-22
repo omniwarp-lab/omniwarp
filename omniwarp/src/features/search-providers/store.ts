@@ -4,6 +4,7 @@ import {
   addSearchProvider,
   deleteSearchProvider,
   listSearchProviders,
+  reorderSearchProviders,
   setSearchProviderEnabled,
   updateSearchProvider,
 } from './commands'
@@ -27,6 +28,7 @@ interface SearchProvidersStore {
   setProviderEnabled: (id: string, enabled: boolean) => Promise<void>
   addProvider: (name: string, url: string) => Promise<SearchProvider>
   updateProvider: (id: string, name: string, url: string) => Promise<SearchProvider>
+  moveProvider: (id: string, direction: 'up' | 'down') => Promise<void>
   removeProvider: (id: string) => Promise<void>
   getProviderUrl: (id: string) => string | undefined
 }
@@ -62,6 +64,23 @@ const useSearchProvidersStore = create<SearchProvidersStore>((set, get) => ({
       providers: s.providers.map((p) => (p.id === id ? hydrated : p)),
     }))
     return hydrated
+  },
+  moveProvider: async (id, direction) => {
+    const prev = get().providers
+    const index = prev.findIndex((p) => p.id === id)
+    const targetIndex = direction === 'up' ? index - 1 : index + 1
+    if (index === -1 || targetIndex < 0 || targetIndex >= prev.length) return
+
+    const list = [...prev]
+    const [item] = list.splice(index, 1)
+    list.splice(targetIndex, 0, item)
+
+    set({ providers: list })
+    try {
+      await reorderSearchProviders(list.map((p) => p.id))
+    } catch {
+      set({ providers: prev })
+    }
   },
   removeProvider: async (id) => {
     const target = get().providers.find((p) => p.id === id)

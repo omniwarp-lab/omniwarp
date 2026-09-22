@@ -29,6 +29,10 @@ function updateSearchProvider(
   return invoke<SearchProvider>('update_search_provider', { id, name, url })
 }
 
+function reorderSearchProviders(ids: string[]): Promise<void> {
+  return invoke('reorder_search_providers', { ids })
+}
+
 function deleteSearchProvider(id: string): Promise<void> {
   return invoke('delete_search_provider', { id })
 }
@@ -45,5 +49,6 @@ export {
   setSearchProviderEnabled,
   addSearchProvider,
   updateSearchProvider,
+  reorderSearchProviders,
   deleteSearchProvider,
 }

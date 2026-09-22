@@ -113,7 +113,7 @@ pub async fn preview_search_provider_icon(
 pub fn list_search_providers(db: State<'_, Db>) -> DbResult<Vec<SearchProvider>> {
     let conn = db.conn();
     let mut stmt = conn.prepare_cached(
-        "SELECT id, name, url, icon_data IS NOT NULL AS has_icon, icon_updated_at, is_custom, enabled FROM search_providers ORDER BY rowid ASC",
+        "SELECT id, name, url, icon_data IS NOT NULL AS has_icon, icon_updated_at, is_custom, enabled FROM search_providers ORDER BY position ASC, rowid ASC",
     )?;
     let rows = stmt
         .query_map([], |row| {
@@ -210,7 +210,7 @@ pub async fn add_search_provider(
     let (icon_data, icon_updated_at, has_icon) = resolve_icon(&icon_cache, &url);
 
     db.execute(
-        "INSERT INTO search_providers (id, name, url, icon_data, icon_updated_at, is_custom) VALUES (?1, ?2, ?3, ?4, ?5, 1)",
+        "INSERT INTO search_providers (id, name, url, icon_data, icon_updated_at, is_custom, position) VALUES (?1, ?2, ?3, ?4, ?5, 1, (SELECT COALESCE(MAX(position) + 1, 0) FROM search_providers))",
         params![id, name, url, icon_data, icon_updated_at],
     )?;
     let _ = app.emit(SEARCH_PROVIDERS_UPDATED, ());
@@ -287,6 +287,23 @@ pub async fn update_search_provider(
         is_custom,
         enabled,
     })
+}
+
+#[tauri::command]
+#[tracing::instrument(skip_all, err)]
+pub fn reorder_search_providers(
+    app: AppHandle,
+    db: State<'_, Db>,
+    ids: Vec<String>,
+) -> DbResult<()> {
+    for (index, id) in ids.iter().enumerate() {
+        db.execute(
+            "UPDATE search_providers SET position = ?1 WHERE id = ?2",
+            params![index as i64, id],
+        )?;
+    }
+    let _ = app.emit(SEARCH_PROVIDERS_UPDATED, ());
+    Ok(())
 }
 
 #[tauri::command]

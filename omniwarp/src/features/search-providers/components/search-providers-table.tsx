@@ -5,7 +5,16 @@ import {
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { Eye, EyeOff, Globe, Pencil, Plus, Trash2 } from 'lucide-react'
+import {
+  ChevronDown,
+  ChevronUp,
+  Eye,
+  EyeOff,
+  Globe,
+  Pencil,
+  Plus,
+  Trash2,
+} from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useSearchProvidersStore } from '@/features/search-providers/store'
 import { AddSearchProviderDialog } from '@/features/search-providers/components/add-search-provider-dialog'
@@ -13,7 +22,8 @@ import type { SearchProvider } from '@/features/search-providers/types'
 import { cn } from '@/lib/utils'
 
 const COLUMN_STYLES: Record<string, string> = {
-  icon: 'w-10 pl-3.5 pr-1',
+  order: 'w-14 pl-3 pr-1',
+  icon: 'w-8 px-1',
   name: 'w-32 px-3',
   url: 'px-3 truncate',
   actions: 'w-28 pr-3.5 pl-1 text-right',
@@ -45,10 +55,39 @@ function SearchProvidersTable() {
   const setProviderEnabled = useSearchProvidersStore(
     (s) => s.setProviderEnabled,
   )
+  const moveProvider = useSearchProvidersStore((s) => s.moveProvider)
   const removeProvider = useSearchProvidersStore((s) => s.removeProvider)
 
   const columns = useMemo<ColumnDef<SearchProvider>[]>(
     () => [
+      {
+        id: 'order',
+        header: () => null,
+        cell: ({ row }) => (
+          <div className='flex items-center gap-0.5'>
+            <button
+              type='button'
+              disabled={row.index === 0}
+              onClick={() => void moveProvider(row.original.id, 'up')}
+              title={t('settings.searchProvidersTable.moveUp')}
+              aria-label={t('settings.searchProvidersTable.moveUp')}
+              className='flex size-5.5 items-center justify-center rounded text-muted-foreground/60 transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50 disabled:opacity-20 disabled:pointer-events-none'
+            >
+              <ChevronUp className='size-3.5' />
+            </button>
+            <button
+              type='button'
+              disabled={row.index === providers.length - 1}
+              onClick={() => void moveProvider(row.original.id, 'down')}
+              title={t('settings.searchProvidersTable.moveDown')}
+              aria-label={t('settings.searchProvidersTable.moveDown')}
+              className='flex size-5.5 items-center justify-center rounded text-muted-foreground/60 transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50 disabled:opacity-20 disabled:pointer-events-none'
+            >
+              <ChevronDown className='size-3.5' />
+            </button>
+          </div>
+        ),
+      },
       {
         id: 'icon',
         cell: ({ row }) => <ProviderTableIcon src={row.original.icon} />,
@@ -142,7 +181,7 @@ function SearchProvidersTable() {
         },
       },
     ],
-    [removeProvider, setProviderEnabled, t],
+    [moveProvider, providers.length, removeProvider, setProviderEnabled, t],
   )
 
   const table = useReactTable({

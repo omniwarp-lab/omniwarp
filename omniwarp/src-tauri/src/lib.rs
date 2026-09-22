@@ -48,7 +48,8 @@ use commands::clipboard::copy_text;
 use commands::hud::show_hud;
 use commands::search_providers::{
     add_search_provider, delete_search_provider, list_search_providers,
-    preview_search_provider_icon, set_search_provider_enabled, update_search_provider, IconCache,
+    preview_search_provider_icon, reorder_search_providers, set_search_provider_enabled,
+    update_search_provider, IconCache,
 };
 use commands::settings::{open_logs_dir, open_settings_window};
 use commands::system::{lock_screen, restart_system, shutdown_system, sleep_system};
@@ -219,6 +220,7 @@ pub fn run() {
             set_search_provider_enabled,
             add_search_provider,
             update_search_provider,
+            reorder_search_providers,
             delete_search_provider
         ])
         .build(tauri::generate_context!())

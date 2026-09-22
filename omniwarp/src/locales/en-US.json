@@ -105,6 +105,8 @@
       "deleteProvider": "Delete provider",
       "editProvider": "Edit Search Provider",
       "editProviderDescription": "Update provider name and URL template with {query} placeholder.",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
       "cancel": "Cancel",
       "add": "Add",
       "save": "Save"
