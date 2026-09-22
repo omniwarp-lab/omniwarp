@@ -17,6 +17,7 @@ import {
 } from '@/features/search-providers/commands'
 import { previewIconUrl } from '@/features/search-providers/providers'
 import { useSearchProvidersStore } from '@/features/search-providers/store'
+import { autoApplyQueryToUrl } from '@/features/search-providers/url'
 import type { SearchProvider } from '@/features/search-providers/types'
 
 interface AddSearchProviderDialogProps {
@@ -74,7 +75,9 @@ function AddSearchProviderDialog({
 
     const timer = setTimeout(async () => {
       const [titleResult, iconResult] = await Promise.allSettled([
-        !isNameManuallyEditedRef.current ? fetchWebsiteTitle(trimmed) : Promise.resolve(null),
+        !isNameManuallyEditedRef.current
+          ? fetchWebsiteTitle(trimmed)
+          : Promise.resolve(null),
         previewSearchProviderIcon(trimmed),
       ])
 
@@ -106,8 +109,8 @@ function AddSearchProviderDialog({
 
   const canSubmit = Boolean(
     name.trim() &&
-      /^https?:\/\/\S+/i.test(url.trim()) &&
-      url.includes('{query}'),
+    /^https?:\/\/\S+/i.test(url.trim()) &&
+    url.includes('{query}'),
   )
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -122,9 +125,21 @@ function AddSearchProviderDialog({
     handleClose()
   }
 
+  const handleUrlPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const text = e.clipboardData.getData('text').trim()
+    const transformed = autoApplyQueryToUrl(text)
+    if (transformed !== text) {
+      e.preventDefault()
+      setUrl(transformed)
+    }
+  }
+
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleClose()}>
-      <DialogContent dir={dir} className='sm:max-w-md gap-0 p-0 overflow-hidden'>
+      <DialogContent
+        dir={dir}
+        className='sm:max-w-md gap-0 p-0 overflow-hidden'
+      >
         <form onSubmit={handleSubmit} autoComplete='off'>
           <DialogHeader className='p-5 pb-3 gap-1.5 text-start'>
             <DialogTitle className='text-base font-semibold text-foreground tracking-tight'>
@@ -224,7 +239,8 @@ function AddSearchProviderDialog({
                 spellCheck={false}
                 placeholder='https://github.com/search?q={query}'
                 value={url}
-                onChange={(e) => setUrl(e.target.value)}
+                onPaste={handleUrlPaste}
+                onChange={(e) => setUrl(e.target.value.replace(/%s/g, '{query}'))}
                 className='h-9 w-full rounded-lg border border-border bg-background px-3 font-mono text-xs text-foreground placeholder:text-muted-foreground outline-none transition-all focus:border-ring focus:ring-2 focus:ring-ring/20'
               />
               <span className='text-[11px] text-muted-foreground'>
