@@ -77,7 +77,7 @@ function SearchProvidersHeaderSwitch() {
 
 function SearchProvidersTable() {
   const { t } = useTranslation()
-  const [isAddOpen, setIsAddOpen] = useState(false)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingProvider, setEditingProvider] = useState<SearchProvider | null>(
     null,
   )
@@ -158,7 +158,10 @@ function SearchProvidersTable() {
             <button
               type='button'
               disabled={!enabled}
-              onClick={() => setIsAddOpen(true)}
+              onClick={() => {
+                setEditingProvider(null)
+                setIsDialogOpen(true)
+              }}
               title={t('settings.searchProvidersTable.addProvider')}
               aria-label={t('settings.searchProvidersTable.addProvider')}
               className='group flex size-7 shrink-0 items-center justify-center rounded-lg text-muted-foreground/70 transition-all outline-none hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50 active:scale-95 disabled:pointer-events-none disabled:opacity-30'
@@ -196,7 +199,10 @@ function SearchProvidersTable() {
                   <button
                     type='button'
                     disabled={!enabled}
-                    onClick={() => setEditingProvider(row.original)}
+                    onClick={() => {
+                      setEditingProvider(row.original)
+                      setIsDialogOpen(true)
+                    }}
                     title={t('settings.searchProvidersTable.editProvider')}
                     aria-label={t('settings.searchProvidersTable.editProvider')}
                     className='group flex size-7 shrink-0 items-center justify-center rounded-lg text-muted-foreground/70 transition-all outline-none hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50 active:scale-95 disabled:pointer-events-none disabled:opacity-40'
@@ -304,13 +310,8 @@ function SearchProvidersTable() {
       </div>
 
       <AddSearchProviderDialog
-        open={isAddOpen || Boolean(editingProvider)}
-        onOpenChange={(open) => {
-          if (!open) {
-            setIsAddOpen(false)
-            setEditingProvider(null)
-          }
-        }}
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
         provider={editingProvider}
       />
     </>
