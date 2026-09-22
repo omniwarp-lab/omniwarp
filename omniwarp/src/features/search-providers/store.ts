@@ -1,5 +1,6 @@
 import { create } from 'zustand/react'
 import { listen } from '@tauri-apps/api/event'
+import { settingsStore } from '@/features/settings/storage'
 import {
   addSearchProvider,
   deleteSearchProvider,
@@ -11,6 +12,9 @@ import {
 import { SEARCH_PROVIDERS_UPDATED_EVENT } from './events'
 import { BUILT_IN_ICONS, providerIconUrl } from './providers'
 import type { SearchProvider } from './types'
+
+const ENABLED_KEY = 'searchProviders.enabled'
+const DEFAULT_ENABLED = true
 
 function hydrateIcons(providers: SearchProvider[]): SearchProvider[] {
   return providers.map((p) => ({
@@ -24,6 +28,8 @@ function hydrateIcons(providers: SearchProvider[]): SearchProvider[] {
 }
 
 interface SearchProvidersStore {
+  enabled: boolean
+  setEnabled: (enabled: boolean) => Promise<void>
   providers: SearchProvider[]
   setProviderEnabled: (id: string, enabled: boolean) => Promise<void>
   addProvider: (name: string, url: string) => Promise<SearchProvider>
@@ -34,8 +40,20 @@ interface SearchProvidersStore {
 }
 
 const useSearchProvidersStore = create<SearchProvidersStore>((set, get) => ({
+  enabled: DEFAULT_ENABLED,
+  setEnabled: async (enabled) => {
+    if (get().enabled === enabled) return
+    const prev = get().enabled
+    set({ enabled })
+    try {
+      await settingsStore.set(ENABLED_KEY, enabled)
+    } catch {
+      set({ enabled: prev })
+    }
+  },
   providers: [],
   getProviderUrl: (id: string) => {
+    if (!get().enabled) return undefined
     return get().providers.find((p) => p.id === id && p.enabled)?.url
   },
   setProviderEnabled: async (id, enabled) => {
@@ -97,9 +115,25 @@ const useSearchProvidersStore = create<SearchProvidersStore>((set, get) => ({
 
 let syncActive = false
 
-async function initSearchProvidersSettingsSync(): Promise<void> {
-  if (syncActive) return
+async function initSearchProvidersSettingsSync(): Promise<() => void> {
+  if (syncActive) return () => {}
   syncActive = true
+
+  try {
+    const stored = await settingsStore.get<boolean>(ENABLED_KEY)
+    if (typeof stored === 'boolean') {
+      useSearchProvidersStore.setState({ enabled: stored })
+    }
+  } catch {}
+
+  const unlistenSettings = await settingsStore.onKeyChange<boolean>(
+    ENABLED_KEY,
+    (value) => {
+      if (typeof value === 'boolean') {
+        useSearchProvidersStore.setState({ enabled: value })
+      }
+    },
+  )
 
   const loadProviders = async () => {
     try {
@@ -111,7 +145,13 @@ async function initSearchProvidersSettingsSync(): Promise<void> {
   }
 
   await loadProviders()
-  await listen(SEARCH_PROVIDERS_UPDATED_EVENT, loadProviders)
+  const unlistenTauri = await listen(SEARCH_PROVIDERS_UPDATED_EVENT, loadProviders)
+
+  return () => {
+    unlistenSettings()
+    unlistenTauri()
+    syncActive = false
+  }
 }
 
 export { useSearchProvidersStore, initSearchProvidersSettingsSync }

@@ -98,6 +98,8 @@
       "urlTemplate": "الگوی نشانی",
       "showInSearch": "نمایش در جستجو",
       "hideFromSearch": "پنهان کردن از جستجو",
+      "enableProviders": "فعال‌سازی ارائه‌دهندگان جستجو",
+      "disableProviders": "غیرفعال‌سازی ارائه‌دهندگان جستجو",
       "addProvider": "افزودن ارائه‌دهنده جستجو",
       "addProviderDescription": "نام ارائه‌دهنده و الگوی نشانی را با جایگزین {query} وارد کنید.",
       "providerNamePlaceholder": "مثلاً Github",

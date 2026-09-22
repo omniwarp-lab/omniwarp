@@ -16,6 +16,7 @@ import {
   Trash2,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { Switch, SwitchThumb } from '@/components/ui/switch'
 import { useSearchProvidersStore } from '@/features/search-providers/store'
 import { AddSearchProviderDialog } from '@/features/search-providers/components/add-search-provider-dialog'
 import type { SearchProvider } from '@/features/search-providers/types'
@@ -46,10 +47,42 @@ function ProviderTableIcon({ src }: { src?: string }) {
   )
 }
 
+function SearchProvidersHeaderSwitch() {
+  const { t } = useTranslation()
+  const enabled = useSearchProvidersStore((s) => s.enabled)
+  const setEnabled = useSearchProvidersStore((s) => s.setEnabled)
+
+  return (
+    <div className='flex h-7 items-center'>
+      <Switch
+        dir='ltr'
+        checked={enabled}
+        onCheckedChange={(checked) => void setEnabled(checked)}
+        title={
+          enabled
+            ? t('settings.searchProvidersTable.disableProviders')
+            : t('settings.searchProvidersTable.enableProviders')
+        }
+        aria-label={
+          enabled
+            ? t('settings.searchProvidersTable.disableProviders')
+            : t('settings.searchProvidersTable.enableProviders')
+        }
+      >
+        <SwitchThumb className='rtl:data-checked:translate-x-4 duration-150 ease-out' />
+      </Switch>
+    </div>
+  )
+}
+
 function SearchProvidersTable() {
   const { t } = useTranslation()
   const [isAddOpen, setIsAddOpen] = useState(false)
-  const [editingProvider, setEditingProvider] = useState<SearchProvider | null>(null)
+  const [editingProvider, setEditingProvider] = useState<SearchProvider | null>(
+    null,
+  )
+
+  const enabled = useSearchProvidersStore((s) => s.enabled)
 
   const providers = useSearchProvidersStore((s) => s.providers)
   const setProviderEnabled = useSearchProvidersStore(
@@ -62,12 +95,12 @@ function SearchProvidersTable() {
     () => [
       {
         id: 'order',
-        header: () => null,
+        header: SearchProvidersHeaderSwitch,
         cell: ({ row }) => (
           <div className='flex items-center gap-0.5'>
             <button
               type='button'
-              disabled={row.index === 0}
+              disabled={!enabled || row.index === 0}
               onClick={() => void moveProvider(row.original.id, 'up')}
               title={t('settings.searchProvidersTable.moveUp')}
               aria-label={t('settings.searchProvidersTable.moveUp')}
@@ -77,7 +110,9 @@ function SearchProvidersTable() {
             </button>
             <button
               type='button'
-              disabled={row.index === providers.length - 1}
+              disabled={
+                !enabled || row.index === providers.length - 1
+              }
               onClick={() => void moveProvider(row.original.id, 'down')}
               title={t('settings.searchProvidersTable.moveDown')}
               aria-label={t('settings.searchProvidersTable.moveDown')}
@@ -122,10 +157,11 @@ function SearchProvidersTable() {
           <div className='flex justify-end'>
             <button
               type='button'
+              disabled={!enabled}
               onClick={() => setIsAddOpen(true)}
               title={t('settings.searchProvidersTable.addProvider')}
               aria-label={t('settings.searchProvidersTable.addProvider')}
-              className='group flex size-7 shrink-0 items-center justify-center rounded-lg text-muted-foreground/70 transition-all outline-none hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50 active:scale-95'
+              className='group flex size-7 shrink-0 items-center justify-center rounded-lg text-muted-foreground/70 transition-all outline-none hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50 active:scale-95 disabled:pointer-events-none disabled:opacity-30'
             >
               <Plus className='size-4 text-foreground/80 transition-colors group-hover:text-foreground' />
             </button>
@@ -141,12 +177,13 @@ function SearchProvidersTable() {
             <div className='flex items-center justify-end gap-1.5'>
               <button
                 type='button'
+                disabled={!enabled}
                 onClick={() =>
                   void setProviderEnabled(row.original.id, !isEnabled)
                 }
                 title={label}
                 aria-label={label}
-                className='group flex size-7 shrink-0 items-center justify-center rounded-lg text-muted-foreground/70 transition-all outline-none hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50 active:scale-95'
+                className='group flex size-7 shrink-0 items-center justify-center rounded-lg text-muted-foreground/70 transition-all outline-none hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50 active:scale-95 disabled:pointer-events-none disabled:opacity-40'
               >
                 {isEnabled ? (
                   <Eye className='size-4 text-foreground/80 transition-colors group-hover:text-foreground' />
@@ -158,19 +195,23 @@ function SearchProvidersTable() {
                 <>
                   <button
                     type='button'
+                    disabled={!enabled}
                     onClick={() => setEditingProvider(row.original)}
                     title={t('settings.searchProvidersTable.editProvider')}
                     aria-label={t('settings.searchProvidersTable.editProvider')}
-                    className='group flex size-7 shrink-0 items-center justify-center rounded-lg text-muted-foreground/70 transition-all outline-none hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50 active:scale-95'
+                    className='group flex size-7 shrink-0 items-center justify-center rounded-lg text-muted-foreground/70 transition-all outline-none hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50 active:scale-95 disabled:pointer-events-none disabled:opacity-40'
                   >
                     <Pencil className='size-3.5 transition-colors' />
                   </button>
                   <button
                     type='button'
+                    disabled={!enabled}
                     onClick={() => void removeProvider(row.original.id)}
                     title={t('settings.searchProvidersTable.deleteProvider')}
-                    aria-label={t('settings.searchProvidersTable.deleteProvider')}
-                    className='group flex size-7 shrink-0 items-center justify-center rounded-lg text-muted-foreground/70 transition-all outline-none hover:bg-destructive/10 hover:text-destructive focus-visible:ring-2 focus-visible:ring-ring/50 active:scale-95'
+                    aria-label={t(
+                      'settings.searchProvidersTable.deleteProvider',
+                    )}
+                    className='group flex size-7 shrink-0 items-center justify-center rounded-lg text-muted-foreground/70 transition-all outline-none hover:bg-destructive/10 hover:text-destructive focus-visible:ring-2 focus-visible:ring-ring/50 active:scale-95 disabled:pointer-events-none disabled:opacity-40'
                   >
                     <Trash2 className='size-3.5 transition-colors' />
                   </button>
@@ -181,7 +222,14 @@ function SearchProvidersTable() {
         },
       },
     ],
-    [moveProvider, providers.length, removeProvider, setProviderEnabled, t],
+    [
+      enabled,
+      moveProvider,
+      providers.length,
+      removeProvider,
+      setProviderEnabled,
+      t,
+    ],
   )
 
   const table = useReactTable({
@@ -194,6 +242,7 @@ function SearchProvidersTable() {
     <>
       <div
         dir='ltr'
+        aria-disabled={!enabled}
         className='overflow-hidden rounded-xl border border-border bg-card'
       >
         <table className='w-full table-fixed border-collapse text-left text-xs'>
@@ -222,7 +271,13 @@ function SearchProvidersTable() {
               </tr>
             ))}
           </thead>
-          <tbody className='divide-y divide-border'>
+          <tbody
+            className={cn(
+              'divide-y divide-border transition-opacity',
+              !enabled &&
+                'pointer-events-none select-none opacity-40',
+            )}
+          >
             {table.getRowModel().rows.map((row) => (
               <tr
                 key={row.id}

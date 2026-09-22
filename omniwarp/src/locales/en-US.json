@@ -98,6 +98,8 @@
       "urlTemplate": "URL Template",
       "showInSearch": "Show in search",
       "hideFromSearch": "Hide from search",
+      "enableProviders": "Enable Search Providers",
+      "disableProviders": "Disable Search Providers",
       "addProvider": "Add Search Provider",
       "addProviderDescription": "Enter provider name and URL template with {query} placeholder.",
       "providerNamePlaceholder": "e.g. GitHub",

@@ -67,6 +67,7 @@ function useCommandPaletteSections(
   )
 
   const providers = useSearchProvidersStore((s) => s.providers)
+  const searchProvidersEnabled = useSearchProvidersStore((s) => s.enabled)
 
   return useMemo(() => {
     const trimmed = query.trim()
@@ -108,8 +109,10 @@ function useCommandPaletteSections(
       ? [calculatorSection, ...base]
       : base
 
+    if (!trimmed || !searchProvidersEnabled) return baseWithCalculator
+
     const activeProviders = providers.filter((p) => p.enabled)
-    if (!trimmed || activeProviders.length === 0) return baseWithCalculator
+    if (activeProviders.length === 0) return baseWithCalculator
 
     return [
       ...baseWithCalculator,
@@ -130,7 +133,15 @@ function useCommandPaletteSections(
         ),
       },
     ]
-  }, [results, groups, t, query, calcResult, providers])
+  }, [
+    results,
+    groups,
+    t,
+    query,
+    calcResult,
+    providers,
+    searchProvidersEnabled,
+  ])
 }
 
 export { useCommandPaletteSections }
