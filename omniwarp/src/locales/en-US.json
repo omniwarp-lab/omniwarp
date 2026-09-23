@@ -49,7 +49,8 @@
     "quit": "Quit"
   },
   "sound": {
-    "toggleMute": "Toggle Mute"
+    "toggleMute": "Toggle Mute",
+    "toggleMicrophoneMute": "Toggle Microphone Mute"
   },
   "system": {
     "lock": "Lock Screen",

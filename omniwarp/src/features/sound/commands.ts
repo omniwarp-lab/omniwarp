@@ -4,4 +4,9 @@ function toggleMute(): Promise<void> {
   return invoke('toggle_mute')
 }
 
-export { toggleMute }
+function toggleMicrophoneMute(): Promise<boolean> {
+  return invoke('toggle_microphone_mute')
+}
+
+export { toggleMute, toggleMicrophoneMute }
+

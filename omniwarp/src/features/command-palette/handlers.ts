@@ -1,7 +1,7 @@
 import { focusApp, launchApp } from '@/features/apps/commands.ts'
 import { copyText } from '@/features/clipboard/commands'
 import { openSettings } from '@/features/settings/commands.ts'
-import { toggleMute } from '@/features/sound/commands.ts'
+import { toggleMicrophoneMute, toggleMute } from '@/features/sound/commands.ts'
 import {
   lockScreen,
   restartSystem,
@@ -72,6 +72,8 @@ async function handleSelect(value: string) {
           await openSettings()
         } else if (id === 'sound.toggleMute') {
           await toggleMute()
+        } else if (id === 'sound.toggleMicrophoneMute') {
+          await toggleMicrophoneMute()
         } else if (id === 'system.lock') {
           await lockScreen()
         } else if (id === 'system.sleep') {
