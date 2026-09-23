@@ -1,4 +1,3 @@
-use crate::apps::windows::com::ComGuard;
 use crate::apps::windows::packages::package_roots;
 use crate::apps::{AppInfo, AppKind, Apps};
 use std::collections::HashMap;
@@ -28,7 +27,6 @@ impl Drop for OwnedPwstr {
 
 impl Apps {
     pub fn discover() -> Result<Self> {
-        let _com = ComGuard::new();
         let apps_folder: IShellItem =
             unsafe { SHGetKnownFolderItem(&FOLDERID_AppsFolder, KNOWN_FOLDER_FLAG(0), None)? };
         let enum_items: IEnumShellItems =
