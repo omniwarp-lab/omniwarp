@@ -13,6 +13,7 @@
       "app": "App",
       "game": "Game",
       "omniwarp": "OmniWarp",
+      "sound": "Sound",
       "system": "System",
       "webSearch": "Web Search"
     },
@@ -46,6 +47,9 @@
   "tray": {
     "settings": "Settings",
     "quit": "Quit"
+  },
+  "sound": {
+    "toggleMute": "Toggle Mute"
   },
   "system": {
     "lock": "Lock Screen",
@@ -142,6 +146,7 @@
       "restart": "Failed to restart computer",
       "shutdown": "Failed to shut down computer"
     },
+    "sound": "The sound operation failed",
     "settings": {
       "open": "Failed to open settings window",
       "openDir": "Failed to open logs directory"

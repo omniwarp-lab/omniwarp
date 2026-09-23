@@ -9,6 +9,7 @@ import {
   MoonIcon,
   PowerIcon,
   RotateCwIcon,
+  VolumeXIcon,
 } from 'lucide-react'
 import { initAppsSync } from '@/features/apps/sync.ts'
 import { showAppError } from '@/features/hud/errors'
@@ -45,6 +46,12 @@ async function registerCommandsGroup(): Promise<void> {
         labelKey: 'omniwarp.settings',
       },
       {
+        id: 'commands:sound.toggleMute',
+        icon: VolumeXIcon,
+        subgroup: 'sound',
+        labelKey: 'sound.toggleMute',
+      },
+      {
         id: 'commands:system.lock',
         icon: LockIcon,
         subgroup: 'system',
@@ -76,6 +83,10 @@ async function registerCommandsGroup(): Promise<void> {
     subgroupConfigs: {
       omniwarp: {
         gradient: 'bg-gradient-to-br from-[#40444c] to-[#282b31]',
+        iconColor: '#fff',
+      },
+      sound: {
+        gradient: 'bg-gradient-to-br from-[#587B99] to-[#293C50]',
         iconColor: '#fff',
       },
       system: {

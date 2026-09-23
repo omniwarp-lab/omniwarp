@@ -16,6 +16,7 @@ mod hud;
 mod logging;
 mod settings;
 mod shortcuts;
+mod sound;
 mod system;
 mod tray;
 mod web_search;
@@ -52,6 +53,7 @@ use commands::search_providers::{
     update_search_provider, IconCache,
 };
 use commands::settings::{open_logs_dir, open_settings_window};
+use commands::sound::toggle_mute;
 use commands::system::{lock_screen, restart_system, shutdown_system, sleep_system};
 use commands::tray::exit_app;
 use commands::web_search::{fetch_website_title, search_web};
@@ -209,6 +211,7 @@ pub fn run() {
             open_settings_window,
             open_logs_dir,
             show_hud,
+            toggle_mute,
             lock_screen,
             sleep_system,
             restart_system,
