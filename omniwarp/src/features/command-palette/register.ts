@@ -10,6 +10,7 @@ import {
   MoonIcon,
   PowerIcon,
   RotateCwIcon,
+  Volume2Icon,
   VolumeXIcon,
 } from 'lucide-react'
 import { initAppsSync } from '@/features/apps/sync.ts'
@@ -45,6 +46,12 @@ async function registerCommandsGroup(): Promise<void> {
         icon: BoltIcon,
         subgroup: 'omniwarp',
         labelKey: 'omniwarp.settings',
+      },
+      {
+        id: 'commands:sound.setVolume',
+        icon: Volume2Icon,
+        subgroup: 'sound',
+        labelKey: 'sound.setVolume',
       },
       {
         id: 'commands:sound.toggleMute',

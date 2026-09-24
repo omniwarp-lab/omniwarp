@@ -14,3 +14,15 @@ pub fn toggle_microphone_mute(window: tauri::WebviewWindow) -> SoundResult<bool>
     Sound::toggle_microphone_mute()
 }
 
+#[tauri::command]
+#[tracing::instrument(skip_all, err)]
+pub fn get_volume() -> SoundResult<u32> {
+    Sound::get_volume()
+}
+
+#[tauri::command]
+#[tracing::instrument(skip_all, err)]
+pub fn set_volume(percent: u32) -> SoundResult<()> {
+    Sound::set_volume(percent)
+}
+

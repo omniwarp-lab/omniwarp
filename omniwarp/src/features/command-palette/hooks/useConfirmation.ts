@@ -5,6 +5,7 @@ import { handleSelect } from '@/features/command-palette/handlers.ts'
 interface UseConfirmationOptions {
   inputRef: React.RefObject<HTMLInputElement | null>
   onOpenConfirmation?: () => void
+  onOpenVolume?: () => Promise<void>
 }
 
 interface UseConfirmationReturn {
@@ -17,6 +18,7 @@ interface UseConfirmationReturn {
 function useConfirmation({
   inputRef,
   onOpenConfirmation,
+  onOpenVolume,
 }: UseConfirmationOptions): UseConfirmationReturn {
   const [confirmingItem, setConfirmingItem] = useState<PaletteItem | null>(null)
 
@@ -29,6 +31,10 @@ function useConfirmation({
 
   const handleItemSelect = useCallback(
     async (item: PaletteItem) => {
+      if (item.id === 'commands:sound.setVolume') {
+        await onOpenVolume?.()
+        return
+      }
       if (item.destructive) {
         onOpenConfirmation?.()
         setConfirmingItem(item)
@@ -36,7 +42,7 @@ function useConfirmation({
       }
       await handleSelect(item.id)
     },
-    [onOpenConfirmation],
+    [onOpenConfirmation, onOpenVolume],
   )
 
   const handleConfirmAction = useCallback(async () => {

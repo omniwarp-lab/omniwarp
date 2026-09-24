@@ -36,5 +36,25 @@ impl Sound {
     pub fn toggle_microphone_mute() -> SoundResult<bool> {
         toggle_endpoint_mute(eCapture, eCommunications)
     }
+
+    pub fn get_volume() -> SoundResult<u32> {
+        let endpoint_volume = get_default_endpoint_volume(eRender, eConsole)?;
+        unsafe {
+            let level = endpoint_volume.GetMasterVolumeLevelScalar()?;
+            Ok((level * 100.0).round() as u32)
+        }
+    }
+
+    pub fn set_volume(percent: u32) -> SoundResult<()> {
+        let endpoint_volume = get_default_endpoint_volume(eRender, eConsole)?;
+        let clamped = percent.min(100);
+        unsafe {
+            if endpoint_volume.GetMute()?.as_bool() && clamped > 0 {
+                endpoint_volume.SetMute(false, std::ptr::null())?;
+            }
+            endpoint_volume.SetMasterVolumeLevelScalar(clamped as f32 / 100.0, std::ptr::null())?;
+        }
+        Ok(())
+    }
 }
 

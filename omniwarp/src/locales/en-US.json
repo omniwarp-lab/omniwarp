@@ -49,6 +49,8 @@
     "quit": "Quit"
   },
   "sound": {
+    "setVolume": "Set Volume",
+    "adjustVolume": "Adjust",
     "toggleMute": "Toggle Mute",
     "toggleMicrophoneMute": "Toggle Microphone Mute"
   },

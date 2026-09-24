@@ -49,6 +49,8 @@
     "quit": "خروج"
   },
   "sound": {
+    "setVolume": "تنظیم صدا",
+    "adjustVolume": "تنظیم",
     "toggleMute": "قطع/وصل صدا",
     "toggleMicrophoneMute": "قطع/وصل میکروفون"
   },
