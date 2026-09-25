@@ -9,6 +9,7 @@ import {
   MicIcon,
   MicOffIcon,
   MoonIcon,
+  PlayIcon,
   PowerIcon,
   RotateCwIcon,
   SkipBackIcon,
@@ -79,6 +80,12 @@ async function registerCommandsGroup(): Promise<void> {
         icon: SkipBackIcon,
         subgroup: 'system',
         labelKey: 'system.previousTrack',
+      },
+      {
+        id: 'commands:system.playPause',
+        icon: PlayIcon,
+        subgroup: 'system',
+        labelKey: 'system.playPause',
       },
       {
         id: 'commands:system.nextTrack',

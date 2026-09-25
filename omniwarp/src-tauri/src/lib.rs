@@ -58,7 +58,8 @@ use commands::sound::{
     toggle_mute,
 };
 use commands::system::{
-    lock_screen, next_track, previous_track, restart_system, shutdown_system, sleep_system,
+    lock_screen, next_track, play_pause, previous_track, restart_system, shutdown_system,
+    sleep_system,
 };
 use commands::tray::exit_app;
 use commands::web_search::{fetch_website_title, search_web};
@@ -228,6 +229,7 @@ pub fn run() {
             shutdown_system,
             next_track,
             previous_track,
+            play_pause,
             search_web,
             fetch_website_title,
             preview_search_provider_icon,

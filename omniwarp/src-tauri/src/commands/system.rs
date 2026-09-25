@@ -39,3 +39,9 @@ pub fn previous_track(window: tauri::WebviewWindow) {
     let _ = window.hide();
     System::previous_track();
 }
+
+#[tauri::command]
+pub fn play_pause(window: tauri::WebviewWindow) {
+    let _ = window.hide();
+    System::play_pause();
+}

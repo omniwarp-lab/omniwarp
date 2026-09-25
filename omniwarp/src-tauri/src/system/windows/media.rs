@@ -2,6 +2,7 @@ use crate::system::System;
 
 const VK_MEDIA_NEXT_TRACK: u8 = 0xB0;
 const VK_MEDIA_PREV_TRACK: u8 = 0xB1;
+const VK_MEDIA_PLAY_PAUSE: u8 = 0xB3;
 const KEYEVENTF_EXTENDEDKEY: u32 = 0x0001;
 const KEYEVENTF_KEYUP: u32 = 0x0002;
 
@@ -24,5 +25,9 @@ impl System {
 
     pub fn previous_track() {
         send_media_key(VK_MEDIA_PREV_TRACK);
+    }
+
+    pub fn play_pause() {
+        send_media_key(VK_MEDIA_PLAY_PAUSE);
     }
 }

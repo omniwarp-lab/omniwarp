@@ -24,6 +24,10 @@ function previousTrack(): Promise<void> {
   return invoke('previous_track')
 }
 
+function playPause(): Promise<void> {
+  return invoke('play_pause')
+}
+
 export {
   lockScreen,
   sleepSystem,
@@ -31,4 +35,5 @@ export {
   shutdownSystem,
   nextTrack,
   previousTrack,
+  playPause,
 }

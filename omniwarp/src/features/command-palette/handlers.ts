@@ -5,6 +5,7 @@ import { toggleMicrophoneMute, toggleMute } from '@/features/sound/commands.ts'
 import {
   lockScreen,
   nextTrack,
+  playPause,
   previousTrack,
   restartSystem,
   shutdownSystem,
@@ -81,10 +82,12 @@ async function handleSelect(value: string) {
           await restartSystem()
         } else if (id === 'system.shutdown') {
           await shutdownSystem()
-        } else if (id === 'system.nextTrack') {
-          await nextTrack()
         } else if (id === 'system.previousTrack') {
           await previousTrack()
+        } else if (id === 'system.playPause') {
+          await playPause()
+        } else if (id === 'system.nextTrack') {
+          await nextTrack()
         }
       } catch (err) {
         await showAppError(err)
