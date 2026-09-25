@@ -10,28 +10,19 @@ extern "system" {
     fn keybd_event(b_vk: u8, b_scan: u8, dw_flags: u32, dw_extra_info: usize);
 }
 
+fn send_media_key(vk: u8) {
+    unsafe {
+        keybd_event(vk, 0, KEYEVENTF_EXTENDEDKEY, 0);
+        keybd_event(vk, 0, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
+    }
+}
+
 impl System {
     pub fn next_track() {
-        unsafe {
-            keybd_event(VK_MEDIA_NEXT_TRACK, 0, KEYEVENTF_EXTENDEDKEY, 0);
-            keybd_event(
-                VK_MEDIA_NEXT_TRACK,
-                0,
-                KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP,
-                0,
-            );
-        }
+        send_media_key(VK_MEDIA_NEXT_TRACK);
     }
 
     pub fn previous_track() {
-        unsafe {
-            keybd_event(VK_MEDIA_PREV_TRACK, 0, KEYEVENTF_EXTENDEDKEY, 0);
-            keybd_event(
-                VK_MEDIA_PREV_TRACK,
-                0,
-                KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP,
-                0,
-            );
-        }
+        send_media_key(VK_MEDIA_PREV_TRACK);
     }
 }
