@@ -4,9 +4,8 @@
 
 ## Documentation
 
-| Guide                            | Description                                |
-|----------------------------------|--------------------------------------------|
-| [Calculator](docs/calculator.md) | Supported operators, functions, and syntax |
+- [Calculator](docs/calculator.md)
+- [Search Providers](docs/search-providers.md)
 
 ## License
 
