@@ -59,7 +59,8 @@
     "lock": "قفل کردن صفحه",
     "sleep": "حالت خواب",
     "restart": "راه‌اندازی مجدد",
-    "shutdown": "خاموش کردن"
+    "shutdown": "خاموش کردن",
+    "nextTrack": "آهنگ بعدی"
   },
   "omniwarp": {
     "settings": "تنظیمات"

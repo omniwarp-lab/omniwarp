@@ -27,3 +27,9 @@ pub fn shutdown_system(window: tauri::WebviewWindow) -> SystemResult<()> {
     let _ = window.hide();
     System::shutdown()
 }
+
+#[tauri::command]
+pub fn next_track(window: tauri::WebviewWindow) {
+    let _ = window.hide();
+    System::next_track();
+}

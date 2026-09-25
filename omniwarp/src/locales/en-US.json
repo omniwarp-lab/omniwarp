@@ -59,7 +59,8 @@
     "lock": "Lock Screen",
     "sleep": "Sleep",
     "restart": "Restart",
-    "shutdown": "Shut Down"
+    "shutdown": "Shut Down",
+    "nextTrack": "Next Track"
   },
   "omniwarp": {
     "settings": "Settings"

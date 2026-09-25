@@ -16,4 +16,8 @@ function shutdownSystem(): Promise<void> {
   return invoke('shutdown_system')
 }
 
-export { lockScreen, sleepSystem, restartSystem, shutdownSystem }
+function nextTrack(): Promise<void> {
+  return invoke('next_track')
+}
+
+export { lockScreen, sleepSystem, restartSystem, shutdownSystem, nextTrack }

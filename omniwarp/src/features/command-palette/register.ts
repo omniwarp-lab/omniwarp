@@ -11,6 +11,7 @@ import {
   MoonIcon,
   PowerIcon,
   RotateCwIcon,
+  SkipForwardIcon,
   Volume2Icon,
   VolumeXIcon,
 } from 'lucide-react'
@@ -71,6 +72,12 @@ async function registerCommandsGroup(): Promise<void> {
         icon: MicOffIcon,
         subgroup: 'sound',
         labelKey: 'sound.toggleMicrophoneMute',
+      },
+      {
+        id: 'commands:system.nextTrack',
+        icon: SkipForwardIcon,
+        subgroup: 'system',
+        labelKey: 'system.nextTrack',
       },
       {
         id: 'commands:system.lock',

@@ -4,6 +4,7 @@ import { openSettings } from '@/features/settings/commands.ts'
 import { toggleMicrophoneMute, toggleMute } from '@/features/sound/commands.ts'
 import {
   lockScreen,
+  nextTrack,
   restartSystem,
   shutdownSystem,
   sleepSystem,
@@ -40,10 +41,7 @@ async function handleSelect(value: string) {
       const query = useCommandStore.getState().query
       try {
         await searchWeb(
-          template.replace(
-            '{query}',
-            encodeURIComponent(query.trim()),
-          ),
+          template.replace('{query}', encodeURIComponent(query.trim())),
         )
       } catch (err) {
         await showAppError(err)
@@ -82,6 +80,8 @@ async function handleSelect(value: string) {
           await restartSystem()
         } else if (id === 'system.shutdown') {
           await shutdownSystem()
+        } else if (id === 'system.nextTrack') {
+          await nextTrack()
         }
       } catch (err) {
         await showAppError(err)
