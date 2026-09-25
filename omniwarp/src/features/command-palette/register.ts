@@ -107,11 +107,11 @@ async function registerCommandsGroup(): Promise<void> {
         iconColor: '#fff',
       },
       sound: {
-        gradient: 'bg-gradient-to-br from-[#587B99] to-[#293C50]',
+        gradient: 'bg-gradient-to-br from-slate-500 to-slate-700',
         iconColor: '#fff',
       },
       system: {
-        gradient: 'bg-gradient-to-br from-[#587B99] to-[#293C50]',
+        gradient: 'bg-gradient-to-br from-zinc-500 to-zinc-700',
         iconColor: '#fff',
       },
     },
