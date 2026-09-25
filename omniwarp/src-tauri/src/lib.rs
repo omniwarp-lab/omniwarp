@@ -53,7 +53,10 @@ use commands::search_providers::{
     update_search_provider, IconCache,
 };
 use commands::settings::{open_logs_dir, open_settings_window};
-use commands::sound::{get_volume, set_volume, toggle_microphone_mute, toggle_mute};
+use commands::sound::{
+    get_microphone_volume, get_volume, set_microphone_volume, set_volume, toggle_microphone_mute,
+    toggle_mute,
+};
 use commands::system::{lock_screen, restart_system, shutdown_system, sleep_system};
 use commands::tray::exit_app;
 use commands::web_search::{fetch_website_title, search_web};
@@ -215,6 +218,8 @@ pub fn run() {
             toggle_microphone_mute,
             get_volume,
             set_volume,
+            get_microphone_volume,
+            set_microphone_volume,
             lock_screen,
             sleep_system,
             restart_system,

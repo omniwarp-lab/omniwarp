@@ -16,10 +16,11 @@ import { useGroupNavigation } from '@/features/command-palette/hooks/useGroupNav
 import { useConfirmation } from '@/features/command-palette/hooks/useConfirmation.ts'
 import { PaletteItem } from '@/features/command-palette/types'
 import { CalculatorHeroItem } from '@/features/calculator/components'
-import { VolumeDialog } from '@/features/sound/components/volume-dialog'
-import { getVolume } from '@/features/sound/commands'
+import { VolumeDialog } from '@/features/sound/components'
+import { getMicrophoneVolume, getVolume } from '@/features/sound/commands'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { useTranslation } from 'react-i18next'
+import { AudioDirection } from '@/features/sound/types'
 
 function CommandPalette() {
   const { t } = useTranslation()
@@ -27,7 +28,10 @@ function CommandPalette() {
   const setQuery = useCommandStore((s) => s.setQuery)
   const [activeItem, setActiveItem] = useState<PaletteItem | null>(null)
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false)
-  const [initialVolume, setInitialVolume] = useState<number | null>(null)
+  const [volumeDialog, setVolumeDialog] = useState<{
+    direction: AudioDirection
+    initialVolume: number
+  } | null>(null)
   const [shortcutsIsCalculator, setShortcutsIsCalculator] = useState<
     boolean | null
   >(null)
@@ -46,11 +50,14 @@ function CommandPalette() {
       setActiveItem(null)
       setIsShortcutsOpen(false)
     },
-    onOpenVolume: async () => {
+    onOpenVolume: async (direction: AudioDirection) => {
       setActiveItem(null)
       setIsShortcutsOpen(false)
-      const vol = await getVolume().catch(() => 0)
-      setInitialVolume(vol)
+      const vol =
+        direction === 'input'
+          ? await getMicrophoneVolume().catch(() => 0)
+          : await getVolume().catch(() => 0)
+      setVolumeDialog({ direction, initialVolume: vol })
     },
   })
 
@@ -83,7 +90,7 @@ function CommandPalette() {
       setActiveItem(null)
       setIsShortcutsOpen(false)
       handleCloseConfirmation()
-      setInitialVolume(null)
+      setVolumeDialog(null)
     }
 
     const unlisten = getCurrentWindow().onFocusChanged(
@@ -206,7 +213,7 @@ function CommandPalette() {
       return
     }
 
-    if (confirmingItem || initialVolume !== null) return
+    if (confirmingItem || volumeDialog !== null) return
 
     if (e.altKey && (e.key.toLowerCase() === 'a' || e.code === 'KeyA')) {
       e.preventDefault()
@@ -313,11 +320,12 @@ function CommandPalette() {
         />
       )}
 
-      {initialVolume !== null && (
+      {volumeDialog !== null && (
         <VolumeDialog
-          initialVolume={initialVolume}
+          direction={volumeDialog.direction}
+          initialVolume={volumeDialog.initialVolume}
           onClose={() => {
-            setInitialVolume(null)
+            setVolumeDialog(null)
             requestAnimationFrame(() => {
               inputRef.current?.focus()
             })

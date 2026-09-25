@@ -50,6 +50,7 @@
   },
   "sound": {
     "setVolume": "Set Volume",
+    "setMicrophoneVolume": "Set Microphone Volume",
     "adjustVolume": "Adjust",
     "toggleMute": "Toggle Mute",
     "toggleMicrophoneMute": "Toggle Microphone Mute"

@@ -1,11 +1,12 @@
 import { useCallback, useState } from 'react'
 import { PaletteItem } from '@/features/command-palette/types.ts'
 import { handleSelect } from '@/features/command-palette/handlers.ts'
+import { AudioDirection } from '@/features/sound/types'
 
 interface UseConfirmationOptions {
   inputRef: React.RefObject<HTMLInputElement | null>
   onOpenConfirmation?: () => void
-  onOpenVolume?: () => Promise<void>
+  onOpenVolume?: (direction: AudioDirection) => Promise<void>
 }
 
 interface UseConfirmationReturn {
@@ -32,7 +33,11 @@ function useConfirmation({
   const handleItemSelect = useCallback(
     async (item: PaletteItem) => {
       if (item.id === 'commands:sound.setVolume') {
-        await onOpenVolume?.()
+        await onOpenVolume?.('output')
+        return
+      }
+      if (item.id === 'commands:sound.setMicrophoneVolume') {
+        await onOpenVolume?.('input')
         return
       }
       if (item.destructive) {

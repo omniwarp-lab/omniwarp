@@ -16,5 +16,20 @@ function setVolume(percent: number): Promise<void> {
   return invoke('set_volume', { percent })
 }
 
-export { toggleMute, toggleMicrophoneMute, getVolume, setVolume }
+function getMicrophoneVolume(): Promise<number> {
+  return invoke('get_microphone_volume')
+}
+
+function setMicrophoneVolume(percent: number): Promise<void> {
+  return invoke('set_microphone_volume', { percent })
+}
+
+export {
+  toggleMute,
+  toggleMicrophoneMute,
+  getVolume,
+  setVolume,
+  getMicrophoneVolume,
+  setMicrophoneVolume,
+}
 

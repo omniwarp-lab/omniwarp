@@ -50,6 +50,7 @@
   },
   "sound": {
     "setVolume": "تنظیم صدا",
+    "setMicrophoneVolume": "تنظیم صدای میکروفون",
     "adjustVolume": "تنظیم",
     "toggleMute": "قطع/وصل صدا",
     "toggleMicrophoneMute": "قطع/وصل میکروفون"

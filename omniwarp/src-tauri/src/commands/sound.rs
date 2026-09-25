@@ -26,3 +26,15 @@ pub fn set_volume(percent: u32) -> SoundResult<()> {
     Sound::set_volume(percent)
 }
 
+#[tauri::command]
+#[tracing::instrument(skip_all, err)]
+pub fn get_microphone_volume() -> SoundResult<u32> {
+    Sound::get_microphone_volume()
+}
+
+#[tauri::command]
+#[tracing::instrument(skip_all, err)]
+pub fn set_microphone_volume(percent: u32) -> SoundResult<()> {
+    Sound::set_microphone_volume(percent)
+}
+

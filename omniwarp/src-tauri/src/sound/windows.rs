@@ -27,6 +27,26 @@ fn toggle_endpoint_mute(data_flow: EDataFlow, role: ERole) -> SoundResult<bool> 
     }
 }
 
+fn get_endpoint_volume(data_flow: EDataFlow, role: ERole) -> SoundResult<u32> {
+    let endpoint_volume = get_default_endpoint_volume(data_flow, role)?;
+    unsafe {
+        let level = endpoint_volume.GetMasterVolumeLevelScalar()?;
+        Ok((level * 100.0).round() as u32)
+    }
+}
+
+fn set_endpoint_volume(data_flow: EDataFlow, role: ERole, percent: u32) -> SoundResult<()> {
+    let endpoint_volume = get_default_endpoint_volume(data_flow, role)?;
+    let clamped = percent.min(100);
+    unsafe {
+        if endpoint_volume.GetMute()?.as_bool() && clamped > 0 {
+            endpoint_volume.SetMute(false, std::ptr::null())?;
+        }
+        endpoint_volume.SetMasterVolumeLevelScalar(clamped as f32 / 100.0, std::ptr::null())?;
+    }
+    Ok(())
+}
+
 impl Sound {
     pub fn toggle_mute() -> SoundResult<()> {
         toggle_endpoint_mute(eRender, eConsole)?;
@@ -38,23 +58,19 @@ impl Sound {
     }
 
     pub fn get_volume() -> SoundResult<u32> {
-        let endpoint_volume = get_default_endpoint_volume(eRender, eConsole)?;
-        unsafe {
-            let level = endpoint_volume.GetMasterVolumeLevelScalar()?;
-            Ok((level * 100.0).round() as u32)
-        }
+        get_endpoint_volume(eRender, eConsole)
     }
 
     pub fn set_volume(percent: u32) -> SoundResult<()> {
-        let endpoint_volume = get_default_endpoint_volume(eRender, eConsole)?;
-        let clamped = percent.min(100);
-        unsafe {
-            if endpoint_volume.GetMute()?.as_bool() && clamped > 0 {
-                endpoint_volume.SetMute(false, std::ptr::null())?;
-            }
-            endpoint_volume.SetMasterVolumeLevelScalar(clamped as f32 / 100.0, std::ptr::null())?;
-        }
-        Ok(())
+        set_endpoint_volume(eRender, eConsole, percent)
+    }
+
+    pub fn get_microphone_volume() -> SoundResult<u32> {
+        get_endpoint_volume(eCapture, eCommunications)
+    }
+
+    pub fn set_microphone_volume(percent: u32) -> SoundResult<()> {
+        set_endpoint_volume(eCapture, eCommunications, percent)
     }
 }
 

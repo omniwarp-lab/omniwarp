@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next'
 import {
   ArrowLeftRight,
   ArrowUpDown,
+  Mic,
+  MicOff,
   Volume1,
   Volume2,
   VolumeX,
@@ -14,10 +16,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { setVolume } from '@/features/sound/commands'
+import { setMicrophoneVolume, setVolume } from '@/features/sound/commands'
+import { AudioDirection } from '@/features/sound/types'
 
 interface VolumeDialogProps {
   initialVolume: number
+  direction?: AudioDirection
   onClose: () => void
 }
 
@@ -28,11 +32,18 @@ const getAcceleratedStep = (count: number): number => {
   return 5
 }
 
-function VolumeDialog({ initialVolume, onClose }: VolumeDialogProps) {
+function VolumeDialog({
+  initialVolume,
+  direction = 'output',
+  onClose,
+}: VolumeDialogProps) {
   const { t, i18n } = useTranslation()
   const dir = i18n.dir()
 
-  const normalizedInitial = Math.max(0, Math.min(100, Math.round(initialVolume)))
+  const normalizedInitial = Math.max(
+    0,
+    Math.min(100, Math.round(initialVolume)),
+  )
   const [volume, setVolumeState] = useState(normalizedInitial)
   const [isDragging, setIsDragging] = useState(false)
 
@@ -50,7 +61,11 @@ function VolumeDialog({ initialVolume, onClose }: VolumeDialogProps) {
       const val = targetVolumeRef.current
       targetVolumeRef.current = null
       try {
-        await setVolume(val)
+        if (direction === 'input') {
+          await setMicrophoneVolume(val)
+        } else {
+          await setVolume(val)
+        }
       } catch {
         // noop
       }
@@ -137,7 +152,21 @@ function VolumeDialog({ initialVolume, onClose }: VolumeDialogProps) {
     }
   }
 
-  const VolumeIcon = volume === 0 ? VolumeX : volume < 50 ? Volume1 : Volume2
+  const IconComponent =
+    direction === 'input'
+      ? volume === 0
+        ? MicOff
+        : Mic
+      : volume === 0
+        ? VolumeX
+        : volume < 50
+          ? Volume1
+          : Volume2
+
+  const title =
+    direction === 'input'
+      ? t('sound.setMicrophoneVolume')
+      : t('sound.setVolume')
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
@@ -151,9 +180,9 @@ function VolumeDialog({ initialVolume, onClose }: VolumeDialogProps) {
           <DialogTitle className='flex items-center justify-between text-sm font-semibold text-foreground tracking-tight'>
             <div className='flex items-center gap-2.5'>
               <div className='flex size-6 shrink-0 items-center justify-center text-muted-foreground'>
-                <VolumeIcon className='size-4' />
+                <IconComponent className='size-4' />
               </div>
-              <span>{t('sound.setVolume')}</span>
+              <span>{title}</span>
             </div>
 
             <span className='text-sm font-mono font-semibold tabular-nums text-muted-foreground'>

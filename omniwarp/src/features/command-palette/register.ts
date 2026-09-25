@@ -6,6 +6,7 @@ import {
   BoltIcon,
   Gamepad2Icon,
   LockIcon,
+  MicIcon,
   MicOffIcon,
   MoonIcon,
   PowerIcon,
@@ -58,6 +59,12 @@ async function registerCommandsGroup(): Promise<void> {
         icon: VolumeXIcon,
         subgroup: 'sound',
         labelKey: 'sound.toggleMute',
+      },
+      {
+        id: 'commands:sound.setMicrophoneVolume',
+        icon: MicIcon,
+        subgroup: 'sound',
+        labelKey: 'sound.setMicrophoneVolume',
       },
       {
         id: 'commands:sound.toggleMicrophoneMute',
