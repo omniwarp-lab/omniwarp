@@ -7,6 +7,28 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **Search providers management** in settings:
+    - Dedicated Search Providers tab with a scrollable table and fixed header.
+    - Global toggle to enable or disable search providers in the command palette.
+    - Ability to toggle visibility for individual search providers and reorder them.
+    - Support for adding, editing, and deleting custom search providers.
+    - Automatic website title detection when pasting a provider URL.
+    - Automatic detection and insertion of `{query}` placeholders from common URL query parameters.
+    - Automatic favicon fetching, format conversion, and live previews.
+    - Local SQLite database persistence for search providers and cached icons.
+- **Sound commands** in the command palette:
+    - Commands to toggle system audio mute and microphone mute.
+    - Commands to set system volume and microphone volume.
+    - Interactive volume dialog with slider dragging, accelerated keyboard adjustments, and level indicators.
+- **Media playback controls** in the command palette:
+    - System commands for Play / Pause, Next Track, and Previous Track.
+
+### Changed
+
+- Updated the gradient background for the System subgroup in the command palette.
+
 ## [0.2.0] - 2026-09-19
 
 ### Added
