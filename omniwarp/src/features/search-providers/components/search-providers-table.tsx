@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Switch, SwitchThumb } from '@/components/ui/switch'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { useSearchProvidersStore } from '@/features/search-providers/store'
 import { AddSearchProviderDialog } from '@/features/search-providers/components/add-search-provider-dialog'
 import type { SearchProvider } from '@/features/search-providers/types'
@@ -51,6 +52,11 @@ function SearchProvidersHeaderSwitch() {
   const { t } = useTranslation()
   const enabled = useSearchProvidersStore((s) => s.enabled)
   const setEnabled = useSearchProvidersStore((s) => s.setEnabled)
+  const label = t(
+    enabled
+      ? 'settings.searchProvidersTable.disableProviders'
+      : 'settings.searchProvidersTable.enableProviders',
+  )
 
   return (
     <div className='flex h-7 items-center'>
@@ -58,16 +64,8 @@ function SearchProvidersHeaderSwitch() {
         dir='ltr'
         checked={enabled}
         onCheckedChange={(checked) => void setEnabled(checked)}
-        title={
-          enabled
-            ? t('settings.searchProvidersTable.disableProviders')
-            : t('settings.searchProvidersTable.enableProviders')
-        }
-        aria-label={
-          enabled
-            ? t('settings.searchProvidersTable.disableProviders')
-            : t('settings.searchProvidersTable.enableProviders')
-        }
+        title={label}
+        aria-label={label}
       >
         <SwitchThumb className='rtl:data-checked:translate-x-4 duration-150 ease-out' />
       </Switch>
@@ -249,15 +247,12 @@ function SearchProvidersTable() {
       <div
         dir='ltr'
         aria-disabled={!enabled}
-        className='overflow-hidden rounded-xl border border-border bg-card'
+        className='flex max-h-full min-h-0 flex-col overflow-hidden rounded-xl border border-border bg-card'
       >
-        <table className='w-full table-fixed border-collapse text-left text-xs'>
-          <thead>
+        <table className='w-full shrink-0 table-fixed border-collapse text-left text-xs'>
+          <thead className='border-b border-border bg-muted/40'>
             {table.getHeaderGroups().map((headerGroup) => (
-              <tr
-                key={headerGroup.id}
-                className='border-b border-border bg-muted/40'
-              >
+              <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
                   <th
                     key={header.id}
@@ -266,47 +261,50 @@ function SearchProvidersTable() {
                       COLUMN_STYLES[header.id],
                     )}
                   >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
+                    {flexRender(
+                      header.column.columnDef.header,
+                      header.getContext(),
+                    )}
                   </th>
                 ))}
               </tr>
             ))}
           </thead>
-          <tbody
-            className={cn(
-              'divide-y divide-border transition-opacity',
-              !enabled &&
-                'pointer-events-none select-none opacity-40',
-            )}
-          >
-            {table.getRowModel().rows.map((row) => (
-              <tr
-                key={row.id}
-                className={cn(
-                  'transition-colors hover:bg-muted/30',
-                  !row.original.enabled && 'opacity-50',
-                )}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <td
-                    key={cell.id}
-                    className={cn(
-                      'py-2.5 align-middle',
-                      COLUMN_STYLES[cell.column.id],
-                    )}
-                  >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
         </table>
+
+        <ScrollArea className='min-h-0 flex-1'>
+          <table className='w-full table-fixed border-collapse text-left text-xs'>
+            <tbody
+              className={cn(
+                'divide-y divide-border transition-opacity',
+                !enabled &&
+                  'pointer-events-none select-none opacity-40',
+              )}
+            >
+              {table.getRowModel().rows.map((row) => (
+                <tr
+                  key={row.id}
+                  className={cn(
+                    'transition-colors hover:bg-muted/30',
+                    !row.original.enabled && 'opacity-50',
+                  )}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <td
+                      key={cell.id}
+                      className={cn(
+                        'py-2.5 align-middle',
+                        COLUMN_STYLES[cell.column.id],
+                      )}
+                    >
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </ScrollArea>
       </div>
 
       <AddSearchProviderDialog

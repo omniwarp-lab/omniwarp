@@ -37,6 +37,7 @@ import {
   useCalculatorSettingsStore,
 } from '@/features/calculator/store'
 import { SearchProvidersTable } from '@/features/search-providers/components/search-providers-table'
+import { cn } from '@/lib/utils'
 
 function SettingsComponent() {
   const { t, i18n } = useTranslation()
@@ -291,7 +292,14 @@ function SettingsComponent() {
           onTabChange={setActiveTab}
         />
 
-        <div className='flex-1 overflow-y-auto p-3'>
+        <div
+          className={cn(
+            'flex-1 p-3',
+            activeTab === 'searchProviders'
+              ? 'flex min-h-0 flex-col overflow-hidden'
+              : 'overflow-y-auto',
+          )}
+        >
           {activeTab === 'general' && <SettingsList items={generalSettings} />}
           {activeTab === 'calculator' && (
             <SettingsList items={calculatorSettings} />
