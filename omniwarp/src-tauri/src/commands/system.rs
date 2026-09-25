@@ -33,3 +33,9 @@ pub fn next_track(window: tauri::WebviewWindow) {
     let _ = window.hide();
     System::next_track();
 }
+
+#[tauri::command]
+pub fn previous_track(window: tauri::WebviewWindow) {
+    let _ = window.hide();
+    System::previous_track();
+}

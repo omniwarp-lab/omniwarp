@@ -20,4 +20,15 @@ function nextTrack(): Promise<void> {
   return invoke('next_track')
 }
 
-export { lockScreen, sleepSystem, restartSystem, shutdownSystem, nextTrack }
+function previousTrack(): Promise<void> {
+  return invoke('previous_track')
+}
+
+export {
+  lockScreen,
+  sleepSystem,
+  restartSystem,
+  shutdownSystem,
+  nextTrack,
+  previousTrack,
+}

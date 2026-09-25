@@ -60,7 +60,8 @@
     "sleep": "Sleep",
     "restart": "Restart",
     "shutdown": "Shut Down",
-    "nextTrack": "Next Track"
+    "nextTrack": "Next Track",
+    "previousTrack": "Previous Track"
   },
   "omniwarp": {
     "settings": "Settings"

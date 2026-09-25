@@ -60,7 +60,8 @@
     "sleep": "حالت خواب",
     "restart": "راه‌اندازی مجدد",
     "shutdown": "خاموش کردن",
-    "nextTrack": "آهنگ بعدی"
+    "nextTrack": "آهنگ بعدی",
+    "previousTrack": "آهنگ قبلی"
   },
   "omniwarp": {
     "settings": "تنظیمات"

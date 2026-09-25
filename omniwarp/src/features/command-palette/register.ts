@@ -11,6 +11,7 @@ import {
   MoonIcon,
   PowerIcon,
   RotateCwIcon,
+  SkipBackIcon,
   SkipForwardIcon,
   Volume2Icon,
   VolumeXIcon,
@@ -72,6 +73,12 @@ async function registerCommandsGroup(): Promise<void> {
         icon: MicOffIcon,
         subgroup: 'sound',
         labelKey: 'sound.toggleMicrophoneMute',
+      },
+      {
+        id: 'commands:system.previousTrack',
+        icon: SkipBackIcon,
+        subgroup: 'system',
+        labelKey: 'system.previousTrack',
       },
       {
         id: 'commands:system.nextTrack',
