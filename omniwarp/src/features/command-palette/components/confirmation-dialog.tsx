@@ -1,9 +1,8 @@
 import { useTranslation } from 'react-i18next'
-import { CornerDownLeft } from 'lucide-react'
+import { CornerDownLeft, type LucideIcon } from 'lucide-react'
 import { PaletteItem } from '@/features/command-palette/types'
 import { Kbd } from '@/components/ui/kbd'
 import { Button } from '@/components/ui/button'
-import { CommandIconRenderer } from '@/features/command-palette/components/icon-renderer'
 import {
   Dialog,
   DialogContent,
@@ -26,6 +25,8 @@ function ConfirmationDialog({
 }: ConfirmationDialogProps) {
   const { t, i18n } = useTranslation()
   const dir = i18n.dir()
+
+  const Icon = item.icon as LucideIcon
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Tab') {
@@ -55,12 +56,8 @@ function ConfirmationDialog({
       >
         <DialogHeader dir={dir} className='p-5 pb-4 gap-2 text-start'>
           <DialogTitle className='flex items-center gap-2.5 text-sm font-semibold text-foreground tracking-tight'>
-            <div className='flex size-6 shrink-0 items-center justify-center'>
-              <CommandIconRenderer
-                icon={item.icon}
-                config={item.subgroupConfig}
-                isRunning={item.isRunning}
-              />
+            <div className='flex size-6 shrink-0 items-center justify-center text-muted-foreground'>
+              <Icon className='size-4' />
             </div>
             <span>{item.label}</span>
           </DialogTitle>
